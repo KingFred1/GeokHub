@@ -1,0 +1,98 @@
+// "use client"
+
+// import React, { useState, useRef, useEffect } from "react";
+// import DetailsSocialShare from "./DetailsSocialShare";
+// import { Post } from "@/sanity/types";
+// import { FaShareAlt } from "react-icons/fa";
+
+// const CardOptions = ({ post }: { post: Post }) => {
+//   const { title, _id, excerpt, slug } = post;
+
+//     const postSlug = slug?.current ? `/blogs/${slug.current}` : "#";
+
+
+//   const [showOptions, setShowOptions] = useState(false);
+//   const [showShareOptions, setShowShareOptions] = useState(false);
+//   const optionsRef = useRef<HTMLDivElement>(null);
+//   const shareBtnRef = useRef<HTMLButtonElement>(null);
+
+//   useEffect(() => {
+//     function handleClickOutside(event: MouseEvent) {
+//       if (
+//         optionsRef.current &&
+//         !optionsRef.current.contains(event.target as Node) &&
+//         (!shareBtnRef.current ||
+//           !shareBtnRef.current.contains(event.target as Node))
+//       ) {
+//         setShowOptions(false);
+//         setShowShareOptions(false);
+//       }
+//     }
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   return (
+//     <div>
+//       <div className="absolute right-3 top-3 z-20" ref={optionsRef}>
+//         <button
+//           className="rounded-full bg-gray-100 p-2 h-8 w-8 flex items-center justify-center shadow transition-opacity opacity-0 group-hover:opacity-100 focus:opacity-100 "
+//           onClick={() => {
+//             setShowOptions((v) => !v);
+//             setShowShareOptions(false);
+//           }}
+//           aria-label="Show options"
+//           type="button"
+//         >
+//           <span className="text-2xl font-semibold text-gray-900 items-center justify-center pb-4">...</span>
+//         </button>
+
+//         {/* Dropdown menu */}
+//         {showOptions && (
+//           <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 z-30">
+//             {/* <button
+//               className="block w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+//               onClick={() => {
+//                 setShowOptions(false);
+//                 // implement follow logic here
+//               }}
+//             >
+//               Follow
+//             </button> */}
+//             <button
+//               ref={shareBtnRef}
+//               className="block w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+//               onClick={() => {
+//                 setShowOptions(false);
+//                 setShowShareOptions(true);
+//               }}
+//             >
+//               <span className="flex items-center gap-2">
+//                 <FaShareAlt />
+//               <span>Share</span>
+//               </span>
+//             </button>
+//           </div>
+//         )}
+
+//         {/* Share dropdown (floating below the button) */}
+//         {showShareOptions && (
+//           <div className="absolute right-0 mt-2 w-56 z-50">
+//             <DetailsSocialShare
+//               postId={_id}
+//               postUrl={
+//                 typeof window !== "undefined"
+//                   ? `${window.location.origin}${postSlug}`
+//                   : postSlug
+//               }
+//               postTitle={title}
+//               postDescription={excerpt || ""}
+//             />
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CardOptions;

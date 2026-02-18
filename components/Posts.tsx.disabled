@@ -1,0 +1,196 @@
+// // components/Posts.tsx
+// import { urlFor } from "@/sanity/lib/image";
+// import { Post } from "@/sanity/types";
+// import Link from "next/link";
+// // import LikeButton from "./global/LikeButton";
+// // import CommentCount from "./global/CommentCount";
+// import CardOptions from "./global/CardOptions";
+// // import AdSenseAd from "./ads/AdSenseAd";
+// // import AdPlaceholder from "./ads/AdPlaceholder";
+// import { Clock, Calendar, ArrowRight } from "lucide-react";
+
+// function formatTimeShort(dateString: string): string {
+//   const date = new Date(dateString);
+//   const now = new Date();
+//   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+//   if (diffInSeconds < 60) return "just now";
+//   const diffInMinutes = Math.floor(diffInSeconds / 60);
+//   if (diffInMinutes < 60) return `${diffInMinutes}m`;
+//   const diffInHours = Math.floor(diffInMinutes / 60);
+//   if (diffInHours < 24) return `${diffInHours}h`;
+//   const diffInDays = Math.floor(diffInHours / 24);
+//   if (diffInDays < 7) return `${diffInDays}d`;
+//   const diffInWeeks = Math.floor(diffInDays / 7);
+//   return `${diffInWeeks}w`;
+// }
+
+// interface MasonryGridProps {
+//   posts: Post[];
+// }
+
+// export default function MasonryGrid({ posts }: MasonryGridProps) {
+//   // Handle undefined or empty posts
+//   if (!posts || posts.length === 0) {
+//     return (
+//       <div className="text-center py-16 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+//         <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+//         <div className="text-gray-500 text-lg mb-2">No articles found</div>
+//         <p className="text-gray-400 text-sm">
+//           There are no posts to display at this time.
+//         </p>
+//       </div>
+//     );
+//   }
+
+//   // Insert ads at strategic positions (after every 4th post)
+//   const contentWithAds = [];
+//   for (let i = 0; i < posts.length; i++) {
+//     // Add post
+//     contentWithAds.push(
+//       <PostCard key={`post-${posts[i]._id}`} post={posts[i]} index={i} />
+//     );
+
+//     // Insert ad after every 4th post (adjust frequency as needed)
+//     if ((i + 1) % 4 === 0 && i !== posts.length - 1) {
+//       const adIndex = i / 4 + 1;
+//       contentWithAds.push(
+//         <div key={`ad-${adIndex}`} className="col-span-1">
+//           {/* Use AdSenseAd when you have your AdSense ID, otherwise use placeholder */}
+//           {/* <AdPlaceholder size="small" className="h-48 sm:h-96" /> */}
+//           {/* <AdSenseAd slot={`${process.env.NEXT_PUBLIC_ADS_SLOT_PREFIX}_${adIndex}`} className="h-48 sm:h-96" /> */}
+//         </div>
+//       );
+//     }
+//   }
+
+//   return (
+//     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+//       {contentWithAds}
+//     </div>
+//   );
+// };
+
+// // Separate component for individual post cards
+// const PostCard = ({ post, index }: { post: Post; index: number }) => {
+//   const { title, slug, author, publishedAt, _updatedAt, categories } = post;
+
+//   const postSlug = slug?.current ? `/blogs/${slug.current}` : "#";
+//   const imageUrl = post.mainImage?.asset
+//   ? urlFor(post.mainImage)
+//       .width(1200)        
+//       .height(800)
+//       .quality(80)
+//       .format("webp")
+//       .auto("format")
+//       .url()
+//   : "/fallback-image.jpg";
+
+//   // Determine card size - every 6th post is featured
+//   const isFeatured = index % 6 === 0;
+//   const gridSpan = isFeatured 
+//     ? "sm:col-span-2 lg:col-span-2" 
+//     : "col-span-1";
+
+//   return (
+//     <article
+//       className={`group relative overflow-hidden rounded-lg sm:rounded-xl bg-card dark:bg-card shadow-md hover:shadow-lg sm:hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0 sm:hover:-translate-y-1 ${gridSpan} h-80 sm:h-96`}
+//     >
+//       {/* Card Options */}
+//       <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30">
+//         <CardOptions post={post} />
+//       </div>
+
+//       <Link href={postSlug} className="block w-full h-full">
+//         {/* Image Container - Full height */}
+//         <div className="absolute inset-0">
+//           <img
+//             src={imageUrl}
+//             width={1200}
+//             height={800}
+//             alt={title}
+//             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+//             loading={index < 3 ? "eager" : "lazy"}
+//           />
+          
+//           {/* Lighter gradient overlay for better readability */}
+//           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+//         </div>
+
+//         {/* Content Overlay */}
+//         <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-5 z-20">
+//           {/* Category tag - more subtle */}
+//           <div className="mb-2">
+//             <span className="inline-block bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white px-2 py-1 rounded text-xs font-medium uppercase">
+//               {categories?.[0]?.title || "News"}
+//             </span>
+//           </div>
+
+//           {/* Title with better contrast */}
+//           <h2 className="text-lg sm:text-xl font-semibold text-white mb-2 leading-tight drop-shadow-md line-clamp-2">
+//             {title}
+//           </h2>
+
+//           {/* Excerpt - limited to 2 lines */}
+//           {excerpt && (
+//             <p className="text-gray-200 text-xs sm:text-sm mb-3 line-clamp-2 drop-shadow-md hidden sm:block">
+//               {excerpt}
+//             </p>
+//           )}
+
+//           {/* Author and metadata */}
+//           <div className="flex items-center justify-between mb-3">
+//             <div className="flex items-center">
+//               {author?.image && (
+//                 <img
+//                   src={urlFor(author.image).url()}
+//                   width={28}
+//                   height={28}
+//                   alt={author?.name || "Author"}
+//                   className="rounded-full mr-2 h-5 w-5 sm:h-6 sm:w-6 border border-white/30"
+//                   loading="lazy"
+//                 />
+//               )}
+//               <span className="text-white text-xs sm:text-sm font-medium drop-shadow-md">
+//                 {author?.name}
+//               </span>
+//             </div>
+
+//             <div className="flex items-center text-gray-200 text-xs drop-shadow-md">
+//               <Clock className="h-3 w-3 mr-1" />
+//               <time dateTime={publishedAt}>
+//                 {formatTimeShort(_updatedAt || publishedAt)}
+//               </time>
+//             </div>
+//           </div>
+
+//           {/* Engagement and action buttons */}
+//           <div className="flex items-center justify-between pt-3 border-t border-white/20">
+//             {/* <div className="flex items-center space-x-2 sm:space-x-3">
+//               <LikeButton postId={_id} variant="light" size="sm" />
+//               <Link 
+//                 href={`/blogs/${slug?.current}/#comments`}
+//                 className="flex items-center text-white/80 hover:text-white transition-colors"
+//               >
+//                 <CommentCount postId={_id} variant="light" size="sm" />
+//               </Link>
+//             </div> */}
+            
+//             {/* Read more button */}
+//             <div className="flex items-center text-white text-xs sm:text-sm font-medium">
+//               Read more
+//               <ArrowRight className="h-3 w-3 ml-1 transform group-hover:translate-x-1 transition-transform" />
+//             </div>
+//           </div>
+//         </div>
+//       </Link>
+
+//       {/* Featured badge - more subtle */}
+//       {isFeatured && (
+//         <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium uppercase z-30">
+//           Featured
+//         </div>
+//       )}
+//     </article>
+//   );
+// };

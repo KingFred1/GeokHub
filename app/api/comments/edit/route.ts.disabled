@@ -1,0 +1,32 @@
+// import { NextResponse } from "next/server";
+// import { eq, and } from "drizzle-orm";
+// import { db } from "@/database/drizzle";
+// import { comments } from "@/database/schema";
+// import { auth } from "@/auth";
+
+// export async function PUT(req: Request) {
+//   try {
+//     const session = await auth();
+//     const { commentId, content } = await req.json();
+
+//     if (!session || !session.user?.id) {
+//       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//     }
+
+//     if (!commentId || !content) {
+//       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+//     }
+
+//     // Optional: Ensure the user is the owner of the comment
+//     await db
+//       .update(comments)
+//       .set({ content })
+//       .where(and(eq(comments.id, commentId), eq(comments.userId, session.user.id)));
+
+//     return NextResponse.json({ message: "Comment updated" });
+//   } catch (error) {
+//     console.error("Edit error:", error);
+//     return NextResponse.json({ error: "Server error" }, { status: 500 });
+//   }
+// }
+

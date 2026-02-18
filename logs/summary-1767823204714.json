@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-01-07T22:00:04.713Z",
+  "totalPosts": 794,
+  "successCount": 794,
+  "errorCount": 0,
+  "successRate": "100.0%",
+  "successMethods": {
+    "api": 0,
+    "direct": 794,
+    "direct-legacy": 0
+  },
+  "totalTimeMinutes": "25.5",
+  "avgTimePerPost": 1500,
+  "baseUrl": "https://www.geokhub.com",
+  "keyFileAccessible": true,
+  "apiConnected": false
+}

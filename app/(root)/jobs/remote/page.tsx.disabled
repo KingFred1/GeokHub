@@ -1,0 +1,49 @@
+// import SubCatSkeleton from '@/components/global/skeleton/SubCatSkeleton';
+// import MasonryGrid from '@/components/World';
+// import { client } from '@/sanity/lib/client';
+// import { BLOG_BY_CATEGORY_SLUG } from '@/sanity/lib/queries';
+// import { Suspense } from 'react';
+
+// export const dynamic = 'force-dynamic' // Ensure dynamic fetching
+// export const revalidate = 0 // Disable static caching
+
+// // Server component that fetches data
+// async function WorldContent() {
+//   const mainBlogs = await client.fetch(BLOG_BY_CATEGORY_SLUG, { slug: "world" },
+//     {
+//           cache: 'no-store', // Equivalent to dynamic fetching
+//           next: { 
+//             tags: ['news/world'], // Add revalidation tag
+//             revalidate: 30 // Fallback revalidation every 30 seconds
+//           }
+//         }
+//   );
+//   return <MasonryGrid post={mainBlogs} />;
+// }
+
+
+
+// // Main page component
+// export default function World() {
+//   return (
+//     <div className='w-full min-h-screen relative overflow-hidden md:px-20 mt-4'>
+//       <div>
+//         <Suspense fallback={<SubCatSkeleton />}>
+          
+//           <WorldContent />
+//         </Suspense>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export const metadata = {
+//   title: 'World',
+//   description: 'Get update on world news',
+//   keywords: ['world', 'news', 'international'],
+// };
+
+// export const viewport = {
+//   width: 'device-width',
+//   initialScale: 1,
+// };

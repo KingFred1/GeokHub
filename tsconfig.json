@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/sitemap.xl",
+    "components/global/skeleton",
+    "scripts/bulk-index.js",
+    "lib/google-indexing.ts",
+    ".next\\dev/types/**/*.ts",
+    ".next\\dev/types/**/*.ts",
+    "app/api/comments/count/route.ts.disabled",
+    "app/api/comments/edit/route.ts.disabled",
+    "app/api/comments/likes/route.ts.disabled",
+    "app/api/comments/reactions/route.ts.disabled",
+    "app/api/comments/route.ts",
+    "app/api/like/route.ts",
+    "app/api/likes/route.ts",
+    "app/(root)/courses/layout.tsx",
+    "app/(root)/jobs/page.tsx.disabled",
+    "app/(root)/jobs/remote/page.tsx.disabled",
+    "app/api/indexnow/route.ts",
+    "components/Posts.tsx.disabled",
+    "components/global/CardOptions.tsx.disabled",
+    "app/api/revalidate/route.ts.disabled",
+    "components/CodeCopyScript.tsx.disable",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

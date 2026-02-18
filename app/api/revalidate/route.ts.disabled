@@ -1,0 +1,27 @@
+// import { NextResponse } from 'next/server'
+// import { revalidatePath } from 'next/cache'
+
+// export async function POST(request: Request) {
+//   const secret = request.headers.get('x-sanity-secret')
+  
+//   // Verify secret
+//   if (secret !== process.env.NEXT_PUBLIC_SANITY_REVALIDATE_SECRET) {
+//     return NextResponse.json({ message: 'Invalid secret' }, { status: 401 })
+//   }
+
+//   // Revalidate specific paths
+//   revalidatePath('/news')
+//   revalidatePath('/news/world') 
+//   revalidatePath('/news/entertainment')
+//   revalidatePath('/news/politics') 
+//   revalidatePath('/news/health')
+//   revalidatePath('/news/technology')
+
+//   revalidatePath('/') // Optional: revalidate homepage if needed
+  
+//   return NextResponse.json({ 
+//     revalidated: true, 
+//     now: Date.now(),
+//     paths: ['/news', '/news/world', '/news/entertainment', '/news/politics', '/news/health', '/news/technology',  '/'] 
+//   })
+// }

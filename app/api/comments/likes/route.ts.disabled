@@ -1,0 +1,94 @@
+// import { NextResponse } from "next/server";
+// import { and, eq, sql } from "drizzle-orm";
+// import { db } from "@/database/drizzle";
+// import { likes } from "@/database/schema";
+
+// // ✅ Get Likes Count + User Like Status
+// // ✅ Get Likes Count + User Like Status
+// export async function GET(req: Request) {
+//   try {
+//     const { searchParams } = new URL(req.url);
+//     const commentId = searchParams.get("commentId");
+//     const postId = searchParams.get("postId");
+//     const userId = searchParams.get("userId");
+
+//     if (!commentId && !postId) {
+//       return NextResponse.json({ error: "Comment ID or Post ID required" }, { status: 400 });
+//     }
+
+//     // Correct the query to count likes based on commentId or postId
+//     const likeCondition = commentId
+//       ? eq(likes.commentId, commentId)
+//       : eq(likes.postId, postId);
+
+//     // Fetch likes count
+//     const likesCountResult = await db
+//       .select({ likes: sql<number>`COUNT(*)` })
+//       .from(likes)
+//       .where(likeCondition);
+
+//     // Check if the user has liked the comment/post
+//     const userLikedResult = userId
+//       ? await db
+//           .select()
+//           .from(likes)
+//           .where(and(likeCondition, eq(likes.userId, userId)))
+//           .limit(1)
+//       : [];
+
+//     return NextResponse.json({
+//       likesCount: likesCountResult[0]?.likes || 0, // Safely accessing likes count
+//       userLiked: userLikedResult.length > 0, // If user has liked the comment/post
+//     });
+//   } catch (error) {
+//     console.error("Error in GET /comments/likes:", error);
+//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+//   }
+// }
+
+
+// // ✅ Toggle Like
+// export async function POST(req: Request) {
+//   try {
+//     const { commentId, postId, userId } = await req.json();
+
+//     if (!userId) {
+//       return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+//     }
+//     if (!commentId && !postId) {
+//       return NextResponse.json({ error: "Comment ID or Post ID required" }, { status: 400 });
+//     }
+
+//     const likeCondition = commentId
+//       ? eq(likes.commentId, commentId)
+//       : eq(likes.postId, postId);
+
+//     const userLiked = await db
+//       .select()
+//       .from(likes)
+//       .where(and(likeCondition, eq(likes.userId, userId)))
+//       .limit(1);
+
+//     if (userLiked.length > 0) {
+//       // Unlike
+//       await db.delete(likes).where(and(likeCondition, eq(likes.userId, userId)));
+//     } else {
+//       // Like
+//       await db.insert(likes).values({ commentId, postId, userId });
+//     }
+
+//     // Recalculate the like count
+//     const likesCountResult = await db
+//       .select({ likes: sql<number>`COUNT(*)` })
+//       .from(likes)
+//       .where(likeCondition);
+
+//     return NextResponse.json({
+//       likesCount: likesCountResult[0]?.likes || 0,
+//       userLiked: userLiked.length === 0, // If not liked, user now likes it
+//     });
+//   } catch (error) {
+//     console.error("Error in POST /comments/likes:", error);
+//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+//   }
+// }
