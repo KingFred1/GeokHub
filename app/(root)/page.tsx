@@ -1,7 +1,6 @@
 import { SEARCH_QUERY } from "@/sanity/lib/queries";
 import { client } from "@/sanity/lib/client";
 import { Metadata } from "next";
-import HomeSkeleton from "@/components/global/skeleton/HomeSkeleton";
 import Link from "next/link";
 
 // lightweight arrow icon to avoid pulling in the lucide-react bundle
@@ -139,7 +138,7 @@ export default async function Home({
         {!searchTerm && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-2">
             <div className="lg:col-span-6 col-span-12">
-              <ClientOnlySwipeBlog posts={forYou.slice(0, 2)} />
+              {/* <ClientOnlySwipeBlog posts={forYou.slice(0, 2)} /> */}
             </div>
             <div className="lg:col-span-6 col-span-12">
               <div className="md:mt-7">
@@ -161,7 +160,7 @@ export default async function Home({
         {!searchTerm && (
           <>
             <TextNewsGrid posts={forYou.slice(2, 5)} />
-            <ClientOnlyGadgetsSection post={gadgets} />
+            {/* <ClientOnlyGadgetsSection post={gadgets} /> */}
             <div className="mb-12">
               <LatestNews posts={latestNews.slice(2, 8)} />
             </div>
