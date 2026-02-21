@@ -124,7 +124,7 @@ const HomeContent = async ({ searchTerm }: { searchTerm?: string }) => {
               <HydrationFix 
                 fallback={<div className="min-h-[400px] animate-pulse bg-gray-100 rounded-lg" />}
               >
-                <LatestNews posts={latestNews.slice(2, 8)} />
+                {/* <LatestNews posts={latestNews.slice(2, 8)} /> */}
               </HydrationFix>
             </div>
 
@@ -139,7 +139,7 @@ const HomeContent = async ({ searchTerm }: { searchTerm?: string }) => {
                       key={post._id}
                       fallback={<div className="min-h-[300px] animate-pulse bg-gray-100 rounded-lg" />}
                     >
-                      <HomeBlog post={post} />
+                      {/* <HomeBlog post={post} /> */}
                     </HydrationFix>
                   )
                 ))}
@@ -160,7 +160,7 @@ const HomeContent = async ({ searchTerm }: { searchTerm?: string }) => {
               <HydrationFix 
                 fallback={<div className="min-h-[400px] animate-pulse bg-gray-100 rounded-lg" />}
               >
-                <TechnologyCat posts={technology} />
+                {/* <TechnologyCat posts={technology} /> */}
               </HydrationFix>
             </div>
           </>
@@ -176,7 +176,7 @@ const HomeContent = async ({ searchTerm }: { searchTerm?: string }) => {
                       key={post._id}
                       fallback={<div className="min-h-[300px] animate-pulse bg-gray-100 rounded-lg" />}
                     >
-                      <HomeBlog post={post} />
+                      {/* <HomeBlog post={post} /> */}
                     </HydrationFix>
                   )
                 ))
