@@ -1,4 +1,4 @@
-"use client";
+// server component – no need for client bundle
 
 import Link from "next/link";
 import { Post } from "@/types";

@@ -1,4 +1,4 @@
-"use client"
+// server component
 
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
@@ -15,7 +15,7 @@ import { FaInternetExplorer } from "react-icons/fa6";
 // import LikeButton from "./global/LikeButton";
 // import CommentCount from "./global/CommentCount";
 
-import { useFormattedTimeShort } from "@/hooks/useClientTime";
+import { formatTimeShort } from "@/lib/formatTime";
 
 function getPostDetailUrl(post: Post): string {
   // Check if post has categories
@@ -157,7 +157,7 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
     })
     .slice(0, 8);
 
-        const formattedTime = useFormattedTimeShort(displayedPosts[0]?._updatedAt);
+        const formattedTime = formatTimeShort(displayedPosts[0]?._updatedAt);
 
 
 

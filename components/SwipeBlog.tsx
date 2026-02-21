@@ -16,7 +16,7 @@ import Image from "next/image";
 import { Clock } from "lucide-react";
 import { ImGoogle } from "react-icons/im";
 
-import { useFormattedTimeShort } from "@/hooks/useClientTime";
+import { formatTimeShort } from "@/lib/formatTime";
 
 function getPostDetailUrl(post: Post): string {
 
@@ -116,7 +116,7 @@ const SwipeBlog = ({ posts }: { posts: Post[] }) => {
   // Always call hooks in the same order — compute featured dateString safely
   const featuredDateString =
     (posts && posts.length > 0 && (posts[activeIndex]?._updatedAt || posts[0]?._updatedAt)) || "";
-  const formattedTime = useFormattedTimeShort(featuredDateString);
+  const formattedTime = formatTimeShort(featuredDateString);
   const handleSlideChange = (swiper: any) => {
     setActiveIndex(swiper.activeIndex);
   };

@@ -1,11 +1,11 @@
-"use client";
+// server component – no hooks needed
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
 import Link from "next/link";
 // import LikeButton from "./global/LikeButton";
 // import CommentCount from "./global/CommentCount";
 import { Clock } from "lucide-react";
-import { useFormattedTimeShort } from "@/hooks/useClientTime";
+import { formatTimeShort } from "@/lib/formatTime";
 
 
 type PickForYouProps = {
@@ -97,7 +97,7 @@ export default function PickForYou({ post }: PickForYouProps) {
     plainText = plainText + "...";
   }
 
-    const formattedTime = useFormattedTimeShort(publishedAt || "");
+    const formattedTime = formatTimeShort(publishedAt || "");
 
 
   // Get the correct detail page URL based on category

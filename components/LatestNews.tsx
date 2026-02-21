@@ -1,4 +1,4 @@
-"use client"
+// server component – no interactive hooks
 
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
@@ -6,7 +6,7 @@ import { Calendar, ArrowRight} from "lucide-react";
 // import LikeButton from "./global/LikeButton";
 // import CommentCount from "./global/CommentCount";
 
-import { useFormattedTimeShort } from "@/hooks/useClientTime";
+import { formatTimeShort } from "@/lib/formatTime";
 
 function getSlugValue(post: Post): string | undefined {
   if (!post) return undefined;
@@ -134,7 +134,7 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                 // Get the correct detail page URL based on category
     const detailUrl = getPostDetailUrl(post);
 
-        const formattedTime = useFormattedTimeShort(post.publishedAt);
+        const formattedTime = formatTimeShort(post.publishedAt);
 
 
             return (

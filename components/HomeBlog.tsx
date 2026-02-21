@@ -1,4 +1,4 @@
-"use client";
+// server component: no "use client" directive
 
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
@@ -12,9 +12,10 @@ import {
   ArrowRight,
   Share2,
   Bookmark,
+  Clock,
 } from "lucide-react";
 
-
+import { formatTimeShort } from "@/lib/formatTime";
 
 function getPostDetailUrl(post: Post): string {
   // Check if post has categories
@@ -118,6 +119,9 @@ const HomeBlog = ({ post }: { post: Post }) => {
 
   // Get the correct detail page URL based on category
   const detailUrl = getPostDetailUrl(post);
+
+  // relative time computed at render (server) to avoid client hook
+  const formattedTime = formatTimeShort(publishedAt || "");
 
   return (
     <article className="group relative bg-white dark:bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700">

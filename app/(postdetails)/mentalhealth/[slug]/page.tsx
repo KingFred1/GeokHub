@@ -795,7 +795,7 @@ export default async function MentalHealthDetailPage({
                   <div className="mb-10 px-4 lg:px-6">
                     <div className="flex items-center gap-3 mb-6">
                       <Brain className="h-6 w-6 text-blue-600" />
-                      <h3 className="text-xl font-bold text-gray-900">
+                      <h3 className="text-xl font-bold dark:text-gray-100 text-gray-900">
                         Related Topics
                       </h3>
                     </div>

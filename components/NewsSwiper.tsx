@@ -14,7 +14,7 @@ import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 // import CommentCount from "./global/CommentCount";
 import { Clock, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
-import { useFormattedTimeShort } from "@/hooks/useClientTime";
+import { formatTimeShort } from "@/lib/formatTime";
 
 function getSlugValue(post: Post): string | undefined {
   if (!post?.slug) return undefined;
@@ -166,7 +166,7 @@ const NewsSwiper = ({ post }: { post: Post[] }) => {
             // Get the correct detail page URL based on category
             const detailUrl = getPostDetailUrl(posts);
 
-            const formattedTime = useFormattedTimeShort(posts._updatedAt);
+            const formattedTime = formatTimeShort(posts._updatedAt);
 
             return (
               <SwiperSlide key={posts._id} virtualIndex={index}>

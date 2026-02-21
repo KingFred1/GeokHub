@@ -1,4 +1,4 @@
-"use client";
+// server component – no client-side hooks needed
 
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
@@ -7,7 +7,7 @@ import Link from "next/link";
 // import CommentCount from "./global/CommentCount";
 // import CardOptions from "./global/CardOptions";
 
-import { useFormattedTimeShort } from "@/hooks/useClientTime";
+import { formatTimeShort } from "@/lib/formatTime";
 
 function getSlugValue(post: Post): string | undefined {
   if (!post?.slug) return undefined;
@@ -117,7 +117,7 @@ const SideBlogCard = ({ post }: { post: Post }) => {
 
       const detailUrl = getPostDetailUrl(post);
 
-          const formattedTime = useFormattedTimeShort(_updatedAt);
+          const formattedTime = formatTimeShort(_updatedAt);
 
 
   return (

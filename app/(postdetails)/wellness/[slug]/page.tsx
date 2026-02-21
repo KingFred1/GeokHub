@@ -323,7 +323,7 @@ const wellnessColors = {
   dark: "green",
   gradient: "from-emerald-600 to-teal-600",
   gradientLight: "from-emerald-50 to-teal-50",
-  gradientDark: "from-emerald-900/30 to-teal-900/30",
+  gradientDark: "from-emerald-800/50 to-teal-800/50",
   border: "emerald-100",
   borderDark: "emerald-800",
   text: "emerald-600",

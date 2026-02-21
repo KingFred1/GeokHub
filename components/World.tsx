@@ -1,4 +1,4 @@
-"use client"
+// server component – no hooks needed
 
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
@@ -7,7 +7,7 @@ import Link from "next/link";
 // import CommentCount from "./global/CommentCount";
 import { User, Clock } from "lucide-react";
 
-import { useFormattedTimeShort } from "@/hooks/useClientTime";
+import { formatTimeShort } from "@/lib/formatTime";
 
 interface MasonryGridProps {
   posts: Post[];
@@ -156,7 +156,7 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
         // Get the correct detail page URL based on category
         const detailUrl = getPostDetailUrl(post);
 
-        const formattedTime = useFormattedTimeShort(post._updatedAt);
+        const formattedTime = formatTimeShort(post._updatedAt);
 
         return (
           <article
