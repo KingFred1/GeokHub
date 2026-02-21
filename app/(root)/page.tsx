@@ -12,7 +12,12 @@ const ArrowRightIcon = () => (
     stroke="currentColor"
     className="w-4 h-4"
   >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 5l7 7-7 7"
+    />
   </svg>
 );
 
@@ -138,7 +143,7 @@ export default async function Home({
         {!searchTerm && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-2">
             <div className="lg:col-span-6 col-span-12">
-              {/* <ClientOnlySwipeBlog posts={forYou.slice(0, 2)} /> */}
+              <ClientOnlySwipeBlog posts={forYou.slice(0, 2)} />
             </div>
             <div className="lg:col-span-6 col-span-12">
               <div className="md:mt-7">
@@ -147,9 +152,14 @@ export default async function Home({
                 </h1>
                 <div className="rounded-lg">
                   <div className="grid md:grid-cols-2 gap-4">
-                    {latestNews.slice(0, 2).map((post) => (
-                      post?._id && <PickForYou key={post._id} post={post} />
-                    ))}
+                    {latestNews
+                      .slice(0, 2)
+                      .map(
+                        (post) =>
+                          post?._id && (
+                            <PickForYou key={post._id} post={post} />
+                          ),
+                      )}
                   </div>
                 </div>
               </div>
@@ -160,7 +170,7 @@ export default async function Home({
         {!searchTerm && (
           <>
             <TextNewsGrid posts={forYou.slice(2, 5)} />
-            {/* <ClientOnlyGadgetsSection post={gadgets} /> */}
+            <ClientOnlyGadgetsSection post={gadgets} />
             <div className="mb-12">
               <LatestNews posts={latestNews.slice(2, 8)} />
             </div>
@@ -169,9 +179,12 @@ export default async function Home({
                 Lifestyle
               </h1>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                {lifestyle.slice(0, 8).map((post) => (
-                  post?._id && <HomeBlog key={post._id} post={post} />
-                ))}
+                {lifestyle
+                  .slice(0, 8)
+                  .map(
+                    (post) =>
+                      post?._id && <HomeBlog key={post._id} post={post} />,
+                  )}
               </div>
               <div className="text-center mt-6 sm:mt-8">
                 <Link
@@ -193,9 +206,10 @@ export default async function Home({
           <div className="my-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {searchResults.length > 0 ? (
-                searchResults.map((post) => (
-                  post?._id && <HomeBlog key={post._id} post={post} />
-                ))
+                searchResults.map(
+                  (post) =>
+                    post?._id && <HomeBlog key={post._id} post={post} />,
+                )
               ) : (
                 <div className="col-span-full text-center py-10 bg-white dark:bg-gray-800 rounded-xl">
                   <p className="text-gray-500">
