@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.geokhub.com";
 
 const nextConfig: NextConfig = {
+  // disable turbopack to avoid worker errors during build
+  turbopack: {},
+
   typescript: {
     ignoreBuildErrors: true,
   },
