@@ -8,7 +8,7 @@ import PaginationControls from "@/components/PaginationControls";
 import { BLOG_BY_CATEGORY_SLUG_PAGINATED } from "@/sanity/lib/queries";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 86400; // 1 day
 
 
 interface TechnologyContentProps {
@@ -38,7 +38,7 @@ async function TechnologyContent({ page = 1 }: TechnologyContentProps) {
         cache: "no-store",
         next: {
           tags: ["technology/tech-news"],
-          revalidate: 3600,
+          revalidate: 86400,
         },
       }
     );

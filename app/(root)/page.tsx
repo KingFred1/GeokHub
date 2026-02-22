@@ -21,9 +21,7 @@ const ArrowRightIcon = () => (
   </svg>
 );
 
-// client wrappers for components that depend on browser APIs
-import ClientOnlySwipeBlog from "@/components/ClientOnlySwipeBlog";
-import ClientOnlyGadgetsSection from "@/components/ClientOnlyGadgetsSection";
+
 
 // server components for static render
 import PickForYou from "@/components/PickForYou";
@@ -31,6 +29,9 @@ import HomeBlog from "@/components/HomeBlog";
 import TechnologyCat from "@/components/TechnologyCat";
 import LatestNews from "@/components/LatestNews";
 import TextNewsGrid from "@/components/TextNewsGrid";
+
+import StaticFeaturedPosts from "@/components/StaticFeaturedPosts";
+import StaticGadgetsGrid from "@/components/StaticGadgetsGrid";
 
 // ISR configuration
 export const revalidate = 3600; // 1 hour
@@ -136,17 +137,26 @@ export default async function Home({
     searchResults = [],
   ] = data;
 
+  // debugging: log counts so we can see if technology posts arrived
+  console.log("home data counts:", {
+    forYou: forYou.length,
+    latestNews: latestNews.length,
+    gadgets: gadgets.length,
+    lifestyle: lifestyle.length,
+    technology: technology.length,
+  });
+
   return (
     <div className="w-full min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4">
         {/* Hero Section */}
         {!searchTerm && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-2">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
             <div className="lg:col-span-6 col-span-12">
-              <ClientOnlySwipeBlog posts={forYou.slice(0, 2)} />
+              <StaticFeaturedPosts posts={forYou.slice(0, 1)} />
             </div>
             <div className="lg:col-span-6 col-span-12">
-              <div className="md:mt-7">
+              <div className="md:mt-10">
                 <h1 className="font-bold text-2xl mb-4 text-dark dark:text-gray-200 pl-2">
                   Top Stories
                 </h1>
@@ -169,8 +179,8 @@ export default async function Home({
 
         {!searchTerm && (
           <>
-            <TextNewsGrid posts={forYou.slice(2, 5)} />
-            <ClientOnlyGadgetsSection post={gadgets} />
+            <TextNewsGrid posts={forYou.slice(1, 4)} />
+            <StaticGadgetsGrid post={gadgets} />
             <div className="mb-12">
               <LatestNews posts={latestNews.slice(2, 8)} />
             </div>
@@ -197,7 +207,13 @@ export default async function Home({
               </div>
             </div>
             <div className="space-y-12">
-              <TechnologyCat posts={technology} />
+              {technology.length > 0 ? (
+                <TechnologyCat posts={technology} />
+              ) : (
+                <p className="text-center text-gray-500">
+                  No technology articles available right now.
+                </p>
+              )}
             </div>
           </>
         )}

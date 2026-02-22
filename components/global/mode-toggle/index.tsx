@@ -22,7 +22,7 @@ const ThemeSwitcher = () => {
   if (!mounted) return null;
 
   // Show the actual applied theme (system, light, or dark)
-  const current = theme === "system" ? resolvedTheme : theme;
+  const current = theme === "light" ? resolvedTheme : theme;
 
   const options = [
     {

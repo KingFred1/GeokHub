@@ -3,8 +3,6 @@ import { BLOGS_BY_CATEGORY_SLUGS, LIFESTYLE_CATEGORIES } from "@/sanity/lib/quer
 import LifestyleServer from "@/components/category/LifestyleServer";
 import { Category, Post } from "@/type";
 import { Metadata } from "next";
-import { Suspense } from "react";
-import NewsSkeleton from "@/components/global/skeleton/NewsSkeleton";
 
 interface LifestylePageProps {
   params: Promise<{ category?: string[] }>;
@@ -95,9 +93,7 @@ export default async function LifestylePage(props: LifestylePageProps) {
   return (
     <div className="w-full min-h-screen relative overflow-hidden px-4 md:px-4 lg:px-20 mt-4">
       <div className="max-w-7xl mx-auto">
-        <Suspense fallback={<NewsSkeleton />}>
-          <LifestyleContent {...props} />
-        </Suspense>
+        <LifestyleContent {...props} />
       </div>
     </div>
   );

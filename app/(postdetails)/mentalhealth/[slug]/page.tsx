@@ -7,8 +7,8 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+// Suspense not needed for server view counter
+// skeleton no longer needed after removing Suspense
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -522,9 +522,7 @@ export default async function MentalHealthDetailPage({
                   <div className="bg-card rounded-2xl p-4 shadow-lg border">
                     <div className="flex flex-col items-center">
                       <Eye className="h-6 w-6 text-blue-600 mb-2" />
-                      <Suspense fallback={<Skeleton className="h-6 w-12" />}>
-                        <View slug={decodedSlug} />
-                      </Suspense>
+                      <View slug={decodedSlug} />
                       <span className="text-xs text-gray-500 mt-1">Views</span>
                     </div>
                   </div>

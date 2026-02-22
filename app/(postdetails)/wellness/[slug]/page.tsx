@@ -7,8 +7,8 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+// no Suspense needed for view component
+// skeleton no longer needed after removing Suspense
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -606,9 +606,7 @@ export default async function WellnessDetailPage({
                       <Eye
                         className={`h-6 w-6 text-${wellnessColors.text} dark:text-${wellnessColors.textDark} mb-2`}
                       />
-                      <Suspense fallback={<Skeleton className="h-6 w-12" />}>
-                        <View slug={decodedSlug} />
-                      </Suspense>
+                      <View slug={decodedSlug} />
                       <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Views
                       </span>

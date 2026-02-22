@@ -68,11 +68,11 @@ type LatestNewsProps = {
 
 export default function LatestNews({ posts }: LatestNewsProps) {
   const getPlainText = (post: Post) => {
-    if (!post.body) return post.excerpt || "Read more about this story...";
+    if (!post.metaDescription) return post.excerpt || "Read more about this story...";
 
     try {
-      if (Array.isArray(post.body)) {
-        const firstBlock = post.body.find(
+      if (Array.isArray(post.metaDescription)) {
+        const firstBlock = post.metaDescription.find(
           (block) => block._type === "block" && Array.isArray(block.children)
         );
         if (firstBlock) {
@@ -83,9 +83,9 @@ export default function LatestNews({ posts }: LatestNewsProps) {
               .substring(0, 100) + "..."
           );
         }
-      } else if (typeof post.body === "string") {
+      } else if (typeof post.metaDescription === "string") {
         return (
-          post.body.substring(0, 100).replace(/[#*_`~>\[\]\(\)]/g, "") + "..."
+          post.metaDescription.substring(0, 100).replace(/[#*_`~>\[\]\(\)]/g, "") + "..."
         );
       }
     } catch {

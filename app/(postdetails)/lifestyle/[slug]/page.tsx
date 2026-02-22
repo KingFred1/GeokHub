@@ -7,8 +7,7 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+// Suspense/skeleton removed; view counter is server-rendered
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -471,9 +470,7 @@ export default async function LifestyleDetailPage({
                   <div className="bg-card dark:card rounded-2xl p-4 shadow-lg border border-gray-100 dark:border-gray-700">
                     <div className="flex flex-col items-center">
                       <Eye className="h-6 w-6 text-rose-600 dark:text-rose-400 mb-2" />
-                      <Suspense fallback={<Skeleton className="h-6 w-12" />}>
                         <View slug={decodedSlug} />
-                      </Suspense>
                       <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">Views</span>
                     </div>
                   </div>

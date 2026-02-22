@@ -51,6 +51,16 @@ function getPostDetailUrl(post: Post): string {
   return `/blogs/${post.slug?.current}`;
 }
 
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
 export default function TextNewsGrid({ posts, title }: TextNewsGridProps) {
 
 
@@ -113,9 +123,12 @@ export default function TextNewsGrid({ posts, title }: TextNewsGridProps) {
                 </p>
               )}
 
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-2">
-                <Calendar className="h-3 w-3" />
-                <span>{new Date(post._createdAt).toDateString()}</span>
+             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <time dateTime={post.publishedAt}>
+                  {formatDate(post.publishedAt)}
+                </time>
+                <span>•</span>
+                <span>{post.author?.name || "GeokHub"}</span>
               </div>
             </Link>
           );

@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import GoogleAuthButton from "@/components/global/GoogleAuthButton";
 import { Metadata } from 'next';
-import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Profile',
@@ -34,10 +33,6 @@ async function ProfileContent() {
   );
 }
 
-export default function ProfilePage() {
-  return (
-    <Suspense fallback={<div>Loading profile...</div>}>
-      <ProfileContent />
-    </Suspense>
-  );
+export default async function ProfilePage() {
+  return <ProfileContent />;
 }

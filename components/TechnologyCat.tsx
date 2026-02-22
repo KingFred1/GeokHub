@@ -143,21 +143,27 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
 
   if (!posts || posts.length === 0) return null;
 
-
-    // Get the correct detail page URL based on category
+  // for debugging: ensure we know how many items arrived
+  console.log("TechnologyCat received", posts.length, "posts");
 
   // Exclude posts where category or parent category is 'tech-news' from this component
-  const displayedPosts = posts
+  let displayedPosts = posts
     .filter((post) => {
       return !post.categories?.some((c) => {
         const slug = c.slug?.current?.toLowerCase?.();
         const parentSlug = c.parent?.slug?.current?.toLowerCase?.();
         return slug === 'tech-news' || parentSlug === 'tech-news';
       });
-    })
-    .slice(0, 8);
+    });
 
-        const formattedTime = formatTimeShort(displayedPosts[0]?._updatedAt);
+  // if filtering removed everything, fall back to raw list so we show something
+  if (displayedPosts.length === 0 && posts.length > 0) {
+    console.warn("TechnologyCat filter removed all posts; falling back to unfiltered list");
+    displayedPosts = posts.slice();
+  }
+
+  displayedPosts = displayedPosts.slice(0, 8);
+  const formattedTime = formatTimeShort(displayedPosts[0]?._updatedAt);
 
 
 

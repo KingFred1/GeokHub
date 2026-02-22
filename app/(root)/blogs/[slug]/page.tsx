@@ -7,8 +7,7 @@ import {
 import { notFound, redirect } from "next/navigation";
 import markdownit from "markdown-it";
 import View from "@/components/View";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+// Suspense and skeleton removed; view counter rendered on server
 import { Metadata } from "next";
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import removeMarkdown from "remove-markdown";
@@ -449,9 +448,7 @@ export default async function BlogDetailPage({
                       />
                       <div className="w-8 h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
                       <div className="text-center">
-                        <Suspense fallback={<Skeleton className="h-4 w-8" />}>
-                          <View slug={decodedSlug} />
-                        </Suspense>
+                            <View slug={decodedSlug} />
                       </div>
                     </div>
                   </div>

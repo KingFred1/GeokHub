@@ -1,7 +1,5 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import NewsSwiper from "@/components/NewsSwiper";
+// server component: interactivity moved to LifestyleClient
+import ClientNewsSwiper from "@/components/ClientNewsSwiper";
 import MasonryGrid from "@/components/World";
 import SideBlog from "@/components/SideBlog";
 import {
@@ -11,10 +9,10 @@ import {
   Scale,
   TrendingUp,
   X,
-  Loader2,
 } from "lucide-react";
 import { Category, Post } from "@/type";
 import Link from "next/link";
+import LifestyleClient from "@/components/category/LifestyleClient";
 
 interface LifestyleServerProps {
   categorySlug?: string;
@@ -55,69 +53,24 @@ export default function LifestyleServer({
   initialPosts,
   lifestyleCategories,
 }: LifestyleServerProps) {
-  const [allPosts, setAllPosts] = useState<Post[]>(initialPosts);
-  const [displayedPosts, setDisplayedPosts] = useState<Post[]>(initialPosts.slice(0, 17)); // Show first 17 posts
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(initialPosts.length > 17);
-  
-  const postsPerLoad = 17;
-  const activeCategory = categorySlug;
-
-  // Reset displayed posts whenever the initial posts or category changes
-  useEffect(() => {
-    // update full list
-    setAllPosts(initialPosts);
-
-    // compute filtered list for the active category
-    const filtered = activeCategory === "lifestyle"
-      ? initialPosts
-      : initialPosts.filter((post) =>
+  // compute filtered posts server-side
+  const allPosts = initialPosts || [];
+  const filteredPosts =
+    categorySlug === "lifestyle"
+      ? allPosts
+      : allPosts.filter((post) =>
           post.categories?.some((cat) => {
-            const catSlug = typeof cat.slug === 'string' ? cat.slug : cat.slug?.current;
-            return catSlug === activeCategory;
+            const catSlug =
+              typeof cat.slug === "string" ? cat.slug : cat.slug?.current;
+            return catSlug === categorySlug;
           })
         );
 
-    // initialize the visible posts and hasMore
-    setDisplayedPosts(filtered.slice(0, postsPerLoad));
-    setHasMore(filtered.length > postsPerLoad);
-  }, [initialPosts, activeCategory, postsPerLoad]);
-
-  // Filter posts based on category (derived from the current allPosts)
-  const filteredPosts = activeCategory === "lifestyle" 
-    ? allPosts 
-    : allPosts.filter((post) =>
-        post.categories?.some((cat) => {
-          const catSlug = typeof cat.slug === 'string' ? cat.slug : cat.slug?.current;
-          return catSlug === activeCategory;
-        })
-      );
-
-  // Featured posts (always show first 4 for NewsSwiper)
   const featuredPosts = filteredPosts.slice(0, 4);
   const sideBlogPost = filteredPosts.slice(4, 5);
-  
-  // Load more posts function
-  const loadMorePosts = async () => {
-    setLoadingMore(true);
-    
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Use functional update so we always base on latest displayed length
-    setDisplayedPosts(prev => {
-      const start = prev.length;
-      const nextPosts = filteredPosts.slice(start, start + postsPerLoad);
-      const newList = [...prev, ...nextPosts];
-
-      // Check if there are more posts to load
-      setHasMore(newList.length < filteredPosts.length);
-
-      return newList;
-    });
-    
-    setLoadingMore(false);
-  };
+  const initialDisplay = filteredPosts.slice(0, 17);
+  const hasMore = initialDisplay.length < filteredPosts.length;
+  const activeCategory = categorySlug;
 
   return (
     <>
@@ -163,10 +116,10 @@ export default function LifestyleServer({
               <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
               <span>Daily Updates</span>
             </div>
-            {displayedPosts.length > 0 && (
+            {initialDisplay.length > 0 && (
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-pink-400 rounded-full mr-2"></div>
-                <span>Showing {displayedPosts.length} of {filteredPosts.length}</span>
+                <span>Showing {initialDisplay.length} of {filteredPosts.length}</span>
               </div>
             )}
           </div>
@@ -239,7 +192,7 @@ export default function LifestyleServer({
               </h2>
             </div>
             {featuredPosts.length > 0 ? (
-              <NewsSwiper post={featuredPosts} />
+              <ClientNewsSwiper post={featuredPosts} />
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-500">No trending articles available</p>
@@ -288,77 +241,30 @@ export default function LifestyleServer({
                   })?.title || activeCategory} Stories`}
             </h2>
             <span className="ml-3 px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full">
-              Showing {displayedPosts.length} of {filteredPosts.length} articles
+              Showing {initialDisplay.length} of {filteredPosts.length} articles
             </span>
           </div>
           
           {/* Load More Info */}
           {hasMore && (
             <div className="hidden md:block text-sm text-gray-600 dark:text-gray-400">
-              {filteredPosts.length - displayedPosts.length} more articles available
+              {filteredPosts.length - initialDisplay.length} more articles available
             </div>
           )}
         </div>
         
-        {displayedPosts.length > 0 ? (
+        {filteredPosts.length > 0 ? (
           <>
             {/* Show posts from position 5 onwards (after featured posts) */}
-            <MasonryGrid posts={displayedPosts.slice(5)} />
-            
-            {/* Load More Button */}
-            {hasMore && (
-              <div className="mt-12 text-center">
-                <button
-                  onClick={loadMorePosts}
-                  disabled={loadingMore}
-                  className="px-8 py-3 bg-pink-600 text-white rounded-full hover:bg-pink-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center mx-auto"
-                >
-                  {loadingMore ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Loading More Articles...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-5 w-5 mr-2" />
-                      Load {Math.min(postsPerLoad, filteredPosts.length - displayedPosts.length)} More Articles
-                    </>
-                  )}
-                </button>
-                <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                  {filteredPosts.length - displayedPosts.length} articles remaining
-                </p>
-              </div>
-            )}
-            
-            {/* End of Results */}
-            {!hasMore && filteredPosts.length > 0 && (
-              <div className="mt-12 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-pink-100 dark:bg-pink-900/20 rounded-full mb-4">
-                  <Sparkles className="h-8 w-8 text-pink-600 dark:text-pink-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  You've reached the end!
-                </h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  All {filteredPosts.length} articles have been loaded.
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <Link
-                    href="/lifestyle"
-                    className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors"
-                  >
-                    Back to All Lifestyle
-                  </Link>
-                  <button
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    Scroll to Top
-                  </button>
-                </div>
-              </div>
-            )}
+            <MasonryGrid posts={initialDisplay.slice(5)} />
+
+            {/* interactive load‑more handled in client component */}
+            <LifestyleClient
+              initialPosts={initialDisplay}
+              allPosts={filteredPosts}
+              activeCategory={activeCategory}
+              lifestyleCategories={lifestyleCategories}
+            />
           </>
         ) : (
           <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-2xl">

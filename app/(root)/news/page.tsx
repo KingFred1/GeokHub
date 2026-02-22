@@ -1,8 +1,6 @@
-import NewsSkeleton from "@/components/global/skeleton/NewsSkeleton";
 import NewsClient from "@/components/category/NewsClient";
 import { client } from "@/sanity/lib/client";
 import { BLOGS_BY_NEWS_SLUGS, NEWS_CATEGORIES } from "@/sanity/lib/queries";
-import { Suspense } from "react";
 import { Category, Post } from "@/type";
 
 export const dynamic = "force-dynamic";
@@ -37,9 +35,7 @@ export default function NewsPage() {
   return (
     <div className="w-full min-h-screen relative overflow-hidden md:px-4 lg:px-4 px-4 mt-4">
       <div className="max-w-7xl mx-auto">
-        <Suspense fallback={<NewsSkeleton />}>
-          <NewsContent />
-        </Suspense>
+        <NewsContent />
       </div>
     </div>
   );

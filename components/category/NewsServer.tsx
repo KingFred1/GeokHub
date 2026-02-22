@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Category, Post } from "@/type";
 import Link from "next/link";
-import { Suspense } from "react";
+// Suspense removed; NewsSwiper is a client component loaded on client
 
 interface NewsServerProps {
   categorySlug?: string;
@@ -168,19 +168,17 @@ export default async function NewsServer({
               </h2>
             </div>
             
-            {/* Wrap NewsSwiper in Suspense with error handling */}
-            <Suspense fallback={<NewsSwiperFallback />}>
-              {hasSwiperPosts ? (
-                <NewsSwiperWrapper posts={swiperPosts} />
-              ) : (
-                <div className="w-full h-80 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
-                  <div className="text-center">
-                    <Newspaper className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">No featured posts available</p>
-                  </div>
+            {/* NewsSwiperWrapper is a client component; it will hydrate on client */}
+            {hasSwiperPosts ? (
+              <NewsSwiperWrapper posts={swiperPosts} />
+            ) : (
+              <div className="w-full h-80 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center">
+                <div className="text-center">
+                  <Newspaper className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500 dark:text-gray-400">No featured posts available</p>
                 </div>
-              )}
-            </Suspense>
+              </div>
+            )}
           </div>
         </div>
 

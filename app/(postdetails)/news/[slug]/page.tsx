@@ -7,8 +7,7 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+// Suspense/skeleton removed; view counter rendered server-side
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -446,9 +445,7 @@ export default async function NewsDetailPage({
                       />
                       <div className="w-8 h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
                       <div className="text-center">
-                        <Suspense fallback={<Skeleton className="h-4 w-8" />}>
                           <View slug={decodedSlug} />
-                        </Suspense>
                       </div>
                     </div>
                   </div>

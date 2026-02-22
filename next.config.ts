@@ -10,6 +10,18 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
 
+  // dev webpack tweaks --------------------------------------------------
+  webpack(config, options) {
+    // Avoid embedding full absolute paths in source maps; this sidesteps
+    // parentheses problems entirely by using resourcePath only.
+    if (config.output) {
+      config.output.devtoolModuleFilenameTemplate = (info: any) =>
+        // normalize windows backslashes and drop leading drive letters
+        `webpack:///${info.resourcePath.replace(/\\/g, "/")}`;
+    }
+    return config;
+  },
+
   images: {
     domains: ["cdn.sanity.io", "lh3.googleusercontent.com"],
     remotePatterns: [
