@@ -19,6 +19,7 @@ import PickForYou from "@/components/PickForYou";
 import markdownItLinkAttributes from "markdown-it-link-attributes";
 import BlogContentWithReadMore from "@/components/global/BlogContentWithReadMore";
 import SidebarShareButton from "@/components/global/SidebarShareButton";
+import InlineArticleAd from "@/components/ads/InlineArticleAd";
 import { Calendar, ArrowRight, BookOpen } from "lucide-react";
 import { NewsletterForm } from "@/components/global/Newsletter-form";
 import Link from "next/link";
@@ -584,6 +585,8 @@ export default async function BlogDetailPage({
                         />
                       </div>
                     </div>
+
+                    <InlineArticleAd />
 
                     {/* Article Footer */}
                     <footer className="border-t border-gray-200 dark:border-gray-700 pt-8">

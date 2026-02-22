@@ -15,6 +15,7 @@ import FloatingActionBar from "@/components/global/FloatingActionBar";
 import markdownItLinkAttributes from "markdown-it-link-attributes";
 import BlogContentWithReadMore from "@/components/global/BlogContentWithReadMore";
 import SidebarShareButton from "@/components/global/SidebarShareButton";
+import InlineArticleAd from "@/components/ads/InlineArticleAd";
 import {
   Calendar,
   ArrowRight,
@@ -784,6 +785,8 @@ export default async function ProgrammingDetailPage({
                     </div>
                   </div>
                 </article>
+
+                <InlineArticleAd />
 
                 {/* Resources & References */}
                 {post.sources && post.sources.length > 0 && (

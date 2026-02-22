@@ -16,6 +16,7 @@ import FloatingActionBar from "@/components/global/FloatingActionBar";
 import markdownItLinkAttributes from "markdown-it-link-attributes";
 import BlogContentWithReadMore from "@/components/global/BlogContentWithReadMore";
 import SidebarShareButton from "@/components/global/SidebarShareButton";
+import InlineArticleAd from "@/components/ads/InlineArticleAd";
 import {
   Calendar,
   ArrowRight,
@@ -888,6 +889,8 @@ export default async function WellnessDetailPage({
                     </div>
                   </div>
                 </article>
+
+                <InlineArticleAd />
 
                 {/* Safety & Equipment */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">

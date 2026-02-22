@@ -15,6 +15,7 @@ import FloatingActionBar from "@/components/global/FloatingActionBar";
 import markdownItLinkAttributes from "markdown-it-link-attributes";
 import BlogContentWithReadMore from "@/components/global/BlogContentWithReadMore";
 import SidebarShareButton from "@/components/global/SidebarShareButton";
+import InlineArticleAd from "@/components/ads/InlineArticleAd";
 import {
   Calendar,
   ArrowRight,
@@ -748,7 +749,9 @@ export default async function AIDetailPage({
                   </div>
                 </article>
 
-                {/* Technical Details & Sources */}
+                <InlineArticleAd />
+
+                {/* Technical Details & Sources */}}
                 {post.sources && post.sources.length > 0 && (
                   <div className="mb-10 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-3 mb-6">
