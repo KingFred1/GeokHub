@@ -118,8 +118,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: escapeUrl(`${baseUrl}/lifestyle/weightloss`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
       
       // News
-      { url: escapeUrl(`${baseUrl}/news/world`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      { url: escapeUrl(`${baseUrl}/news/business`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      // { url: escapeUrl(`${baseUrl}/news/world`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      // { url: escapeUrl(`${baseUrl}/news/business`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
     ];
 
     // ========================

@@ -113,8 +113,8 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
       title: "News",
       links: [
         { title: "Latest News", href: "/news" },
-        { title: "Business", href: "/news/business" },
-        { title: "Global News", href: "/news/world" },
+        // { title: "Business", href: "/news/business" },
+        // { title: "Global News", href: "/news/world" },
       ],
     },
     {
