@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { client } from '@/sanity/lib/client'
+import { getCanonicalPath, getSlugString } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 86400; // 24 hours
@@ -112,14 +113,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: escapeUrl(`${baseUrl}/technology/emerging-tech`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
       { url: escapeUrl(`${baseUrl}/technology/cloud-devops`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
       
-      // Lifestyle
-      { url: escapeUrl(`${baseUrl}/lifestyle/mentalhealth`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      { url: escapeUrl(`${baseUrl}/lifestyle/wellness`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      { url: escapeUrl(`${baseUrl}/lifestyle/weightloss`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
+      // Lifestyle subpages (now top‑level)
+      { url: escapeUrl(`${baseUrl}/mentalhealth`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/wellness`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/weightloss`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
       
       // News
-      // { url: escapeUrl(`${baseUrl}/news/world`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      // { url: escapeUrl(`${baseUrl}/news/business`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/news/world`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/news/business`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
     ];
 
     // ========================
@@ -128,87 +129,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const postRoutes: MetadataRoute.Sitemap = [];
 
     for (const post of (posts || [])) {
-      // FIX: Handle slug extraction properly
-      let slugValue: string;
-      
-      // Check if slug is an object with current property
-      if (post.slug && typeof post.slug === 'object' && 'current' in post.slug) {
-        slugValue = post.slug.current;
-      } 
-      // Check if slug is already a string
-      else if (typeof post.slug === 'string') {
-        slugValue = post.slug;
-      }
-      // If no slug, skip this post
-      else {
-        console.log(`❌ Skipping post with invalid slug:`, post);
+      const canonicalPath = getCanonicalPath(post);
+      const slugValue = getSlugString(post.slug);
+
+      // filter out fallback /blogs entries (we don't want them in sitemap)
+      if (canonicalPath.startsWith("/blogs/")) {
+        console.log(`⚠️ Skipping post with uncategorised slug: ${slugValue}`);
         continue;
       }
 
-      if (!slugValue || slugValue.trim() === '') {
-        console.log(`❌ Skipping post with empty slug:`, post);
-        continue;
-      }
-
-      console.log(`🔗 Processing post with slug: ${slugValue}`);
-
-      // Determine proper canonical URL based on categories
-      let canonicalPath = '';
-      const categories = post.categories || [];
-
-      // Check each category to determine the right canonical path
-      for (const cat of categories) {
-        let catSlug: string;
-        
-        // Handle category slug extraction
-        if (cat.slug && typeof cat.slug === 'object' && 'current' in cat.slug) {
-          catSlug = cat.slug.current?.toLowerCase();
-        } else if (typeof cat.slug === 'string') {
-          catSlug = cat.slug.toLowerCase();
-        } else {
-          continue; // Skip if no valid category slug
-        }
-
-        if (!catSlug) continue;
-
-        console.log(`   Checking category: ${catSlug} for post: ${slugValue}`);
-
-        // Technology categories
-        if (['ai', 'tech-news', 'cybersecurity', 'programming', 'gadgets', 'emerging-tech', 'cloud-devops'].includes(catSlug)) {
-          canonicalPath = `/technology/${catSlug}/${slugValue}`;
-          console.log(`   ✅ Assigned to: ${canonicalPath}`);
-          break;
-        }
-        // Lifestyle categories
-        if (['mentalhealth', 'wellness', 'weightloss'].includes(catSlug)) {
-          canonicalPath = `/lifestyle/${catSlug}/${slugValue}`;
-          console.log(`   ✅ Assigned to: ${canonicalPath}`);
-          break;
-        }
-        // News categories
-        if (catSlug === 'world') {
-          canonicalPath = `/news/world/${slugValue}`;
-          console.log(`   ✅ Assigned to: ${canonicalPath}`);
-          break;
-        }
-        if (catSlug === 'business') {
-          canonicalPath = `/news/business/${slugValue}`;
-          console.log(`   ✅ Assigned to: ${canonicalPath}`);
-          break;
-        }
-        if (catSlug === 'news') {
-          canonicalPath = `/news/${slugValue}`;
-          console.log(`   ✅ Assigned to: ${canonicalPath}`);
-          break;
-        }
-      }
-
-      // If no category matched, SKIP this post - don't include /blogs/ URLs
-      if (!canonicalPath) {
-        console.log(`⚠️ Skipping post without valid category: ${slugValue}`);
-        console.log(`   Categories found:`, categories);
-        continue;
-      }
+      console.log(`🔗 Processing post with slug: ${slugValue} – canonical ${canonicalPath}`);
 
       const lastModified = new Date(post._updatedAt || post.publishedAt);
       const postAge = Date.now() - lastModified.getTime();
@@ -261,15 +191,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Log a few skipped posts for debugging
     const skippedPosts = (posts || []).filter(post => {
-      const slug = post.slug?.current || post.slug;
+      const slug = getSlugString(post.slug);
       return !postRoutes.find(route => route.url.includes(slug));
     }).slice(0, 3);
     
     if (skippedPosts.length > 0) {
       console.log('\n⚠️ Sample skipped posts:');
       skippedPosts.forEach((post, i) => {
-        const slug = post.slug?.current || post.slug;
-        console.log(`  ${i + 1}. ${slug} - Categories:`, post.categories?.map(c => c.slug?.current || c.slug));
+        const slug = getSlugString(post.slug);
+        console.log(`  ${i + 1}. ${slug} - Categories:`,
+          post.categories?.map(c => getSlugString(c.slug)));
       });
     }
 

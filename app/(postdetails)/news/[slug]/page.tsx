@@ -1,6 +1,7 @@
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import { notFound, redirect } from "next/navigation";
+import { getSlugString } from "@/lib/seo";
 import markdownit from "markdown-it";
 import removeMarkdown from "remove-markdown";
 import { Metadata } from "next";
@@ -161,9 +162,7 @@ function formatReadableDate(dateString: string): string {
 }
 
 function getSlugValue(post: any): string | undefined {
-  if (!post) return undefined;
-  if (typeof post.slug === "string") return post.slug;
-  return post.slug?.current;
+  return getSlugString(post?.slug) || undefined;
 }
 
 // Function to get post detail URL based on category

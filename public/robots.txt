@@ -8,4 +8,3 @@ Disallow: /private/
 Disallow: /dashboard/
 
 Sitemap: https://www.geokhub.com/sitemap.xml
-Sitemap: https://www.geokhub.com/sitemap-news.xml

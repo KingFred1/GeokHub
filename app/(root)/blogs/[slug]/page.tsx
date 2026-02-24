@@ -4,6 +4,7 @@ import {
   BLOG_BY_CATEGORY_SLUG,
   BLOG_BY_SLUG_QUERY,
 } from "@/sanity/lib/queries";
+import { getCanonicalPath, getSlugString } from "@/lib/seo";
 import { notFound, redirect } from "next/navigation";
 import markdownit from "markdown-it";
 import View from "@/components/View";
@@ -142,52 +143,9 @@ export async function generateMetadata({
       };
     }
 
-    // Compute canonical URL using the same section-aware logic as the sitemap
-    // so the canonical used on the page matches the canonical put in the sitemap.
+    // compute canonical using shared helper (must match sitemap logic)
     const baseUrl = "https://www.geokhub.com";
-
-    function getPostPathForCanonical(post: any) {
-      const slugVal =
-        typeof post.slug === "string"
-          ? post.slug
-          : (post.slug && post.slug.current) || "";
-      const cats = post.categories || [];
-
-      for (const cat of cats) {
-        const cslug = (cat.slug || cat.title || "").toLowerCase();
-        const parentSlug = (cat as any).parent?.slug?.toLowerCase() || "";
-
-        if (
-          [
-            "ai",
-            "programming",
-            "cloud-devops",
-            "emerging-tech",
-            "gadgets",
-            "cybersecurity",
-            "tech-news",
-          ].includes(cslug)
-        ) {
-          return `/technology/${cslug}/${slugVal}`;
-        }
-
-        if (cslug === "mentalhealth") return `/mentalhealth/${slugVal}`;
-        if (cslug === "wellness") return `/wellness/${slugVal}`;
-        if (cslug === "weightloss") return `/weightloss/${slugVal}`;
-        if (cslug === "lifestyle") return `/lifestyle/${slugVal}`;
-
-        if (cslug === "world") return `/news/world/${slugVal}`;
-        if (cslug === "business") return `/news/business/${slugVal}`;
-        if (cslug === "news") return `/news/${slugVal}`;
-
-        if (parentSlug === "world") return `/news/world/${slugVal}`;
-        if (parentSlug === "news") return `/news/${slugVal}`;
-      }
-
-      return `/blogs/${slug}`;
-    }
-
-    const canonicalUrl = `${baseUrl}${getPostPathForCanonical(post)}`;
+    const canonicalUrl = `${baseUrl}${getCanonicalPath(post)}`;
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
           .width(1200)
