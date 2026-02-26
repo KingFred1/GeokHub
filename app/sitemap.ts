@@ -79,21 +79,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // ========================
     // MAIN CATEGORY PAGES (MEDIUM PRIORITY)
     // ========================
+    // NOTE: /technology and /lifestyle redirect to /technology/tech-news and /lifestyles
+    // so we exclude them from sitemap to avoid "Page with redirect" errors in Search Console
     const mainCategoryRoutes: MetadataRoute.Sitemap = [
       { 
-        url: escapeUrl(`${baseUrl}/technology`), 
-        lastModified: new Date(), 
-        changeFrequency: 'daily',
-        priority: 0.8 
-      },
-      { 
-        url: escapeUrl(`${baseUrl}/lifestyle`), 
-        lastModified: new Date(), 
-        changeFrequency: 'daily',
-        priority: 0.8 
-      },
-      { 
         url: escapeUrl(`${baseUrl}/news`), 
+        lastModified: new Date(), 
+        changeFrequency: 'daily',
+        priority: 0.8 
+      },
+      // Include direct lifestyle destination instead of redirect
+      { 
+        url: escapeUrl(`${baseUrl}/lifestyles`), 
         lastModified: new Date(), 
         changeFrequency: 'daily',
         priority: 0.8 
@@ -103,10 +100,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // ========================
     // CATEGORY SUBCATEGORIES (LOWER PRIORITY)
     // ========================
+    // NOTE: /technology redirects to /technology/tech-news, so include tech-news with higher priority
     const subcategoryRoutes: MetadataRoute.Sitemap = [
-      // Technology
+      // Technology - tech-news is the default landing
+      { url: escapeUrl(`${baseUrl}/technology/tech-news`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
       { url: escapeUrl(`${baseUrl}/technology/ai`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      { url: escapeUrl(`${baseUrl}/technology/tech-news`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
       { url: escapeUrl(`${baseUrl}/technology/cybersecurity`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
       { url: escapeUrl(`${baseUrl}/technology/programming`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
       { url: escapeUrl(`${baseUrl}/technology/gadgets`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },

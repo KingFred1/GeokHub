@@ -349,9 +349,11 @@ export default async function WeightLossDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-WEIGHT LOSS POSTS ==========
+    // ========== REJECT NON-WEIGHT LOSS POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Weight Loss category
     if (!isWeightLossPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

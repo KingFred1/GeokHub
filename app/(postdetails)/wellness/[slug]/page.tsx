@@ -429,9 +429,11 @@ export default async function WellnessDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-WELLNESS POSTS ==========
+    // ========== REJECT NON-WELLNESS POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Wellness category
     if (!isWellnessPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

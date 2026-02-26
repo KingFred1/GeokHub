@@ -364,9 +364,11 @@ export default async function ProgrammingDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-PROGRAMMING POSTS ==========
+    // ========== REJECT NON-PROGRAMMING POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Programming category
     if (!isProgrammingPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

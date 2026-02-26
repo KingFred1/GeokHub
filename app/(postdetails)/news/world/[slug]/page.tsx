@@ -322,9 +322,11 @@ export default async function WorldDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-WORLD POSTS ==========
+    // ========== REJECT NON-WORLD POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the World category
     if (!isWorldPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 
   // dev webpack tweaks --------------------------------------------------
   webpack(config, options) {
@@ -52,6 +49,27 @@ const nextConfig: NextConfig = {
   //     },
   //   ];
   // },
+
+  // Permanent 301 redirects for URL structure changes
+  async redirects() {
+    return [
+      {
+        source: '/technology',
+        destination: '/technology/tech-news',
+        permanent: true, // 301 redirect
+      },
+      {
+        source: '/lifestyle',
+        destination: '/lifestyles',
+        permanent: true, // 301 redirect
+      },
+      {
+        source: '/lifestyle/:path*',
+        destination: '/lifestyles/:path*',
+        permanent: true, // 301 redirect
+      },
+    ];
+  },
 
   // compress: true,
   // poweredByHeader: false,

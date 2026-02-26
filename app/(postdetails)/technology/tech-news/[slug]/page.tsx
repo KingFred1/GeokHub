@@ -365,9 +365,11 @@ export default async function TechDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-TECH POSTS ==========
+    // ========== REJECT NON-TECH POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Tech News category
     if (!isTechPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

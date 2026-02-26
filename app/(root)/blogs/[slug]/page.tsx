@@ -668,8 +668,9 @@ export default async function BlogDetailPage({
       </>
     );
   } catch (error) {
-    // If there's an error, redirect to home
-    redirect("/");
+    // If there's an error, return 404 instead of redirect
+    // Redirects create "Page with redirect" issues in Search Console
+    notFound();
   }
 }
 

@@ -371,9 +371,11 @@ export default async function EmergingTechDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-EMERGING TECH POSTS ==========
+    // ========== REJECT NON-EMERGING TECH POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Emerging Tech category
     if (!isEmergingTechPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

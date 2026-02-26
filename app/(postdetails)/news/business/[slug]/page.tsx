@@ -340,9 +340,11 @@ export default async function BusinessDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-BUSINESS POSTS ==========
+    // ========== REJECT NON-BUSINESS POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Business category
     if (!isBusinessPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

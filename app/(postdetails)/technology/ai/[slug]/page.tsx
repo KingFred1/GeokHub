@@ -353,9 +353,11 @@ export default async function AIDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-AI POSTS ==========
+    // ========== REJECT NON-AI POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the AI category
     if (!isAIPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

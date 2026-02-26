@@ -377,9 +377,11 @@ export default async function CloudDevOpsDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-CLOUD & DEVOPS POSTS ==========
+    // ========== REJECT NON-CLOUD & DEVOPS POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Cloud & DevOps category
     if (!isCloudDevOpsPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

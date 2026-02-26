@@ -346,9 +346,11 @@ export default async function GadgetsDetailPage({
       );
     });
 
-    // ========== REDIRECT NON-GADGETS POSTS ==========
+    // ========== REJECT NON-GADGETS POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Gadgets category
     if (!isGadgetsPost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

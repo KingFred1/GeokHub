@@ -318,9 +318,11 @@ export default async function LifestyleDetailPage({
              parentSlug === "lifestyle" || parentSlug === "living";
     });
 
-    // ========== REDIRECT NON-LIFESTYLE POSTS ==========
+    // ========== REJECT NON-LIFESTYLE POSTS WITH 404 ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in the Lifestyle category
     if (!isLifestylePost) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // ========== CHECK PUBLICATION DATE ==========

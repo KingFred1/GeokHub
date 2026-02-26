@@ -314,9 +314,11 @@ export default async function NewsDetailPage({
 
     const primarySection = getPrimarySection(post);
 
-    // Redirect to blog if not a recognized section (news/world/business)
+    // ========== REJECT IF NOT A RECOGNIZED NEWS SECTION ==========
+    // Don't redirect - this creates "Page with redirect" issues in Search Console
+    // Instead, return 404 for posts not in recognized news sections (news/world/business)
     if (!primarySection) {
-      redirect(`/blogs/${decodedSlug}`);
+      notFound();
     }
 
     // Compute section-aware slug and map `business` to `/news/business`
