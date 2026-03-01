@@ -7,8 +7,7 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// no Suspense needed for view component
-// skeleton no longer needed after removing Suspense
+
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";

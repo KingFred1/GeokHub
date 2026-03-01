@@ -8,7 +8,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// Suspense/skeleton removed; view counter rendered server-side
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -47,8 +46,7 @@ const md = markdownit({
   },
 });
 
-// CRITICAL: Force dynamic rendering
-export const dynamic = "force-dynamic";
+
 export const revalidate = 86400;
 
 // METADATA
@@ -59,6 +57,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    // FIX: decode slug so canonical URL matches the page URL exactly
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
@@ -72,7 +72,7 @@ export async function generateMetadata({
         body,
         publishedAt
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 86400 } },
     );
 
@@ -80,11 +80,14 @@ export async function generateMetadata({
       return {
         title: "News Article Not Found - GeokHub",
         description: "The requested news article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/news/${slug}`;
+    const canonicalUrl = `https://www.geokhub.com/news/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -106,6 +109,20 @@ export async function generateMetadata({
       title: post.seoTitle || `${post.title} - GeokHub News`,
       description: post.metaDescription || description,
       alternates: { canonical: canonicalUrl },
+
+      // FIX: explicitly allow indexing on the success path
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+
       openGraph: {
         title: post.title,
         description,
@@ -125,7 +142,8 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    // On transient errors, keep pages indexable so we don't accidentally
+    // de-index content due to a temporary fetch failure.
     return {
       robots: {
         index: true,
@@ -223,7 +241,7 @@ export default async function NewsDetailPage({
     const decodedSlug = decodeURIComponent(slug);
     const baseUrl = "https://www.geokhub.com";
 
-    // Fetch the news post - using inline query like in blogs page
+    // Fetch the news post
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         _id,
@@ -280,7 +298,7 @@ export default async function NewsDetailPage({
       notFound();
     }
 
-    // ========== SECTION CHECK (news | world) ==========
+    // ========== SECTION CHECK (news | world | business) ==========
     function getPrimarySection(
       post: any,
     ): { slug: string; title?: string } | undefined {
@@ -314,9 +332,7 @@ export default async function NewsDetailPage({
 
     const primarySection = getPrimarySection(post);
 
-    // ========== REJECT IF NOT A RECOGNIZED NEWS SECTION ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in recognized news sections (news/world/business)
+    
     if (!primarySection) {
       notFound();
     }
@@ -447,7 +463,7 @@ export default async function NewsDetailPage({
                       />
                       <div className="w-8 h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
                       <div className="text-center">
-                          <View slug={decodedSlug} />
+                        <View slug={decodedSlug} />
                       </div>
                     </div>
                   </div>
@@ -514,7 +530,7 @@ export default async function NewsDetailPage({
                     </div>
                   </div>
 
-                  <div className="relative ">
+                  <div className="relative">
                     {/* Check if we have gallery images */}
                     {post.galleryImages && post.galleryImages.length > 0 ? (
                       <>
@@ -611,7 +627,7 @@ export default async function NewsDetailPage({
                           Sources
                         </h4>
                         <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                          {post.sources.map((source, index) => (
+                          {post.sources.map((source: string, index: number) => (
                             <li key={index} className="flex items-start gap-2">
                               <span className="text-red-600 mt-1">•</span>
                               <span>{source}</span>
@@ -643,7 +659,7 @@ export default async function NewsDetailPage({
                             Topics
                           </h4>
                           <div className="flex flex-wrap gap-2">
-                            {post.keywords.slice(0, 8).map((tag, index) => (
+                            {post.keywords.slice(0, 8).map((tag: string, index: number) => (
                               <span
                                 key={index}
                                 className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full"
@@ -662,7 +678,7 @@ export default async function NewsDetailPage({
               {/* Right Sidebar */}
               <aside className="lg:w-80">
                 <div className="sticky top-32 space-y-8">
-                  {/* Breaking News Sidebar - Like "Recommended for You" in blogs */}
+                  {/* Latest News Sidebar */}
                   <div className="bg-white dark:bg-card rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-3 hidden lg:block">
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                       <Newspaper size={20} className="text-red-600" />
@@ -673,14 +689,13 @@ export default async function NewsDetailPage({
                         breakingNewsWithUrls
                           .slice(1, 4)
                           .map((newsItem: any) => {
-                            // Ensure we have a valid slug string
                             const slugString =
                               newsItem.slug?.current || newsItem.slug;
-                            if (!slugString) return null; // Skip if no slug
+                            if (!slugString) return null;
 
                             return (
                               <a
-                                key={slugString} // Use the actual slug string
+                                key={slugString}
                                 href={newsItem.url}
                                 className="block group"
                               >
@@ -705,22 +720,6 @@ export default async function NewsDetailPage({
                     </div>
                   </div>
 
-                  {/* KO-FI WIDGET */}
-                  {/* <div className="">
-                    <iframe
-                      id="kofiframe"
-                      src="https://ko-fi.com/geokhub/?hidefeed=true&widget=true&embed=true&preview=true"
-                      style={{
-                        border: "none",
-                        width: "100%",
-                        padding: "2px",
-                        background: "#f9f9f9",
-                      }}
-                      height="400"
-                      title="geokhub"
-                    />
-                  </div> */}
-
                   {/* Newsletter Signup */}
                   <div className="bg-red-600 rounded-2xl p-6 text-white">
                     <NewsletterForm
@@ -734,7 +733,7 @@ export default async function NewsDetailPage({
               </aside>
             </div>
 
-            {/* Related News Section - Like "Related Posts" in blogs */}
+            {/* Related News Section */}
             {relatedNewsWithUrls && relatedNewsWithUrls.length > 0 && (
               <section className="mt-16">
                 <div className="text-center mb-12">
@@ -786,7 +785,6 @@ export async function generateStaticParams() {
         defined(categories) && 
         count((categories[]->slug.current)[@ in ["news", "world", "business"]]) > 0
       ]{
-
       "slug": slug.current
     }
   `);

@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// Suspense not needed for server component view counter
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";

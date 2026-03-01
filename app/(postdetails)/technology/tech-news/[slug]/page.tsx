@@ -17,12 +17,10 @@ import BlogContentWithReadMore from "@/components/global/BlogContentWithReadMore
 import SidebarShareButton from "@/components/global/SidebarShareButton";
 import InlineArticleAd from "@/components/ads/InlineArticleAd";
 import {
- 
   ArrowRight,
   BookOpen,
   Clock,
   Cpu,
-  
   Smartphone,
   Code,
   Database,
@@ -57,8 +55,8 @@ const md = markdownit({
   },
 });
 
-// Allow static generation for SEO (Google crawling)
-export const revalidate = 86400; // 24 hours
+
+export const revalidate = 86400;
 
 // METADATA
 export async function generateMetadata({
@@ -68,6 +66,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    // FIX: decode slug so canonical URL matches the page URL exactly
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
@@ -86,7 +86,7 @@ export async function generateMetadata({
         technologyType,
         company
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 86400 } },
     );
 
@@ -95,11 +95,14 @@ export async function generateMetadata({
         title: "Tech News Article Not Found - GeokHub",
         description:
           "The requested technology news article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/technology/tech-news/${slug}`;
+    const canonicalUrl = `https://www.geokhub.com/technology/tech-news/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -121,6 +124,20 @@ export async function generateMetadata({
       title: post.seoTitle || `${post.title} - GeokHub Tech News`,
       description: post.metaDescription || description,
       alternates: { canonical: canonicalUrl },
+
+      // FIX: explicitly allow indexing on the success path
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+
       openGraph: {
         title: post.title,
         description,
@@ -141,7 +158,8 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    // On transient errors, keep pages indexable so we don't accidentally
+    // de-index content due to a temporary fetch failure.
     return {
       robots: {
         index: true,
@@ -393,7 +411,7 @@ export default async function TechDetailPage({
         { timeout: 10000 },
       ),
       client.fetch(
-         `*[_type == "post" && "tech-news" in categories[]->slug.current] | order(publishedAt desc)[0...5] {
+        `*[_type == "post" && "tech-news" in categories[]->slug.current] | order(publishedAt desc)[0...5] {
           _id,
           title,
           "slug": slug.current,
@@ -649,7 +667,6 @@ export default async function TechDetailPage({
 
                 {/* Hero Image Slider */}
                 <div className="mb-5">
-                  {/* Check if we have gallery images */}
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -658,17 +675,15 @@ export default async function TechDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* Business News Badge */}
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
-                          BUSINESS NEWS
+                        <span className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          TECH NEWS
                         </span>
                       </div>
                     </>
                   ) : post.images &&
                     Array.isArray(post.images) &&
                     post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
                     <>
                       <ImageSliderWrapper
                         images={post.images.map((img: any) => ({
@@ -679,13 +694,12 @@ export default async function TechDetailPage({
                         className="md:rounded-xl shadow-2xl"
                       />
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           TECH NEWS
                         </span>
                       </div>
                     </>
                   ) : (
-                    // Fallback to single main image
                     <div className="md:rounded-xl overflow-hidden shadow-2xl">
                       <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
                         <img
@@ -696,7 +710,7 @@ export default async function TechDetailPage({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute top-6 left-6">
-                          <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          <span className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                             TECH NEWS
                           </span>
                         </div>
@@ -711,7 +725,7 @@ export default async function TechDetailPage({
                 </div>
 
                 {/* Text-to-Speech Player */}
-                <div className=" mb-10 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-purple-100 dark:border-purple-800">
+                <div className="mb-10 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-purple-100 dark:border-purple-800">
                   <TextToSpeechPlayer content={plainTextContent} />
                 </div>
 
@@ -997,7 +1011,7 @@ export async function generateStaticParams() {
   const posts = await client.fetch(`
     *[_type == "post" && 
       defined(categories) && 
-      count((categories[]->slug.current)[@ in ["tech", "technology"]]) > 0
+      count((categories[]->slug.current)[@ in ["tech-news", "technology"]]) > 0
     ] {
       "slug": slug.current
     }

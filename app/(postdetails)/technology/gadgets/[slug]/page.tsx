@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// view counter rendered directly on server
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -55,8 +54,7 @@ const md = markdownit({
   },
 });
 
-// CRITICAL: Force dynamic rendering
-export const dynamic = "force-dynamic";
+
 export const revalidate = 86400;
 
 // METADATA
@@ -67,6 +65,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    // FIX: decode slug so canonical URL matches the page URL exactly
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
@@ -83,19 +83,22 @@ export async function generateMetadata({
         body,
         publishedAt
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 86400 } },
     );
 
     if (!post) {
       return {
-        title: "Gadgets review Article Not Found - GeokHub",
+        title: "Gadgets Review Article Not Found - GeokHub",
         description: "The requested gadgets article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/technology/gadgets/${slug}`;
+    const canonicalUrl = `https://www.geokhub.com/technology/gadgets/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -114,9 +117,23 @@ export async function generateMetadata({
 
     return {
       metadataBase: new URL("https://www.geokhub.com"),
-      title: post.seoTitle || `${post.title} - GeokHub Gadgets `,
+      title: post.seoTitle || `${post.title} - GeokHub Gadgets`,
       description: post.metaDescription || description,
       alternates: { canonical: canonicalUrl },
+
+      // FIX: explicitly allow indexing on the success path
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+
       openGraph: {
         title: post.title,
         description,
@@ -136,7 +153,8 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    // On transient errors, keep pages indexable so we don't accidentally
+    // de-index content due to a temporary fetch failure.
     return {
       robots: {
         index: true,
@@ -193,7 +211,6 @@ function getPostUrl(post: any): string {
     return `/blogs/${slugValue}`;
   }
 
-  // Check each category for "gadgets" or "gadgets"
   for (const category of post.categories) {
     const categoryTitle = category.title?.toLowerCase();
     const categorySlug = category.slug?.current?.toLowerCase();
@@ -202,7 +219,6 @@ function getPostUrl(post: any): string {
       return `/technology/gadgets/${slugValue}`;
     }
 
-    // Also check parent category if exists
     if (category.parent) {
       const parentTitle = category.parent.title?.toLowerCase();
       const parentSlug = category.parent.slug?.current?.toLowerCase();
@@ -334,21 +350,19 @@ export default async function GadgetsDetailPage({
     }
 
     // ========== GADGETS CATEGORY CHECK ==========
-    const isGadgetsPost = post.categories?.some((cat) => {
+    const isGadgetsPost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      // FIX: removed duplicate parentSlug === "gadgets" condition
       return (
         catTitle === "gadgets" ||
         catSlug === "gadgets" ||
-        parentSlug === "gadgets" ||
         parentSlug === "gadgets"
       );
     });
 
     // ========== REJECT NON-GADGETS POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Gadgets category
     if (!isGadgetsPost) {
       notFound();
     }
@@ -459,7 +473,7 @@ export default async function GadgetsDetailPage({
         },
       },
       articleSection: post.categories?.[0]?.title || "Gadgets",
-      ...(post.breakingNews && { dateline: "GADGETS Review" }),
+      ...(post.breakingNews && { dateline: "GADGETS REVIEW" }),
       ...(post.technologyType && { articleSection: post.technologyType }),
       ...(post.company && { provider: post.company }),
       ...(post.releaseDate && { dateCreated: post.releaseDate }),
@@ -502,7 +516,7 @@ export default async function GadgetsDetailPage({
                     <time dateTime={post.publishedAt} className="font-medium">
                       {formatReadableDate(post.publishedAt)}
                     </time>
-                  </div>{" "}
+                  </div>
                 </div>
               </div>
             </div>
@@ -653,7 +667,6 @@ export default async function GadgetsDetailPage({
 
                 {/* Hero Image Slider */}
                 <div className="mb-5">
-                  {/* Check if we have gallery images */}
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -662,9 +675,9 @@ export default async function GadgetsDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* Business News Badge */}
+                      {/* FIX: was incorrectly using bg-green-600 (business color) */}
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-teal-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           GADGETS REVIEW
                         </span>
                       </div>
@@ -672,7 +685,6 @@ export default async function GadgetsDetailPage({
                   ) : post.images &&
                     Array.isArray(post.images) &&
                     post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
                     <>
                       <ImageSliderWrapper
                         images={post.images.map((img: any) => ({
@@ -683,13 +695,12 @@ export default async function GadgetsDetailPage({
                         className="md:rounded-xl shadow-2xl"
                       />
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-teal-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           GADGETS REVIEW
                         </span>
                       </div>
                     </>
                   ) : (
-                    // Fallback to single main image
                     <div className="md:rounded-xl overflow-hidden shadow-2xl">
                       <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
                         <img
@@ -700,7 +711,7 @@ export default async function GadgetsDetailPage({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute top-6 left-6">
-                          <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          <span className="bg-teal-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                             GADGETS REVIEW
                           </span>
                         </div>

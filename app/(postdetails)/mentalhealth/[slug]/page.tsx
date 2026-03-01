@@ -7,8 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// Suspense not needed for server view counter
-// skeleton no longer needed after removing Suspense
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -52,8 +50,7 @@ const md = markdownit({
   },
 });
 
-// Force dynamic rendering
-export const dynamic = "force-dynamic";
+
 export const revalidate = 86400;
 
 // METADATA
@@ -64,6 +61,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    // FIX: decode slug so canonical URL matches the page URL exactly
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
@@ -80,7 +79,7 @@ export async function generateMetadata({
         body,
         publishedAt
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 86400 } },
     );
 
@@ -88,11 +87,14 @@ export async function generateMetadata({
       return {
         title: "Mental Health Article Not Found - GeokHub",
         description: "The requested mental health article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/mentalhealth/${slug}`;
+    const canonicalUrl = `https://www.geokhub.com/mentalhealth/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -114,6 +116,20 @@ export async function generateMetadata({
       title: post.seoTitle || `${post.title} - GeokHub Mental Health`,
       description: post.metaDescription || description,
       alternates: { canonical: canonicalUrl },
+
+      // FIX: explicitly allow indexing on the success path
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+
       openGraph: {
         title: post.title,
         description,
@@ -133,7 +149,8 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    // On transient errors, keep pages indexable so we don't accidentally
+    // de-index content due to a temporary fetch failure.
     return {
       robots: {
         index: true,
@@ -190,18 +207,15 @@ function getPostUrl(post: any): string {
     return `/blogs/${slugValue}`;
   }
 
-  // Check each category for mental health (accepts variations like "mentalhealth", "mentalhealth", "mental health")
   for (const category of post.categories) {
     const categoryTitle = (category.title || "").toLowerCase();
     const categorySlug = (category.slug?.current || "").toLowerCase();
 
     const titleIsMental =
       (categoryTitle.includes("mental") && categoryTitle.includes("health")) ||
-      categoryTitle.includes("mentalhealth") ||
       categoryTitle.includes("mentalhealth");
     const slugIsMental =
       (categorySlug.includes("mental") && categorySlug.includes("health")) ||
-      categorySlug.includes("mentalhealth") ||
       categorySlug.includes("mentalhealth");
 
     if (titleIsMental || slugIsMental) {
@@ -236,15 +250,6 @@ function getMentalHealthCategory(mentalHealthType: string): string {
 
   return "Mental Health";
 }
-
-// Mental health color palette - Using calming blue/purple colors
-const mentalHealthColors = {
-  primary: "indigo",
-  gradient: "from-blue-600 to-indigo-600",
-  gradientLight: "from-blue-50 to-indigo-50",
-  border: "blue-100",
-  text: "blue-600",
-};
 
 // Crisis support information
 const crisisSupportInfo = {
@@ -345,22 +350,19 @@ export default async function MentalHealthDetailPage({
     }
 
     // ========== MENTAL HEALTH CATEGORY CHECK ==========
-    const isMentalHealthPost = post.categories?.some((cat) => {
-      const catTitle = cat.title?.toLowerCase();
-      const catSlug = cat.slug?.current?.toLowerCase();
+    // FIX: removed duplicate conditions and typo ("mentalheath")
+    const isMentalHealthPost = post.categories?.some((cat: any) => {
+      const catTitle = (cat.title || "").toLowerCase();
+      const catSlug = (cat.slug?.current || "").toLowerCase();
       return (
         catTitle.includes("mentalhealth") ||
         catSlug.includes("mentalhealth") ||
-        catTitle.includes("mentalheath") ||
-        catSlug.includes("mentalheath") ||
-        catTitle.includes("mentalhealth") ||
-        catSlug.includes("mentalhealth")
+        (catTitle.includes("mental") && catTitle.includes("health")) ||
+        (catSlug.includes("mental") && catSlug.includes("health"))
       );
     });
 
     // ========== REJECT NON-MENTAL HEALTH POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Mental Health category
     if (!isMentalHealthPost) {
       notFound();
     }
@@ -403,21 +405,21 @@ export default async function MentalHealthDetailPage({
 
     // Add URLs to related posts
     const mentalHealthPostsWithUrls =
-      mentalHealthPosts?.map((post: any) => ({
-        ...post,
-        url: getPostUrl(post),
+      mentalHealthPosts?.map((p: any) => ({
+        ...p,
+        url: getPostUrl(p),
       })) || [];
 
     const relatedMentalHealthPostsWithUrls =
-      relatedMentalHealthPosts?.map((post: any) => ({
-        ...post,
-        url: getPostUrl(post),
+      relatedMentalHealthPosts?.map((p: any) => ({
+        ...p,
+        url: getPostUrl(p),
       })) || [];
 
     const trendingMentalHealthWithUrls =
-      trendingMentalHealth?.map((post: any) => ({
-        ...post,
-        url: getPostUrl(post),
+      trendingMentalHealth?.map((p: any) => ({
+        ...p,
+        url: getPostUrl(p),
       })) || [];
 
     // ========== PREPARE DATA ==========
@@ -463,7 +465,7 @@ export default async function MentalHealthDetailPage({
       publisher: {
         "@type": "Organization",
         name: "GeokHub Mental Health",
-        url: "https://www.geokhub.com/lifestyle/mentalhealth",
+        url: "https://www.geokhub.com/mentalhealth",
       },
       articleSection: "Mental Health",
     };
@@ -488,7 +490,7 @@ export default async function MentalHealthDetailPage({
         </div>
 
         <div className="min-h-screen bg-background">
-          {/* Mental Health Navigation Indicator - ADDED THIS SECTION */}
+          {/* Mental Health Navigation Indicator */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
             <div className="max-w-7xl mx-auto px-4 py-2">
               <div className="flex items-center justify-between">
@@ -617,7 +619,6 @@ export default async function MentalHealthDetailPage({
 
                 {/* Hero Image Slider */}
                 <div className="mb-5">
-                  {/* Check if we have gallery images */}
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -626,9 +627,9 @@ export default async function MentalHealthDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* Business News Badge */}
+                      {/* FIX: was incorrectly using bg-green-600 (business color) */}
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           MENTAL HEALTH
                         </span>
                       </div>
@@ -636,7 +637,6 @@ export default async function MentalHealthDetailPage({
                   ) : post.images &&
                     Array.isArray(post.images) &&
                     post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
                     <>
                       <ImageSliderWrapper
                         images={post.images.map((img: any) => ({
@@ -647,13 +647,12 @@ export default async function MentalHealthDetailPage({
                         className="md:rounded-xl shadow-2xl"
                       />
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           MENTAL HEALTH
                         </span>
                       </div>
                     </>
                   ) : (
-                    // Fallback to single main image
                     <div className="md:rounded-xl overflow-hidden shadow-2xl">
                       <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
                         <img
@@ -664,7 +663,7 @@ export default async function MentalHealthDetailPage({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute top-6 left-6">
-                          <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          <span className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                             MENTAL HEALTH
                           </span>
                         </div>
@@ -852,7 +851,6 @@ export default async function MentalHealthDetailPage({
                       </div>
                     </div>
                     <div className="p-2">
-                      {/* Prefer trending if available, otherwise fall back to category list so Popular always shows */}
                       {(trendingMentalHealthWithUrls?.length || 0) > 0 ||
                       (mentalHealthPostsWithUrls?.length || 0) > 0 ? (
                         (trendingMentalHealthWithUrls &&
@@ -978,7 +976,7 @@ export default async function MentalHealthDetailPage({
                   />
                   <div className="text-center mt-12">
                     <Link
-                      href="/lifestyles/mentalhealth"
+                      href="/mentalhealth"
                       className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
                       Explore All Mental Health Resources

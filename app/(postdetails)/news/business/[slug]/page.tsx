@@ -53,8 +53,7 @@ const md = markdownit({
   },
 });
 
-// CRITICAL: Force dynamic rendering
-export const dynamic = "force-dynamic";
+
 export const revalidate = 86400;
 
 // METADATA
@@ -65,6 +64,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    // FIX: decode slug so canonical URL matches the page URL exactly
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
@@ -83,7 +84,7 @@ export async function generateMetadata({
         marketSector,
         stockSymbol
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 86400 } },
     );
 
@@ -91,11 +92,14 @@ export async function generateMetadata({
       return {
         title: "Business News Article Not Found - GeokHub",
         description: "The requested business news article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/news/business/${slug}`;
+    const canonicalUrl = `https://www.geokhub.com/news/business/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -117,6 +121,20 @@ export async function generateMetadata({
       title: post.seoTitle || `${post.title} - GeokHub Business News`,
       description: post.metaDescription || description,
       alternates: { canonical: canonicalUrl },
+
+      // FIX: explicitly allow indexing on the success path
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+
       openGraph: {
         title: post.title,
         description,
@@ -137,7 +155,8 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    // On transient errors, keep pages indexable so we don't accidentally
+    // de-index content due to a temporary fetch failure.
     return {
       robots: {
         index: true,
@@ -913,23 +932,6 @@ export default async function BusinessDetailPage({
                       theme="dark"
                     />
                   </div>
-
-                  {/* Investor Resources */}
-                  {/* <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-6 text-white">
-                    <div className="text-center">
-                      <ChartBar className="h-10 w-10 mx-auto mb-3" />
-                      <h3 className="text-lg font-bold mb-2">Investor Resources</h3>
-                      <p className="text-sm opacity-90 mb-4">
-                        Access market analysis tools and investment insights
-                      </p>
-                      <Link
-                        href="/investor-tools"
-                        className="inline-block bg-white text-amber-600 hover:bg-gray-100 px-6 py-2 rounded-full font-semibold text-sm transition-colors"
-                      >
-                        Explore Tools
-                      </Link>
-                    </div>
-                  </div> */}
                 </div>
               </aside>
             </div>

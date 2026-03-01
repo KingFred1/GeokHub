@@ -7,8 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// Suspense not required for server-side view component
-// skeleton no longer needed after removing Suspense
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -52,8 +50,7 @@ const md = markdownit({
   },
 });
 
-// CRITICAL: Force dynamic rendering
-export const dynamic = "force-dynamic";
+
 export const revalidate = 86400;
 
 // METADATA
@@ -64,6 +61,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    // decode slug so canonical URL matches the page URL exactly
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
@@ -78,7 +77,7 @@ export async function generateMetadata({
         publishedAt,
         location
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 86400 } },
     );
 
@@ -86,11 +85,14 @@ export async function generateMetadata({
       return {
         title: "World News Article Not Found - GeokHub",
         description: "The requested world news article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/news/world/${slug}`;
+    const canonicalUrl = `https://www.geokhub.com/news/world/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -112,6 +114,20 @@ export async function generateMetadata({
       title: post.seoTitle || `${post.title} - GeokHub World News`,
       description: post.metaDescription || description,
       alternates: { canonical: canonicalUrl },
+
+      // FIX: explicitly allow indexing on the success path
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+
       openGraph: {
         title: post.title,
         description,
@@ -132,7 +148,8 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    // On transient errors, keep pages indexable so we don't accidentally
+    // de-index content due to a temporary fetch failure.
     return {
       robots: {
         index: true,
@@ -323,8 +340,6 @@ export default async function WorldDetailPage({
     });
 
     // ========== REJECT NON-WORLD POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the World category
     if (!isWorldPost) {
       notFound();
     }
@@ -742,70 +757,11 @@ export default async function WorldDetailPage({
                     </div>
                   </div>
                 </div>
-
-                {/* Back to World News */}
-                {/* <div className="text-center mb-16">
-                  <Link
-                    href="/world"
-                    className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
-                  >
-                    <Globe className="h-5 w-5" />
-                    Back to World News
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </div> */}
               </div>
 
               {/* Right Sidebar */}
               <aside className="lg:w-80">
                 <div className="sticky top-32 space-y-8">
-                  {/* Trending World News */}
-                  {/* <div className="bg-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5">
-                      <div className="flex items-center gap-3">
-                        <TrendingUp className="h-6 w-6" />
-                        <h2 className="text-xl font-bold">Trending Globally</h2>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      {trendingWorldWithUrls?.length > 0 ? (
-                        trendingWorldWithUrls.slice(0, 5).map((newsItem: any, index: number) => {
-                          const slugString = newsItem.slug?.current || newsItem.slug;
-                          if (!slugString) return null;
-                          
-                          return (
-                            <Link
-                              key={slugString}
-                              href={newsItem.url}
-                              className="group block mb-4 last:mb-0"
-                            >
-                              <div className="flex gap-3 p-3 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200">
-                                <div className="flex-shrink-0">
-                                  <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-lg font-bold text-sm">
-                                    {index + 1}
-                                  </div>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 text-sm">
-                                    {newsItem.title}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <Eye className="h-3 w-3 text-gray-400" />
-                                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                                      {newsItem.views?.toLocaleString() || 0} views
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </Link>
-                          );
-                        })
-                      ) : (
-                        <p className="text-gray-500 text-center py-6">No trending news</p>
-                      )}
-                    </div>
-                  </div> */}
-
                   {/* Latest from Region */}
                   <div className="bg-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                     <div className="bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 text-white p-5">
