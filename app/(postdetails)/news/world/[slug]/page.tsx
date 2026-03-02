@@ -51,7 +51,7 @@ const md = markdownit({
 });
 
 
-export const revalidate = 86400;
+export const revalidate = 2592000;
 
 // METADATA
 export async function generateMetadata({
@@ -78,7 +78,7 @@ export async function generateMetadata({
         location
       }`,
       { slug: decodedSlug },
-      { next: { revalidate: 86400 } },
+      { next: { revalidate: 2592000 } },
     );
 
     if (!post) {
@@ -319,7 +319,7 @@ export default async function WorldDetailPage({
       }`,
       { slug: decodedSlug },
       {
-        next: { revalidate: 86400 },
+        next: { revalidate: 2592000 },
         timeout: 15000,
       },
     );

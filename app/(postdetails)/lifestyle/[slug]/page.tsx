@@ -38,7 +38,7 @@ const md = markdownit({
 
 // CRITICAL: Force dynamic rendering
 export const dynamic = "force-dynamic";
-export const revalidate = 86400;
+export const revalidate = 2592000;
 
 // METADATA
 export async function generateMetadata({
@@ -65,7 +65,7 @@ export async function generateMetadata({
         publishedAt
       }`,
       { slug },
-      { next: { revalidate: 86400 } }
+      { next: { revalidate: 2592000 } }
     );
 
     if (!post) {
@@ -298,7 +298,7 @@ export default async function LifestyleDetailPage({
       }`,
       { slug: decodedSlug },
       {
-        next: { revalidate: 86400 },
+        next: { revalidate: 2592000 },
         timeout: 15000,
       }
     );

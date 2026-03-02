@@ -112,7 +112,7 @@ function videoEmbedPlugin(md: markdownit.MarkdownIt) {
 md.use(videoEmbedPlugin);
 
 // Allow static generation for SEO (Google crawling)
-export const revalidate = 86400; // 24 hours
+export const revalidate = 2592000; // 24 hours
 
 // RESTORED FULL SEO METADATA GENERATION
 export async function generateMetadata({
@@ -127,7 +127,7 @@ export async function generateMetadata({
       BLOG_BY_SLUG_QUERY,
       { slug },
       {
-        next: { revalidate: 86400 },
+        next: { revalidate: 2592000 },
         timeout: 15000,
       },
     );
@@ -272,7 +272,7 @@ export default async function BlogDetailPage({
       BLOG_BY_SLUG_QUERY,
       { slug: decodedSlug },
       {
-        next: { revalidate: 86400 },
+        next: { revalidate: 2592000 },
         timeout: 15000,
       },
     );

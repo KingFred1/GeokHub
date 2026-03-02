@@ -58,7 +58,9 @@ const md = markdownit({
 });
 
 // Allow static generation for SEO (Google crawling)
-export const revalidate = 86400; // 24 hours
+// export const revalidate = 86400; // 24 hours
+
+export const revalidate = 2592000; // 30 days
 
 // METADATA
 export async function generateMetadata({
@@ -85,7 +87,7 @@ export async function generateMetadata({
         publishedAt
       }`,
       { slug },
-      { next: { revalidate: 86400 } },
+      { next: { revalidate: 2592000 } },
     );
 
     if (!post) {
@@ -403,7 +405,7 @@ export default async function WellnessDetailPage({
       }`,
       { slug: decodedSlug },
       {
-        next: { revalidate: 86400 },
+        next: { revalidate: 2592000 },
         timeout: 15000,
       },
     );
