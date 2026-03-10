@@ -8,7 +8,7 @@ import Link from "next/link";
 // trending icons used later ephemeral
 
 export const dynamic = "force-dynamic";
-export const revalidate = 86400 ; // 1 day
+export const revalidate = 2592000 ; // 1 day
 // // or
 // export const revalidate = 1800; // 30 minutes
 // // or  
@@ -22,11 +22,11 @@ export default async function Cybersecurity() {
       cache: "no-store",
       next: {
         tags: ["technology/cybersecurity"],
-        revalidate: 86400, // 1 day
+        revalidate: 2592000, // 1 day
       },
     }
   );
-  const trendingPosts = mainBlogs?.slice(0, 3) || [];
+  const trendingPosts = mainBlogs?.slice(0, 4) || [];
 
   function formatTimeShort(dateString: string): string {
     const date = new Date(dateString);
@@ -73,7 +73,7 @@ export default async function Cybersecurity() {
               Trending Cybersecurity
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {trendingPosts.length > 0 ? (
               trendingPosts.map((post: any) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>

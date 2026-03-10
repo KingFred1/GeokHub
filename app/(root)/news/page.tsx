@@ -4,7 +4,7 @@ import { BLOGS_BY_NEWS_SLUGS, NEWS_CATEGORIES } from "@/sanity/lib/queries";
 import { Category, Post } from "@/type";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 30;
+export const revalidate = 2592000;
 
 export async function generateMetadata() {
   return {

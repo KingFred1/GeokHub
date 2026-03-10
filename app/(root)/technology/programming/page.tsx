@@ -6,7 +6,7 @@ import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 2592000;
 
 function formatTimeShort(dateString: string): string {
   const date = new Date(dateString);
@@ -48,7 +48,7 @@ export default async function ProgrammingPage() {
     { slug: "programming" },
     {
       cache: "no-store",
-      next: { tags: ["technology/programming"], revalidate: 3600 },
+      next: { tags: ["technology/programming"], revalidate: 2592000 },
     }
   );
   const trending = mainBlogs?.slice(0, 4) || [];

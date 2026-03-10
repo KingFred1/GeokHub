@@ -7,7 +7,7 @@ import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 2592000;
 
 function formatTimeShort(dateString: string): string {
   const date = new Date(dateString);
@@ -78,10 +78,10 @@ export default async function GadgetsPage({ searchParams }: { searchParams?: { p
   const mainBlogs = await client.fetch(
     BLOG_BY_CATEGORY_SLUG,
     { slug: "gadgets", start, end },
-    { cache: "no-store", next: { tags: ["technology/gadgets"], revalidate: 3600 } }
+    { cache: "no-store", next: { tags: ["technology/gadgets"], revalidate: 2592000 } }
   );
 
-  const trending = mainBlogs?.slice(0, 3) || [];
+  const trending = mainBlogs?.slice(0, 4) || [];
 
   return (
     <div className="min-h-screen bg-background">

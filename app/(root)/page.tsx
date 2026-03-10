@@ -81,8 +81,18 @@ const HOME_CATEGORIES_QUERY = `{
       mainImage,body,seoTitle,metaDescription,keywords
     },
   "technology": *[_type=="post" && (
-      count((categories[]->slug.current)[@=="technology"])>0 ||
-      count((categories[]->parent->slug.current)[@=="technology"])>0
+      count((categories[]->slug.current)[@=="ai"])>0 ||
+      count((categories[]->slug.current)[@=="programming"])>0 ||
+      count((categories[]->slug.current)[@=="cloud-devops"])>0 ||
+      count((categories[]->slug.current)[@=="emerging-tech"])>0 ||
+      count((categories[]->slug.current)[@=="gadgets"])>0 ||
+      count((categories[]->slug.current)[@=="cybersecurity"])>0 ||
+      count((categories[]->parent->slug.current)[@=="ai"])>0 ||
+      count((categories[]->parent->slug.current)[@=="programming"])>0 ||
+      count((categories[]->parent->slug.current)[@=="cloud-devops"])>0 ||
+      count((categories[]->parent->slug.current)[@=="emerging-tech"])>0 ||
+      count((categories[]->parent->slug.current)[@=="gadgets"])>0 ||
+      count((categories[]->parent->slug.current)[@=="cybersecurity"])>0
     )] | order(publishedAt desc)[0..8] {
       _id,title,slug,publishedAt,_updatedAt,
       author->{name,image},

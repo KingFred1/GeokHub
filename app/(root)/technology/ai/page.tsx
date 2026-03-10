@@ -7,7 +7,7 @@ import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 86400; // 1 day
+export const revalidate = 2592000; // 1 day
 // // or
 // export const revalidate = 1800; // 30 minutes
 // // or  
@@ -21,11 +21,11 @@ export default async function AI() {
       cache: "no-store",
       next: {
         tags: ["technology/ai"],
-        revalidate: 86400,
+        revalidate: 2592000,
       },
     }
   );
-  const trendingPosts = mainBlogs?.slice(0, 3) || [];
+  const trendingPosts = mainBlogs?.slice(0, 4) || [];
 
   function formatTimeShort(dateString: string): string {
     const date = new Date(dateString);
@@ -78,7 +78,7 @@ export default async function AI() {
               Trending AI
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {trendingPosts.length > 0 ? (
               trendingPosts.map((post: any) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>
@@ -139,7 +139,7 @@ export default async function AI() {
       </section>
 
       {/* Main Content Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+      <main className="max-w-7xl mx-auto mt-5 px-4 sm:px-6 lg:px-8 pb-20">
         {mainBlogs?.length > 3 ? (
           <MasonryGrid posts={mainBlogs.slice(4)} />
         ) : (

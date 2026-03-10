@@ -1,5 +1,3 @@
-// server component
-
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
 import {
@@ -163,9 +161,6 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
   }
 
   displayedPosts = displayedPosts.slice(0, 8);
-  const formattedTime = formatTimeShort(displayedPosts[0]?._updatedAt);
-
-
 
   return (
     <section className="w-full max-w-7xl mx-auto py-5 border-y">
@@ -221,81 +216,86 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
     
       {/* Featured Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {displayedPosts.map((post) => (
-          <article
-            key={post._id}
-            className="group bg-card dark:bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
-          >
-            <div className="relative h-48">
-              {/* Removed CardOptions temporarily */}
-              <Link
-                href={getPostDetailUrl(post)}
-                className="block h-full"
-              >
-                <StaticImage
-                  image={post.mainImage}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              </Link>
+        {displayedPosts.map((post) => {
+          // Format time for each post individually - FIXED
+          const formattedTime = formatTimeShort(post?._updatedAt || post?.publishedAt);
+          
+          return (
+            <article
+              key={post._id}
+              className="group bg-card dark:bg-card rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
+            >
+              <div className="relative h-48">
+                {/* Removed CardOptions temporarily */}
+                <Link
+                  href={getPostDetailUrl(post)}
+                  className="block h-full"
+                >
+                  <StaticImage
+                    image={post.mainImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                </Link>
 
-              {/* Category Badge */}
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-                  Tech
-                </span>
-              </div>
-            </div>
-
-            <div className="p-4">
-              <div className="flex items-center gap-4 mb-2 text-sm text-gray-500 dark:text-gray-400">
-                <div className="flex items-center gap-1 ">
-                  {post.author?.image && (
-                    <StaticImage
-                      image={post.author.image}
-                      alt={post.author?.name || "Author"}
-                      className="w-5 h-5 rounded-full"
-                    />
-                  )}
-                  <span>{post.author?.name || "Unknown"}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar size={14} />
-                  <time dateTime={post.publishedAt}>
-                    {formattedTime}
-                  </time>
+                {/* Category Badge */}
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
+                    Tech
+                  </span>
                 </div>
               </div>
 
-              <Link href={getPostDetailUrl(post)}>
-                <h3 className="font-semibold text-xl mb-2 line-clamp-3 text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  {post.title}
-                </h3>
-              </Link>
+              <div className="p-4">
+                <div className="flex items-center gap-4 mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-1 ">
+                    {post.author?.image && (
+                      <StaticImage
+                        image={post.author.image}
+                        alt={post.author?.name || "Author"}
+                        className="w-5 h-5 rounded-full"
+                      />
+                    )}
+                    <span>{post.author?.name || "Unknown"}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Calendar size={14} />
+                    <time dateTime={post.publishedAt || post._updatedAt}>
+                      {formattedTime}
+                    </time>
+                  </div>
+                </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-                <div className="flex items-center gap-4">
+                <Link href={getPostDetailUrl(post)}>
+                  <h3 className="font-semibold text-xl mb-2 line-clamp-3 text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    {post.title}
+                  </h3>
+                </Link>
 
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-4">
-                  {/* <LikeButton postId={post._id} /> */}
-                  {/* <Link href={`/blogs/${post.slug?.current}/#comments`}>
-                    <CommentCount postId={post._id} />
+
+                    <div className="flex items-center gap-4">
+                    {/* <LikeButton postId={post._id} /> */}
+                    {/* <Link href={`/blogs/${post.slug?.current}/#comments`}>
+                      <CommentCount postId={post._id} />
+                    </Link> */}
+                  </div>
+                  </div>
+
+                  {/* <Link
+                    href={getPostDetailUrl(post)}
+                    className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  >
+                    Read more
+                    <ChevronRight size={16} />
                   </Link> */}
                 </div>
-                </div>
-
-                {/* <Link
-                  href={getPostDetailUrl(post)}
-                  className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                >
-                  Read more
-                  <ChevronRight size={16} />
-                </Link> */}
               </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
 
       {/* CTA Section */}

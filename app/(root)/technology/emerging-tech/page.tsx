@@ -6,7 +6,7 @@ import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image"; // note: original import from "@/sanity/lib/image"?
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 2592000;
 
 function formatTimeShort(dateString: string): string {
   const date = new Date(dateString);
@@ -50,11 +50,11 @@ export default async function EmergingTechPage() {
       cache: "no-store",
       next: {
         tags: ["technology/emerging-tech"],
-        revalidate: 3600,
+        revalidate: 2592000,
       },
     }
   );
-  const trendingPosts = mainBlogs?.slice(0, 3) || [];
+  const trendingPosts = mainBlogs?.slice(0, 4) || [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,7 +67,7 @@ export default async function EmergingTechPage() {
               Trending Emerging Tech
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {trendingPosts.length > 0 ? (
               trendingPosts.map((post: any) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>

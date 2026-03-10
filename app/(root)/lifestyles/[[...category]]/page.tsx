@@ -9,7 +9,7 @@ interface LifestylePageProps {
 }
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // 1 hour
+export const revalidate = 2592000; // 1 hour
 // // or
 // export const revalidate = 1800; // 30 minutes
 // // or  
