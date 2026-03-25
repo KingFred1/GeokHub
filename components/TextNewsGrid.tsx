@@ -66,7 +66,7 @@ export default function TextNewsGrid({ posts, title }: TextNewsGridProps) {
 
 
   return (
-    <section className="my-8 mt-2">
+    <section className="mb-4 mt-5 md:mt-10 px-4 md:px-0">
       {title && (
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           {title}
@@ -113,7 +113,7 @@ export default function TextNewsGrid({ posts, title }: TextNewsGridProps) {
               key={post._id}
               className="group border-b border-gray-300 dark:border-gray-700 pb-5"
             >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 hover:underline">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white transition-colors line-clamp-2 hover:underline">
                 {post.title}
               </h3>
 
@@ -127,8 +127,8 @@ export default function TextNewsGrid({ posts, title }: TextNewsGridProps) {
                 <time dateTime={post.publishedAt}>
                   {formatDate(post.publishedAt)}
                 </time>
-                <span>•</span>
-                <span>{post.author?.name || "GeokHub"}</span>
+                {/* <span>•</span>
+                <span>{post.author?.name || "GeokHub"}</span> */}
               </div>
             </Link>
           );

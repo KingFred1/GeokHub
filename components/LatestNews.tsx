@@ -2,11 +2,29 @@
 
 import { urlFor } from "@/sanity/lib/image";
 import { Post } from "@/sanity/types";
-import { Calendar, ArrowRight} from "lucide-react";
+import { ArrowUpRightIcon, Calendar} from "lucide-react";
 // import LikeButton from "./global/LikeButton";
 // import CommentCount from "./global/CommentCount";
 
 import { formatTimeShort } from "@/lib/formatTime";
+import Link from "next/link";
+
+const ArrowRightIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    className="w-5 h-8"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 5l7 7-7 7"
+    />
+  </svg>
+);
 
 function getSlugValue(post: Post): string | undefined {
   if (!post) return undefined;
@@ -102,15 +120,20 @@ export default function LatestNews({ posts }: LatestNewsProps) {
 
 
   return (
-    <section className="w-full py-8">
+    <section className="w-full md:py-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6 sm:mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+        <div className="flex border-b border-gray-200 dark:border-gray-700 pb-4">
+          <Link 
+          href="/technology/tech-news"
+          className="flex text-lg hover:underline sm:text-lg font-semibold text-gray-900 dark:text-white md:px-0 px-4">
             Latest Tech News
-          </h1>
+            <ArrowRightIcon />
+          </Link>
+          
+          
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:gap-4 ">
           {displayPosts.map((post) => {
             const imageUrl = post.mainImage?.asset
               ? urlFor(post.mainImage)
@@ -140,14 +163,14 @@ export default function LatestNews({ posts }: LatestNewsProps) {
             return (
               <article
                 key={post._id}
-                className="bg-card dark:bg-card rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-300 h-full flex flex-col"
+                className="bg-card dark:bg-card border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow duration-300 h-full flex flex-col"
               >
                 {/* Image */}
                 <a
                   href={detailUrl}
                   className="block flex-shrink-0"
                 >
-                  <div className="relative h-40 sm:h-48 w-full overflow-hidden">
+                  <div className="relative h-48 sm:h-48 w-full overflow-hidden">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -172,8 +195,20 @@ export default function LatestNews({ posts }: LatestNewsProps) {
 
                 {/* Content */}
                 <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                  
+
+                  <Link href={detailUrl}>
+                    <h3 className="text-xl sm:text-lg font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 hover:underline transition-colors line-clamp-2 leading-tight">
+                      {post.title}
+                    </h3>
+                  </Link>
+
+                  <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed flex-1">
+                    {getPlainText(post)}
+                  </p>
+
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3">
-                    <div className="flex items-center gap-1">
+                    {/* <div className="flex items-center gap-1">
                       {authorImageUrl && (
                         <img
                           src={authorImageUrl}
@@ -185,8 +220,8 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                       <span className="font-medium text-xs sm:text-sm">
                         {post.author?.name || "Staff Writer"}
                       </span>
-                    </div>
-                    <span className="mx-1 hidden sm:inline">•</span>
+                    </div> */}
+                    {/* <span className="mx-1 hidden sm:inline">•</span> */}
                     <div className="flex items-center gap-1">
                       <Calendar size={12} className="sm:hidden" />
                       <Calendar size={14} className="hidden sm:block" />
@@ -196,17 +231,7 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                     </div>
                   </div>
 
-                  <a href={detailUrl}>
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-2 leading-tight">
-                      {post.title}
-                    </h3>
-                  </a>
-
-                  <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed flex-1">
-                    {getPlainText(post)}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700 mt-auto">
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700 mt-auto bg-black dark:bg-white">
                     {/* <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center gap-4">
                         <LikeButton postId={post._id} />
@@ -216,13 +241,13 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                       </div>
                     </div> */}
 
-                    <a
+                    {/* <a
                       href={detailUrl}
                       className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-xs sm:text-sm font-medium flex items-center"
                     >
                       Read more
                       <ArrowRight size={12} className="ml-1 sm:ml-1" />
-                    </a>
+                    </a> */}
                   </div>
                 </div>
               </article>
@@ -230,15 +255,15 @@ export default function LatestNews({ posts }: LatestNewsProps) {
           })}
         </div>
 
-        <div className="text-center mt-6 sm:mt-8">
-          <a
+        {/* <div className="text-center mt-6 sm:mt-8">
+          <Link
             href="/technology/tech-news"
             className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium text-sm sm:text-base"
           >
             View All News
             <ArrowRight size={14} className="ml-2 sm:ml-2" />
-          </a>
-        </div>
+          </Link>
+        </div> */}
       </div>
     </section>
   );

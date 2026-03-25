@@ -123,7 +123,7 @@ const NewsSwiper = ({ post }: { post: Post[] }) => {
 
   return (
     <div className="w-full relative group">
-      <div className="relative overflow-hidden bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl shadow-lg">
+      <div className="relative overflow-hidden bg-white dark:bg-gray-800 shadow-lg">
         <Swiper
           spaceBetween={0}
           slidesPerView={1}
@@ -150,7 +150,7 @@ const NewsSwiper = ({ post }: { post: Post[] }) => {
           fadeEffect={{ crossFade: true }}
           speed={800}
           onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
-          className="relative w-full h-72 xs:h-80 sm:h-84 md:h-96 lg:h-[350px] overflow-hidden rounded-xl md:rounded-2xl"
+          className="relative w-full h-72 xs:h-80 sm:h-84 md:h-96 lg:h-[350px] overflow-hidden"
         >
           {post.map((posts, index) => {
             const imageUrl = posts.mainImage?.asset
@@ -208,7 +208,7 @@ const NewsSwiper = ({ post }: { post: Post[] }) => {
 
                     {/* Title */}
                     <Link href={detailUrl}>
-                      <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 leading-tight group-hover:text-blue-300 transition-colors line-clamp-2">
+                      <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 leading-tight group-hover:underline transition-colors line-clamp-2">
                         {posts.title}
                       </h2>
                     </Link>

@@ -289,7 +289,7 @@ export type Post = {
     alt?: string;
     _type: "image";
   };
-  gallery?: Array<{
+  galleryImages?: Array<{
     asset?: {
       _ref: string;
       _type: "reference";
@@ -300,6 +300,7 @@ export type Post = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     alt?: string;
+    caption?: string;
     _type: "image";
     _key: string;
   }>;

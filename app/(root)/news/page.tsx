@@ -33,7 +33,7 @@ async function NewsContent() {
 
 export default function NewsPage() {
   return (
-    <div className="w-full min-h-screen relative overflow-hidden md:px-4 lg:px-4 px-4 mt-4">
+    <div className="w-full min-h-screen relative overflow-hidden md:px-4 lg:px-16 px-0 mt-4">
       <div className="max-w-7xl mx-auto">
         <NewsContent />
       </div>

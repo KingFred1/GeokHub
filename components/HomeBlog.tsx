@@ -13,6 +13,7 @@ import {
   Share2,
   Bookmark,
   Clock,
+  Calendar,
 } from "lucide-react";
 
 import { formatTimeShort } from "@/lib/formatTime";
@@ -124,14 +125,14 @@ const HomeBlog = ({ post }: { post: Post }) => {
   const formattedTime = formatTimeShort(publishedAt || "");
 
   return (
-    <article className="group relative bg-white dark:bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
+    <article className="group relative bg-white dark:bg-card overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
       {/* Gradient overlay effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/10 to-purple-50/10 dark:from-blue-900/5 dark:to-purple-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0" />
 
       {/* Category badge */}
       {categories && categories.length > 0 && (
         <div className="absolute top-4 left-4 z-10">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-600 text-white shadow-md">
+          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-600 text-white shadow-md">
             {categories[0]?.title || "Uncategorized"}
           </span>
         </div>
@@ -166,9 +167,9 @@ const HomeBlog = ({ post }: { post: Post }) => {
       </div>
 
       {/* Content section */}
-      <div className="relative p-4 z-10">
+      <div className="relative p-3 z-10">
         {/* Author and date */}
-        <div className="flex items-center gap-3 mb-2">
+        {/* <div className="flex items-center gap-3 mb-2">
           <div className="flex items-center gap-2">
             <div className="relative  h-6 w-6 rounded-full overflow-hidden border-2 border-white dark:border-gray-700 shadow-sm">
               <img
@@ -183,20 +184,22 @@ const HomeBlog = ({ post }: { post: Post }) => {
             </span>
           </div>
           <div className="h-1 w-1 rounded-full bg-gray-300 dark:bg-gray-600" />
-          {/* <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+          
+        </div> */}
+
+        {/* Title */}
+        <Link href={detailUrl}>
+          <h2 className=" text-xl font-semibold text-gray-900 dark:text-white mb-2 group-hover:underline transition-colors duration-300 line-clamp-3 leading-tight">
+            {title}
+          </h2>
+        </Link>
+
+        <div className="flex items-center my-2 gap-1 text-xs text-gray-500 dark:text-gray-400">
             <Calendar size={12} />
             <time dateTime={publishedAt}>
               {formatTimeShort(_updatedAt)}
             </time>
-          </div> */}
         </div>
-
-        {/* Title */}
-        <Link href={detailUrl}>
-          <h2 className=" text-xl font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 line-clamp-3 leading-tight">
-            {title}
-          </h2>
-        </Link>
 
         {/* Excerpt */}
         {excerpt && (
@@ -206,7 +209,7 @@ const HomeBlog = ({ post }: { post: Post }) => {
         )}
 
         {/* Engagement stats and CTA */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700 bg-black dark:bg-white mb-2">
           {/* <div className="flex items-center gap-4">
             <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
               <LikeButton postId={post._id} />
@@ -237,7 +240,7 @@ const HomeBlog = ({ post }: { post: Post }) => {
       </div>
 
       {/* Hover effect border */}
-      <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-all duration-500 pointer-events-none" />
+      <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-200 dark:group-hover:border-blue-700 transition-all duration-500 pointer-events-none" />
     </article>
   );
 };

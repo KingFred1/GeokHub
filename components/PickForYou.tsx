@@ -104,7 +104,7 @@ export default function PickForYou({ post }: PickForYouProps) {
     const detailUrl = getPostDetailUrl(post);
 
   return (
-    <article className="bg-card dark:bg-card rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+    <article className="bg-card dark:bg-card  border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
       {/* Image Section */}
       <Link href={detailUrl} className="block relative overflow-hidden">
         <img
@@ -123,9 +123,17 @@ export default function PickForYou({ post }: PickForYouProps) {
 
       {/* Content Section */}
       <div className="p-4">
-        {/* Author and Date */}
+
+        {/* Title */}
+        <Link href={detailUrl}>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:underline lg:line-clamp-3 line-clamp-3 mb-2 transition-colors">
+            {title}
+          </h3>
+        </Link>
+
+                {/* Author and Date */}
         <div className="flex items-center gap-2 mb-3 text-sm text-gray-600 dark:text-gray-400">
-          {author?.image && (
+          {/* {author?.image && (
             <img
               src={urlFor(author.image).format("webp").url()}
               alt={author?.name || "Author"}
@@ -136,19 +144,12 @@ export default function PickForYou({ post }: PickForYouProps) {
           <span className="font-medium text-gray-700 dark:text-gray-300">
             {author?.name}
           </span>
-          <span className="mx-1">•</span>
+          <span className="mx-1">•</span> */}
           <Clock size={14} />
           <time dateTime={publishedAt} className="ml-1">
             {formattedTime}
           </time>
         </div>
-
-        {/* Title */}
-        <Link href={detailUrl}>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 lg:line-clamp-3 line-clamp-2 mb-2 transition-colors">
-            {title}
-          </h3>
-        </Link>
 
         {/* Excerpt */}
         {/* <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-4">
@@ -156,8 +157,8 @@ export default function PickForYou({ post }: PickForYouProps) {
         </p> */}
 
         {/* Engagement Stats */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700 bg-black dark:bg-white">
+          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 ">
             {/* <div className="flex items-center gap-1">
               <LikeButton postId={_id} />
             </div>
@@ -172,12 +173,12 @@ export default function PickForYou({ post }: PickForYouProps) {
           </div>
 
           {/* Read More */}
-          <Link
+          {/* <Link
             href={detailUrl}
             className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium transition-colors"
           >
             Read more →
-          </Link>
+          </Link> */}
         </div>
       </div>
     </article>

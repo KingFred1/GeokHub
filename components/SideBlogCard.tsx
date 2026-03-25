@@ -122,7 +122,7 @@ const SideBlogCard = ({ post }: { post: Post }) => {
 
   return (
     <div className="relative group ">
-      <article className="w-full border dark:border-card rounded-lg bg-card shadow lg:h-full md:h-[54vh] overflow-hidden">
+      <article className="w-full border dark:border-card bg-card shadow lg:h-full md:h-[54vh] overflow-hidden">
         <div className="relative w-full md:h-[30vh]">
           <Link href={detailUrl} className="block w-full h-full">
             <img
@@ -130,7 +130,7 @@ const SideBlogCard = ({ post }: { post: Post }) => {
               width={1200}
               height={800}
               alt={title}
-              className="w-full h-full object-cover rounded-t-md "
+              className="w-full h-full object-cover "
               loading="eager"
             />
 
@@ -143,11 +143,11 @@ const SideBlogCard = ({ post }: { post: Post }) => {
 
         <div className="dark:text-white relative p-2">
           <div className="text-xs font-semibold py-1 text-gray-600 dark:text-gray-300">
-            {author?.name && (
+            {/* {author?.name && (
               <span>
                 {author.name} <b>.</b>
               </span>
-            )}{" "}
+            )}{" "} */}
             <time dateTime={publishedAt}>{formattedTime}</time>
           </div>
 

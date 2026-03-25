@@ -116,21 +116,21 @@ export default async function Technology({
   return (
     <div className="min-h-screen bg-background dark:bg-darkbackground transition-colors">
       {/* Main Content */}
-      <main className="px-4 sm:px-6 lg:px-8 py-12">
+      <main className="px-0 md:px-6 lg:px-8 py-8">
         {/* Featured Tech News Section */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="md:px-0 px-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {page > 1 ? `Tech News - Page ${page}` : "Latest Tech News"}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
+              {/* <p className="text-gray-600 dark:text-gray-400 mt-2">
                 {page > 1 
                   ? `Page ${page} of technology news and updates`
                   : "Stay informed with the most recent developments in technology"
                 }
                 {totalCount > 0 && ` • ${totalCount} total articles`}
-              </p>
+              </p> */}
             </div>
             
             {/* Page Stats */}

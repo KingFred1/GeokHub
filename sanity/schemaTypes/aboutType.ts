@@ -25,8 +25,8 @@ export const aboutType = defineType({
       name: "shortBio",
       title: "Short Bio (Hero section)",
       type: "text",
-      description: "Brief introduction that appears in the hero section (max 160 characters)",
-      validation: (Rule) => Rule.required().max(160),
+      description: "Brief introduction that appears in the hero section (max 500 characters)",
+      validation: (Rule) => Rule.required().max(500),
     }),
     defineField({
       name: "missionStatement",

@@ -10,7 +10,7 @@ const ArrowRightIcon = () => (
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    className="w-4 h-4"
+    className="w-5 h-8"
   >
     <path
       strokeLinecap="round"
@@ -20,7 +20,6 @@ const ArrowRightIcon = () => (
     />
   </svg>
 );
-
 
 
 // server components for static render
@@ -148,17 +147,17 @@ export default async function Home({
   ] = data;
 
   // debugging: log counts so we can see if technology posts arrived
-  console.log("home data counts:", {
-    forYou: forYou.length,
-    latestNews: latestNews.length,
-    gadgets: gadgets.length,
-    lifestyle: lifestyle.length,
-    technology: technology.length,
-  });
+  // console.log("home data counts:", {
+  //   forYou: forYou.length,
+  //   latestNews: latestNews.length,
+  //   gadgets: gadgets.length,
+  //   lifestyle: lifestyle.length,
+  //   technology: technology.length,
+  // });
 
   return (
     <div className="w-full min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto md:px-4">
         {/* Hero Section */}
         {!searchTerm && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
@@ -166,12 +165,16 @@ export default async function Home({
               <StaticFeaturedPosts posts={forYou.slice(0, 1)} />
             </div>
             <div className="lg:col-span-6 col-span-12">
-              <div className="md:mt-10">
-                <h1 className="font-bold text-2xl mb-4 text-dark dark:text-gray-200 pl-2">
+              <div className="md:mt-16">
+                <Link 
+                  href="/technology/tech-news"
+                  className="flex hover:underline font-bold text-xl mb-4 text-dark dark:text-gray-200 pl-2"
+                >
                   Top Stories
-                </h1>
+                  <ArrowRightIcon />
+                </Link>
                 <div className="rounded-lg">
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-2 md:gap-4">
                     {latestNews
                       .slice(0, 2)
                       .map(
@@ -190,30 +193,26 @@ export default async function Home({
         {!searchTerm && (
           <>
             <TextNewsGrid posts={forYou.slice(1, 4)} />
-            <StaticGadgetsGrid post={gadgets} />
+            
             <div className="mb-12">
               <LatestNews posts={latestNews.slice(2, 8)} />
             </div>
+
+            <StaticGadgetsGrid post={gadgets} />
+
             <div className="mb-12">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Lifestyle
-              </h1>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <Link href="/lifestyles" className=" flex hover:underline font-semibold text-xl mb-4 text-dark dark:text-gray-200 pl-2">
+                Lifestyle 
+                <ArrowRightIcon />
+              </Link>
+              <div></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-4">
                 {lifestyle
                   .slice(0, 8)
                   .map(
                     (post) =>
                       post?._id && <HomeBlog key={post._id} post={post} />,
                   )}
-              </div>
-              <div className="text-center mt-6 sm:mt-8">
-                <Link
-                  href="/lifestyles"
-                  className="inline-flex items-center px-4 py-2 sm:px-6 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 font-medium text-sm sm:text-base"
-                >
-                  View All Lifestyle Articles
-                  <ArrowRightIcon />
-                </Link>
               </div>
             </div>
             <div className="space-y-12">

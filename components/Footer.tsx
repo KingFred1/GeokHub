@@ -14,7 +14,7 @@ export default function Footer() {
               GeokHub
             </Link>
             <p className="mt-4 text-sm">
-              Your go-to platform for insightful blogs, technology news, and tutorials.
+              Your go-to platform for insightful content, world news, technology news, and tutorials.
               Stay curious. Stay informed.
             </p>
             <div className="flex space-x-4 mt-4">
@@ -38,8 +38,8 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-2">Explore</h3>
             <ul className="space-y-1 text-sm">
               <li><Link href="/about" className="hover:underline">About Us</Link></li>
-              <li><Link href="/blogs" className="hover:underline">Blogs</Link></li>
-              <li><Link href="/categories" className="hover:underline">Categories</Link></li>
+              <li><Link href="/technology/tech-news" className="hover:underline">Blogs</Link></li>
+              <li><Link href="/lifestyles" className="hover:underline">Categories</Link></li>
               <li><Link href="/contact" className="hover:underline">Contact</Link></li>
             </ul>
           </div>

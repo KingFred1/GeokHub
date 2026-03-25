@@ -63,26 +63,20 @@ export default async function AI() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white my-4">
+      <div className="max-w-7xl mx-auto px-0 md:px-6 lg:px-8 relative z-10">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white my-4 md:px-0 px-4">
           Artificial Intelligence
         </h1>
       </div>
 
       {/* Trending Section */}
       <section className="py-4 bg-gray-50 dark:bg-gray-800">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-              <TrendingUp className="h-6 w-6 mr-2 text-orange-600" />
-              Trending AI
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="px-0 md:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-6">
             {trendingPosts.length > 0 ? (
               trendingPosts.map((post: any) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>
-                  <article className="bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
+                  <article className="bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
                     <div className="relative h-44 overflow-hidden">
                       <img
                         src={post.mainImage?.asset ? urlFor(post.mainImage).url() : "/fallback-image.jpg"}
@@ -96,7 +90,7 @@ export default async function AI() {
                         </span>
                       </div>
                     </div>
-                    <div className="p-2">
+                    <div className="py-2 md:px-0 px-4">
                       <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
                         {post.author?.image && (
                           <img
@@ -110,7 +104,7 @@ export default async function AI() {
                         <Calendar size={12} />
                         <span>{formatTimeShort(post._createdAt)}</span>
                       </div>
-                      <h3 className="font-semibold text-xl text-gray-900 dark:text-white mb-2 line-clamp-3 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                      <h3 className="font-semibold text-xl text-gray-900 dark:text-white md:mb-2 mb-4 line-clamp-3 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors ">
                         {post.title}
                       </h3>
                       {post.excerpt && (
@@ -139,7 +133,7 @@ export default async function AI() {
       </section>
 
       {/* Main Content Section */}
-      <main className="max-w-7xl mx-auto mt-5 px-4 sm:px-6 lg:px-8 pb-20">
+      <main className="max-w-7xl mx-auto mt-5 px-0 md:px-6 lg:px-8 pb-20">
         {mainBlogs?.length > 3 ? (
           <MasonryGrid posts={mainBlogs.slice(4)} />
         ) : (

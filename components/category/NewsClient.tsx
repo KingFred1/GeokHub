@@ -207,9 +207,9 @@ export default function NewsClient({
     return pageNumbers;
   };
 
-  if (isLoading) {
-    return <NewsSkeleton />;
-  }
+  // if (isLoading) {
+  //   return <NewsSkeleton />;
+  // }
 
   if (error) {
     return (
@@ -229,7 +229,7 @@ export default function NewsClient({
   return (
     <>
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-800/20 rounded-2xl p-6 mb-8">
+      {/* <div className="relative overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-800/20 rounded-2xl p-6 mb-8">
         <div className="relative z-10 max-w-6xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 relative">
             Latest News & Headlines
@@ -239,7 +239,6 @@ export default function NewsClient({
             Stay updated with breaking news, world events, and business reports
           </p>
 
-          {/* Refresh Button */}
           <button
             onClick={refreshAllData}
             disabled={refreshing}
@@ -251,10 +250,10 @@ export default function NewsClient({
             {refreshing ? "Refreshing..." : "Latest Updates"}
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Category Filters */}
-      <div className="flex flex-col items-center mb-8">
+      <div className="flex flex-col items-center my-4">
         <div className="flex flex-wrap gap-3 mb-4 justify-center">
           {categoryConfig.map((category) => {
             const IconComponent = category.icon;
@@ -301,10 +300,10 @@ export default function NewsClient({
       <div className="grid grid-cols-12 md:gap-6 mb-8 lg:mb-10 gap-4">
         {/* Featured News Swiper */}
         <div className="lg:col-span-8 md:col-span-12 col-span-12 order-1">
-          <div className="md:bg-white md:dark:bg-gray-800 rounded-2xl md:p-4 shadow-sm">
+          <div className="bg-card  md:p-4 shadow-sm">
             <div className="flex items-center mb-4">
               <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white px-2 md:px-0">
                 {activeCategory === "news"
                   ? "Top Headlines"
                   : `${getCategoryDisplayName(activeCategory)} News`}
@@ -324,7 +323,7 @@ export default function NewsClient({
 
         {/* Sidebar Latest */}
         <div className="lg:col-span-4 md:col-span-12 col-span-12 order-2">
-          <div className="md:bg-white md:dark:bg-gray-800 rounded-2xl md:p-4 shadow-sm">
+          <div className="bg-card md:p-4 shadow-sm">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Latest Updates
             </h2>

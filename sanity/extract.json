@@ -1862,7 +1862,7 @@
         },
         "optional": true
       },
-      "gallery": {
+      "galleryImages": {
         "type": "objectAttribute",
         "value": {
           "type": "array",
@@ -1923,6 +1923,13 @@
                 "optional": true
               },
               "alt": {
+                "type": "objectAttribute",
+                "value": {
+                  "type": "string"
+                },
+                "optional": true
+              },
+              "caption": {
                 "type": "objectAttribute",
                 "value": {
                   "type": "string"

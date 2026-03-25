@@ -4,6 +4,23 @@ import { Post } from "@/sanity/types";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+const ArrowRightIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    className="w-5 h-8"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 5l7 7-7 7"
+    />
+  </svg>
+);
+
 function getPostDetailUrl(post: Post): string {
   // Check if post has categories
   if (!post.categories || post.categories.length === 0) {
@@ -64,30 +81,31 @@ export default function StaticGadgetsGrid({ post }: Props) {
   const gadgets = post.slice(0, 4); // Show first 4 items
 
   return (
-    <section className="w-full py-8 border-y border-gray-200 dark:border-gray-700">
+    <section className="w-full pt-2 pb-8 mb-2  border-y border-gray-200 dark:border-gray-700">
       <div className="">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+            <Link 
+            href="/technology/gadgets"
+            className="flex text-lg md:text-xl font-semibold text-gray-900 dark:text-white md:px-0 px-4 hover:underline">
               Gadget Reviews
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              In-depth analysis of the latest technology
-            </p>
+              <ArrowRightIcon />
+            </Link>
+           
           </div>
           
-          <Link
+          {/* <Link
             href="/technology/gadgets"
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-medium rounded-lg transition-colors shrink-0"
           >
             View All Reviews
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </Link> */}
         </div>
 
         {/* Static Grid - NO SWIPER */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 md:gap-4">
           {gadgets.map((item) => {
             const imageUrl = item.mainImage?.asset
               ? urlFor(item.mainImage)
@@ -104,7 +122,7 @@ export default function StaticGadgetsGrid({ post }: Props) {
             return (
               <article 
                 key={item._id}
-                className="group bg-card dark:bg-card rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300 hover:shadow-md overflow-hidden h-full flex flex-col"
+                className="group bg-card dark:bg-card border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-300 hover:shadow-md overflow-hidden h-full flex flex-col"
               >
                 {/* Image */}
                 <Link href={detailUrl} className="block overflow-hidden bg-gray-100 dark:bg-gray-800">
@@ -125,7 +143,7 @@ export default function StaticGadgetsGrid({ post }: Props) {
                   
                   {/* Title */}
                   <Link href={detailUrl} className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-3">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 group-hover:underline line-clamp-3">
                       {item.title || "Gadget Review"}
                     </h3>
                   </Link>
@@ -140,7 +158,7 @@ export default function StaticGadgetsGrid({ post }: Props) {
                   {/* Read More Link */}
                   <Link
                     href={detailUrl}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-medium rounded transition-colors text-sm"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-2 py-1 mb-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 font-medium transition-colors text-sm"
                   >
                     Read Analysis
                     <ArrowRight className="h-3 w-3" />
@@ -151,12 +169,6 @@ export default function StaticGadgetsGrid({ post }: Props) {
           })}
         </div>
 
-        {/* Footer Note */}
-        <div className="text-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Independent reviews • Expert analysis • Latest gadgets
-          </p>
-        </div>
       </div>
     </section>
   );

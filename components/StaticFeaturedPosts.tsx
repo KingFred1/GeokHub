@@ -51,20 +51,20 @@ export default function StaticFeaturedPosts({ posts }: Props) {
   const featuredPosts = posts.slice(0, 1);
 
   return (
-    <div className="grid grid-cols-1 mt-5">
+    <div className="grid grid-cols-1 mt-2">
       {featuredPosts.map((post, index) => (
         <Link 
           key={post._id} 
           href={getPostDetailUrl(post)}
           className="group block"
         >
-          <article className="bg-card rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700 h-full flex flex-col">
+          <article className="bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700 h-full flex flex-col">
 
           {/* Content */}
-            <div className="p-3 flex-1">
+            <div className="p-4 flex-1">
               
               {/* Title */}
-              <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 transition-colors md:line-clamp-2 line-clamp-3">
+              <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white mb-1 group-hover:underline transition-colors md:line-clamp-2 line-clamp-3">
                 {post.title}
               </h2>
               
@@ -82,8 +82,8 @@ export default function StaticFeaturedPosts({ posts }: Props) {
                 <time dateTime={post.publishedAt}>
                   {formatDate(post.publishedAt)}
                 </time>
-                <span>•</span>
-                <span>{post.author?.name || "GeokHub"}</span>
+                {/* <span>•</span>
+                <span>{post.author?.name || "GeokHub"}</span> */}
               </div>
             </div>
                         

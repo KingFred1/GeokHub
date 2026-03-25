@@ -128,7 +128,7 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 md:gap-4">
       {posts.map((post, index) => {
         const {
           _id,
@@ -161,7 +161,7 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
         return (
           <article
             key={_id}
-            className="bg-card dark:bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-700"
+            className="bg-card dark:bg-card shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group md:border md:border-gray-100 md:dark:border-gray-700 border-b-2 border-gray-800 dark:border-gray-200"
           >
             
             {/* Image */}
@@ -186,14 +186,14 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
             </Link>
 
             {/* Content */}
-            <div className="p-2">
+            <div className="p-4 md:p-2">
               {/* Meta Info */}
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 md:mb-1 mb-2">
-                <div className="flex items-center gap-1">
+                {/* <div className="flex items-center gap-1">
                   <User size={14} />
                   <span>{author?.name || "Tech Editor"}</span>
                 </div>
-                <span>•</span>
+                <span>•</span> */}
                 <div className="flex items-center gap-1">
                   <Clock size={14} />
                   <time dateTime={publishedAt}>
@@ -204,7 +204,7 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
 
               {/* Title */}
               <Link href={detailUrl}>
-                <h3 className="md:text-lg text-2xl font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors line-clamp-3 mb-3">
+                <h3 className="md:text-lg text-2xl font-semibold text-gray-900 dark:text-white hover:underline transition-colors line-clamp-3 mb-3">
                   {title}
                 </h3>
               </Link>

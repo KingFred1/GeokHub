@@ -6,7 +6,7 @@ import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 2592000;
 
 function formatTimeShort(dateString: string): string {
   const date = new Date(dateString);
@@ -65,7 +65,7 @@ export default async function CloudDevOpsPage() {
       cache: "no-store",
       next: {
         tags: ["technology/cloud-devops"],
-        revalidate: 3600,
+        revalidate: 2592000,
       },
     }
   );
