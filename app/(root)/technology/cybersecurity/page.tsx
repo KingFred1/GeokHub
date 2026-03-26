@@ -66,19 +66,19 @@ export default async function Cybersecurity() {
     <div className="min-h-screen bg-background">
       {/* Trending Section */}
       <section className="py-4 bg-gray-50 dark:bg-gray-800">
-        <div className="px-4 sm:px-6 lg:px-8">
+        <div className="px-0 md:px-4 lg:px-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+            <Link href="/technology/cybersecurity" className="hover:underline text-xl md:text-xl font-semibold text-gray-900 dark:text-white flex items-center">
               <TrendingUp className="h-6 w-6 mr-2 text-orange-600" />
               Trending Cybersecurity
-            </h2>
+            </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-6">
             {trendingPosts.length > 0 ? (
               trendingPosts.map((post: any) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>
-                  <article className="bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
-                    <div className="relative h-44 overflow-hidden">
+                  <article className="bg-card  overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
+                    <div className="relative h-48 overflow-hidden">
                       <img
                         src={post.mainImage?.asset ? urlFor(post.mainImage).url() : "/fallback-image.jpg"}
                         alt={post.title}
@@ -91,7 +91,7 @@ export default async function Cybersecurity() {
                         </span>
                       </div>
                     </div>
-                    <div className="p-2">
+                    <div className="py-2 md:px-2 px-4">
                       <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
                         {post.author?.image && (
                           <img
@@ -134,15 +134,12 @@ export default async function Cybersecurity() {
       </section>
 
       {/* Main Content Section */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Latest Cybersecurity Coverage
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Stay informed on the latest threats, defense techniques, encryption breakthroughs, and privacy tips from the front lines of cybersecurity.
-            </p>
+      <section className="py-6">
+        <div className="max-w-7xl mx-auto px-0 md:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <Link href="/technology/cybersecurity" className="hover:underline text-xl md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              Cybersecurity Coverage
+            </Link>
           </div>
           {mainBlogs?.length > 3 ? (
             <MasonryGrid posts={mainBlogs.slice(4)} />

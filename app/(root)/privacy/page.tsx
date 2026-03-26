@@ -1,86 +1,223 @@
-import React from 'react';
+import React from "react";
 
 const PrivacyPolicy = () => {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
-  
 
   return (
-    <main className="flex-grow container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Privacy Policy</h1>
-          <p className="text-gray-600 mb-6">Last updated: {currentDate}</p>
+    <main className="flex-grow container mx-auto px-4 py-10">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg">
+        <div className="p-6 md:p-10">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+            Privacy Policy
+          </h1>
 
-          <div className="space-y-8">
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Last updated: {currentDate}
+          </p>
+
+          <div className="space-y-10 text-gray-700 dark:text-gray-300 leading-relaxed">
+
+            {/* 1 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">1. Introduction</h2>
-              <p className="text-gray-700 mb-4">Welcome to GeokHub (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
-              <p className="text-gray-700">By using our website, you agree to the collection and use of information in accordance with this policy.</p>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                1. Introduction
+              </h2>
+              <p>
+                Welcome to GeokHub ("we," "our," or "us"). We are committed to
+                protecting your privacy. This Privacy Policy explains how we
+                collect, use, disclose, and safeguard your information when you
+                visit our website.
+              </p>
+              <p className="mt-3">
+                By using our website, you agree to the collection and use of
+                information in accordance with this policy.
+              </p>
             </section>
 
+            {/* 2 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">2. Information We Collect</h2>
-              <p className="text-gray-700 mb-4">We may collect the following types of information:</p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                <li><strong>Personal Data:</strong> Name, email address, etc., when you voluntarily provide it (e.g., when subscribing to our newsletter or leaving comments).</li>
-                <li><strong>Usage Data:</strong> Information about how you interact with our website, including IP address, browser type, pages visited, and time spent on pages.</li>
-                <li><strong>Cookies:</strong> We use cookies to enhance your experience. You can set your browser to refuse all or some cookies.</li>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                2. Information We Collect
+              </h2>
+              <p className="mb-4">
+                We may collect the following types of information:
+              </p>
+
+              <ul className="list-disc pl-6 space-y-3">
+                <li>
+                  <strong>Personal Data:</strong> Name, email address, or other
+                  details you voluntarily provide (e.g., newsletter signup or
+                  comments).
+                </li>
+
+                <li>
+                  <strong>Usage Data:</strong> Information such as IP address,
+                  browser type, pages visited, and time spent on pages.
+                </li>
+
+                <li>
+                  <strong>Cookies and Tracking Technologies:</strong> We use
+                  cookies and similar technologies to enhance your experience.
+                  Third-party vendors, including Google, may use cookies to
+                  serve ads based on your prior visits to this or other websites.
+                </li>
               </ul>
             </section>
 
+            {/* 3 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">3. How We Use Your Information</h2>
-              <p className="text-gray-700 mb-4">We use the collected information for various purposes:</p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-700">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                3. How We Use Your Information
+              </h2>
+
+              <ul className="list-disc pl-6 space-y-3">
                 <li>To provide and maintain our website</li>
-                <li>To notify you about changes to our website</li>
-                <li>To allow you to participate in interactive features</li>
+                <li>To improve user experience and content</li>
+                <li>To communicate updates or changes</li>
                 <li>To provide customer support</li>
-                <li>To gather analysis or valuable information to improve our website</li>
-                <li>To monitor the usage of our website</li>
-                <li>To detect, prevent, and address technical issues</li>
+                <li>To monitor usage and performance</li>
+                <li>To detect and prevent technical issues</li>
               </ul>
             </section>
 
+            {/* 4 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">4. Data Sharing and Disclosure</h2>
-              <p className="text-gray-700 mb-4">We do not sell your personal information. We may share your information in the following situations:</p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                <li><strong>Service Providers:</strong> With third-party vendors who perform services on our behalf.</li>
-                <li><strong>Legal Requirements:</strong> When required by law or to protect our rights.</li>
-                <li><strong>Business Transfers:</strong> In connection with any merger or sale of company assets.</li>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                4. Data Sharing and Disclosure
+              </h2>
+
+              <p className="mb-4">
+                We do not sell your personal data. We may share information in
+                the following cases:
+              </p>
+
+              <ul className="list-disc pl-6 space-y-3">
+                <li>
+                  <strong>Service Providers:</strong> Third-party vendors that
+                  help operate our website.
+                </li>
+                <li>
+                  <strong>Legal Requirements:</strong> If required by law or to
+                  protect our rights.
+                </li>
+                <li>
+                  <strong>Business Transfers:</strong> In case of a merger,
+                  acquisition, or asset sale.
+                </li>
               </ul>
             </section>
 
+            {/* 5 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">5. Data Security</h2>
-              <p className="text-gray-700">We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure.</p>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                5. Data Security
+              </h2>
+              <p>
+                We use appropriate security measures to protect your data.
+                However, no method of transmission over the Internet is 100%
+                secure.
+              </p>
             </section>
 
+            {/* 6 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">6. Third-Party Links</h2>
-              <p className="text-gray-700">Our website may contain links to other sites. We are not responsible for the content or privacy practices of those sites.</p>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                6. Third-Party Links
+              </h2>
+              <p>
+                Our website may contain links to third-party websites. We are not
+                responsible for their privacy practices or content.
+              </p>
             </section>
 
+            {/* 7 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">7. Children&apos;s Privacy</h2>
-              <p className="text-gray-700">Our website is not intended for children under 13. We do not knowingly collect personal information from children under 13.</p>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                7. Children's Privacy
+              </h2>
+              <p>
+                Our website is not intended for children under 13. We do not
+                knowingly collect personal data from children.
+              </p>
             </section>
 
+            {/* 8 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">8. Changes to This Privacy Policy</h2>
-              <p className="text-gray-700">We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                8. Changes to This Policy
+              </h2>
+              <p>
+                We may update this Privacy Policy from time to time. Updates will
+                be posted on this page.
+              </p>
             </section>
 
+            {/* 9 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-4">9. Contact Us</h2>
-              <p className="text-gray-700">If you have any questions about this Privacy Policy, please contact us at:</p>
-              <p className="text-gray-700 mt-2">Email: privacy@geokhub.com</p>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                9. Contact Us
+              </h2>
+              <p>
+                If you have any questions about this Privacy Policy, contact us:
+              </p>
+              <p className="mt-2">Email: privacy@geokhub.com</p>
             </section>
+
+            {/* 10 - ADSENSE */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                10. Advertising and Third-Party Services
+              </h2>
+
+              <p className="mb-4">
+                We may use third-party advertising companies, including Google
+                AdSense, to serve ads when you visit our website.
+              </p>
+
+              <p className="mb-4">
+                Google uses cookies (such as the DoubleClick cookie) to serve
+                ads to users based on their visits to this and other websites.
+              </p>
+
+              <p>
+                You can opt out of personalized advertising by visiting Google
+                Ads Settings.
+              </p>
+            </section>
+
+            {/* 11 - ANALYTICS */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                11. Analytics
+              </h2>
+              <p>
+                We may use third-party analytics tools to monitor and analyze
+                website traffic. These tools may collect information such as IP
+                address, browser type, and pages visited.
+              </p>
+            </section>
+
+            {/* 12 - USER RIGHTS */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                12. Your Data Rights
+              </h2>
+
+              <p className="mb-3">
+                You have the right to access, update, or delete your personal
+                data.
+              </p>
+
+              <p>
+                To request changes or deletion, contact us using the information
+                provided above.
+              </p>
+            </section>
+
           </div>
         </div>
       </div>

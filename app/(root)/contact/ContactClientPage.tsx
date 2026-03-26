@@ -131,7 +131,7 @@ export default function ContactClientPage({ serverData }: ContactClientPageProps
             Let&apos;s Connect
           </div>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight bg-gradient-to-br from-gray-900 via-primary to-purple-600 dark:from-white dark:via-primary/90 dark:to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight ">
             Get in Touch
           </h1>
           
@@ -336,7 +336,7 @@ export default function ContactClientPage({ serverData }: ContactClientPageProps
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group/btn"
+                    className="w-full h-12 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden "
                     disabled={loading}
                   >
                     <span className="relative z-10 flex items-center justify-center">

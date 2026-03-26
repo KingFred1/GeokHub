@@ -201,7 +201,7 @@ export default async function Home({
             <StaticGadgetsGrid post={gadgets} />
 
             <div className="mb-12">
-              <Link href="/lifestyles" className=" flex hover:underline font-semibold text-xl mb-4 text-dark dark:text-gray-200 pl-2">
+              <Link href="/lifestyle/category/lifestyle" className=" flex hover:underline font-semibold text-xl mb-4 text-dark dark:text-gray-200 pl-2">
                 Lifestyle 
                 <ArrowRightIcon />
               </Link>

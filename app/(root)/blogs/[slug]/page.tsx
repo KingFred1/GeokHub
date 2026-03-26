@@ -8,7 +8,6 @@ import { getCanonicalPath, getSlugString } from "@/lib/seo";
 import { notFound, redirect } from "next/navigation";
 import markdownit from "markdown-it";
 import View from "@/components/View";
-// Suspense and skeleton removed; view counter rendered on server
 import { Metadata } from "next";
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import removeMarkdown from "remove-markdown";
@@ -25,7 +24,6 @@ import { Calendar, ArrowRight, BookOpen } from "lucide-react";
 import { NewsletterForm } from "@/components/global/Newsletter-form";
 import Link from "next/link";
 import { CodeScript } from "@/components/CodeScript";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
 
 // Initialize markdown parser with better configuration
@@ -111,8 +109,266 @@ function videoEmbedPlugin(md: markdownit.MarkdownIt) {
 
 md.use(videoEmbedPlugin);
 
-// Allow static generation for SEO (Google crawling)
-export const revalidate = 2592000; // 24 hours
+export const revalidate = 2592000; // 30 days
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post (shared across all pages)
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (
+      categoryTitle === "ai" ||
+      categorySlug === "ai" ||
+      categoryTitle === "artificial intelligence" ||
+      categorySlug === "artificial-intelligence"
+    ) {
+      return `/technology/ai/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cybersecurity" ||
+      categorySlug === "cybersecurity" ||
+      categoryTitle === "security" ||
+      categorySlug === "security"
+    ) {
+      return `/technology/cybersecurity/${slug}`;
+    }
+
+    if (categoryTitle === "gadgets" || categorySlug === "gadgets") {
+      return `/technology/gadgets/${slug}`;
+    }
+
+    if (
+      categoryTitle === "lifestyle" ||
+      categorySlug === "lifestyle" ||
+      categoryTitle === "living" ||
+      categorySlug === "living"
+    ) {
+      return `/lifestyle/${slug}`;
+    }
+
+    const titleIsMental =
+      (categoryTitle?.includes("mental") && categoryTitle?.includes("health")) ||
+      categoryTitle?.includes("mentalhealth");
+    const slugIsMental =
+      (categorySlug?.includes("mental") && categorySlug?.includes("health")) ||
+      categorySlug?.includes("mentalhealth");
+
+    if (titleIsMental || slugIsMental) {
+      return `/mentalhealth/${slug}`;
+    }
+
+    if (
+      categoryTitle === "wellness" ||
+      categorySlug === "wellness" ||
+      categoryTitle === "health" ||
+      categorySlug === "health"
+    ) {
+      return `/wellness/${slug}`;
+    }
+
+    if (
+      categoryTitle === "weightloss" ||
+      categorySlug === "weightloss" ||
+      categoryTitle === "weight-loss" ||
+      categorySlug === "weight-loss" ||
+      categoryTitle === "diet" ||
+      categorySlug === "diet"
+    ) {
+      return `/weightloss/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cloud-devops" ||
+      categorySlug === "cloud-devops" ||
+      categoryTitle === "cloud" ||
+      categorySlug === "cloud" ||
+      categoryTitle === "devops" ||
+      categorySlug === "devops" ||
+      categoryTitle === "infrastructure" ||
+      categorySlug === "infrastructure"
+    ) {
+      return `/technology/cloud-devops/${slug}`;
+    }
+
+    if (
+      categoryTitle === "programming" ||
+      categorySlug === "programming" ||
+      categoryTitle === "coding" ||
+      categorySlug === "coding"
+    ) {
+      return `/technology/programming/${slug}`;
+    }
+
+    if (
+      categoryTitle === "emerging-tech" ||
+      categorySlug === "emerging-tech" ||
+      categoryTitle === "emerging technologies" ||
+      categorySlug === "emerging-technologies" ||
+      categoryTitle === "future tech" ||
+      categorySlug === "future-tech"
+    ) {
+      return `/technology/emerging-tech/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+
+      if (
+        parentTitle === "ai" ||
+        parentSlug === "ai" ||
+        parentTitle === "artificial intelligence" ||
+        parentSlug === "artificial-intelligence"
+      ) {
+        return `/technology/ai/${slug}`;
+      }
+
+      if (
+        parentTitle === "cybersecurity" ||
+        parentSlug === "cybersecurity" ||
+        parentTitle === "security" ||
+        parentSlug === "security"
+      ) {
+        return `/technology/cybersecurity/${slug}`;
+      }
+
+      if (parentTitle === "gadgets" || parentSlug === "gadgets") {
+        return `/technology/gadgets/${slug}`;
+      }
+
+      if (
+        parentTitle === "lifestyle" ||
+        parentSlug === "lifestyle" ||
+        parentTitle === "living" ||
+        parentSlug === "living"
+      ) {
+        return `/lifestyle/${slug}`;
+      }
+
+      const parentTitleIsMental =
+        (parentTitle?.includes("mental") && parentTitle?.includes("health")) ||
+        parentTitle?.includes("mentalhealth");
+      const parentSlugIsMental =
+        (parentSlug?.includes("mental") && parentSlug?.includes("health")) ||
+        parentSlug?.includes("mentalhealth");
+
+      if (parentTitleIsMental || parentSlugIsMental) {
+        return `/mentalhealth/${slug}`;
+      }
+
+      if (
+        parentTitle === "wellness" ||
+        parentSlug === "wellness" ||
+        parentTitle === "health" ||
+        parentSlug === "health"
+      ) {
+        return `/wellness/${slug}`;
+      }
+
+      if (
+        parentTitle === "weightloss" ||
+        parentSlug === "weightloss" ||
+        parentTitle === "weight-loss" ||
+        parentSlug === "weight-loss" ||
+        parentTitle === "diet" ||
+        parentSlug === "diet"
+      ) {
+        return `/weightloss/${slug}`;
+      }
+
+      if (
+        parentTitle === "cloud-devops" ||
+        parentSlug === "cloud-devops" ||
+        parentTitle === "cloud" ||
+        parentSlug === "cloud" ||
+        parentTitle === "devops" ||
+        parentSlug === "devops" ||
+        parentTitle === "infrastructure" ||
+        parentSlug === "infrastructure"
+      ) {
+        return `/technology/cloud-devops/${slug}`;
+      }
+
+      if (
+        parentTitle === "programming" ||
+        parentSlug === "programming" ||
+        parentTitle === "coding" ||
+        parentSlug === "coding"
+      ) {
+        return `/technology/programming/${slug}`;
+      }
+
+      if (
+        parentTitle === "emerging-tech" ||
+        parentSlug === "emerging-tech" ||
+        parentTitle === "emerging technologies" ||
+        parentSlug === "emerging-technologies" ||
+        parentTitle === "future tech" ||
+        parentSlug === "future-tech"
+      ) {
+        return `/technology/emerging-tech/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
+
+// Function to get post detail URL based on category
+function getPostUrl(post: any): string {
+  const slugValue = getSlugString(post?.slug) ?? "";
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
+}
 
 // RESTORED FULL SEO METADATA GENERATION
 export async function generateMetadata({
@@ -122,10 +378,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       BLOG_BY_SLUG_QUERY,
-      { slug },
+      { slug: decodedSlug },
       {
         next: { revalidate: 2592000 },
         timeout: 15000,
@@ -136,16 +393,19 @@ export async function generateMetadata({
       return {
         title: "Post Not Found - GeokHub",
         description: "The requested blog post could not be found on GeokHub.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
         alternates: {
-          canonical: `https://www.geokhub.com/blogs/${slug}`,
+          canonical: `https://www.geokhub.com/blogs/${decodedSlug}`,
         },
       };
     }
 
-    // compute canonical using shared helper (must match sitemap logic)
+    // Compute canonical using shared logic
     const baseUrl = "https://www.geokhub.com";
-    const canonicalUrl = `${baseUrl}${getCanonicalPath(post)}`;
+    const canonicalUrl = `${baseUrl}${getPostUrlPath(post, decodedSlug)}`;
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
           .width(1200)
@@ -165,8 +425,7 @@ export async function generateMetadata({
     return {
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub`,
-      description:
-        post.metaDescription || post.excerpt || "Read this article on GeokHub",
+      description: post.metaDescription || description,
       alternates: {
         canonical: canonicalUrl,
       },
@@ -212,18 +471,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    console.error("Error generating blog metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -256,7 +508,7 @@ function formatReadableDate(dateString: string): string {
   });
 }
 
-// SIMPLIFIED VERSION WITH PROPER REDIRECT (404 FIX) + FULL SEO RESTORED
+// SIMPLIFIED VERSION WITH PROPER 404 HANDLING + FULL SEO RESTORED
 export default async function BlogDetailPage({
   params,
 }: {
@@ -300,7 +552,7 @@ export default async function BlogDetailPage({
       client.fetch(
         RELATED_POSTS_QUERY,
         {
-          categoryId: post?.categories?.[0]?._ref,
+          categoryId: post?.categories?.[0]?._id,
           slug: post?.slug?.current,
         },
         { timeout: 10000 },
@@ -329,7 +581,7 @@ export default async function BlogDetailPage({
           .url()
       : `${baseUrl}/og-image.jpg`;
 
-    const canonicalUrl = `https://www.geokhub.com/blogs/${decodedSlug}`;
+    const canonicalUrl = `${baseUrl}${getPostUrlPath(post, decodedSlug)}`;
 
     // Enhanced JSON-LD with validation
     const jsonLd = {
@@ -353,7 +605,7 @@ export default async function BlogDetailPage({
         "@id": canonicalUrl,
       },
       publisher: {
-        "@type": "Organization",
+        "@type": "NewsMediaOrganization",
         name: "GeokHub",
         url: "https://www.geokhub.com",
         logo: {
@@ -378,8 +630,14 @@ export default async function BlogDetailPage({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -407,7 +665,7 @@ export default async function BlogDetailPage({
                       />
                       <div className="w-8 h-px bg-gray-200 dark:bg-gray-700 my-2"></div>
                       <div className="text-center">
-                            <View slug={decodedSlug} />
+                        <View slug={decodedSlug} />
                       </div>
                     </div>
                   </div>
@@ -418,76 +676,66 @@ export default async function BlogDetailPage({
               <div className="flex-1 max-w-3xl mx-auto min-w-0">
                 {/* Article Container */}
                 <article className="bg-white dark:bg-card rounded shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-
                   {/* Article Header */}
-                                      <div className="p-2 md:p-3 lg:p-2">
-                                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-6 leading-tight tracking-tight">
-                                          {post.title}
-                                        </h1>
-                  
-                                        {/* Author and Metadata */}
-                                        <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                          <div className="flex items-center gap-3">
-                                            {post.author?.image && (
-                                              <img
-                                                src={urlFor(post.author.image).url()}
-                                                alt={post.author.name}
-                                                className="rounded-full h-5 w-5"
-                                              />
-                                            )}
-                                            <div>
-                                              <p className="font-semibold text-gray-900 dark:text-white">
-                                                {post.author?.name || "GeokHub Reporter"}
-                                              </p>
-                                        
-                                            </div>
-                                          </div>
-                  
-                                          <div className="flex items-center gap-4 sm:ml-auto">
-                                            <div className="flex items-center gap-1">
-                                              <Calendar size={16} />
-                                              <time
-                                                dateTime={post.publishedAt}
-                                                className="font-medium"
-                                              >
-                                                {formatReadableDate(post.publishedAt)}
-                                              </time>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                              <BookOpen size={16} />
-                                              <span className="font-medium">
-                                                {readTime} min read
-                                              </span>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        </div>
+                  <div className="p-2 md:p-3 lg:p-2">
+                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-6 leading-tight tracking-tight">
+                      {post.title}
+                    </h1>
 
+                    {/* Author and Metadata */}
+                    <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
+                      <div className="flex items-center gap-3">
+                        {post.author?.image && (
+                          <img
+                            src={urlFor(post.author.image).url()}
+                            alt={post.author.name}
+                            className="rounded-full h-5 w-5"
+                          />
+                        )}
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">
+                            {post.author?.name || "GeokHub Reporter"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 sm:ml-auto">
+                        <div className="flex items-center gap-1">
+                          <Calendar size={16} />
+                          <time
+                            dateTime={post.publishedAt}
+                            className="font-medium"
+                          >
+                            {formatReadableDate(post.publishedAt)}
+                          </time>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <BookOpen size={16} />
+                          <span className="font-medium">
+                            {readTime} min read
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Hero Image with Gradient Overlay */}
-                  <div className="relative ">
-                    {/* Check if we have gallery images */}
+                  <div className="relative">
                     {post.galleryImages && post.galleryImages.length > 0 ? (
-                      <>
-                        <ImageSliderWrapper
-                          images={post.galleryImages}
-                          className="h-64 md:h-80 lg:h-96"
-                        />
-                      </>
+                      <ImageSliderWrapper
+                        images={post.galleryImages}
+                        className="h-64 md:h-80 lg:h-96"
+                      />
                     ) : post.images && post.images.length > 0 ? (
-                      // Fallback to images[] array if galleryImages doesn't exist but images[] does
-                      <>
-                        <ImageSliderWrapper
-                          images={post.images.map((img: any) => ({
-                            asset: img.asset,
-                            alt: img.alt || post.title,
-                            caption: img.caption,
-                          }))}
-                          className="h-64 md:h-80 lg:h-96"
-                        />
-                      </>
+                      <ImageSliderWrapper
+                        images={post.images.map((img: any) => ({
+                          asset: img.asset,
+                          alt: img.alt || post.title,
+                          caption: img.caption,
+                        }))}
+                        className="h-64 md:h-80 lg:h-96"
+                      />
                     ) : (
-                      // Fallback to single main image
                       <div className="relative h-64 md:h-80 lg:h-96">
                         <img
                           src={imageUrl}
@@ -505,36 +753,32 @@ export default async function BlogDetailPage({
 
                   {/* Article Content */}
                   <div className="p-2 md:p-3 lg:p-2">
-                    {/* Article Header */}
-                    <header className="mb-8">
-
-                      {/* Text-to-Speech Player */}
-                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 mb-6">
-                        <TextToSpeechPlayer content={plainTextContent} />
-                      </div>
-                    </header>
+                    {/* Text-to-Speech Player */}
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 mb-6">
+                      <TextToSpeechPlayer content={plainTextContent} />
+                    </div>
 
                     {/* Article Body */}
                     <div className="prose prose-lg md:prose-xl dark:prose-invert max-w-none mb-10">
                       <div
                         className="
-      prose-headings:font-bold 
-      prose-headings:text-gray-900 
-      prose-headings:dark:text-white 
-      prose-p:text-gray-700 
-      prose-p:dark:text-gray-300 
-      prose-a:text-blue-600 
-      prose-a:dark:text-blue-400 
-      prose-strong:text-gray-900 
-      prose-strong:dark:text-white
-      first-letter:text-5xl 
-      first-letter:font-bold 
-      first-letter:float-left 
-      first-letter:mr-2 
-      first-letter:leading-[0.9] 
-      first-letter:text-blue-600 
-      dark:first-letter:text-blue-400
-    "
+                          prose-headings:font-bold 
+                          prose-headings:text-gray-900 
+                          prose-headings:dark:text-white 
+                          prose-p:text-gray-700 
+                          prose-p:dark:text-gray-300 
+                          prose-a:text-blue-600 
+                          prose-a:dark:text-blue-400 
+                          prose-strong:text-gray-900 
+                          prose-strong:dark:text-white
+                          first-letter:text-5xl 
+                          first-letter:font-bold 
+                          first-letter:float-left 
+                          first-letter:mr-2 
+                          first-letter:leading-[0.9] 
+                          first-letter:text-blue-600 
+                          dark:first-letter:text-blue-400
+                        "
                       >
                         <BlogContentWithReadMore
                           parsedContent={parsedContent}
@@ -568,7 +812,7 @@ export default async function BlogDetailPage({
                             Topics
                           </h4>
                           <div className="flex flex-wrap gap-2">
-                            {post.keywords.slice(0, 8).map((tag, index) => (
+                            {post.keywords.slice(0, 8).map((tag: string, index: number) => (
                               <span
                                 key={index}
                                 className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full"
@@ -597,7 +841,7 @@ export default async function BlogDetailPage({
                       {trending?.length > 0 ? (
                         trending
                           .slice(0, 1)
-                          .map((trendingPost) => (
+                          .map((trendingPost: any) => (
                             <PickForYou
                               key={trendingPost.slug.current}
                               post={trendingPost}
@@ -611,28 +855,13 @@ export default async function BlogDetailPage({
                     </div>
                   </div>
 
-                  {/* KO-FI WIDGET */}
-                  {/* <div className="">
-                    <iframe
-                      id="kofiframe"
-                      src="https://ko-fi.com/geokhub/?hidefeed=true&widget=true&embed=true&preview=true"
-                      style={{
-                        border: "none",
-                        width: "100%",
-                        padding: "2px",
-                        background: "#f9f9f9",
-                      }}
-                      height="400"
-                      title="geokhub"
-                    />
-                  </div> */}
-
                   {/* Newsletter Signup */}
-                  <div className="bg-card rounded-2xl p-6 text-white">
+                  <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
                     <NewsletterForm
                       variant="inline"
                       title="Weekly Updates"
                       description="Get the latest news and insights delivered to your inbox."
+                      theme="dark"
                     />
                   </div>
                 </div>
@@ -668,6 +897,7 @@ export default async function BlogDetailPage({
       </>
     );
   } catch (error) {
+    console.error("Blog page error:", error);
     // If there's an error, return 404 instead of redirect
     // Redirects create "Page with redirect" issues in Search Console
     notFound();
@@ -678,7 +908,7 @@ export default async function BlogDetailPage({
 export async function generateStaticParams() {
   try {
     const posts = await client.fetch(
-      `*[_type == "post" && !(_id in path("drafts.**")) && defined(slug.current)] {
+      `*[_type == "post" && defined(slug.current) && publishedAt <= now()] {
         "slug": slug.current
       }`,
       {},
@@ -690,7 +920,6 @@ export async function generateStaticParams() {
     }));
   } catch (error) {
     console.error("Error generating static params for blogs:", error);
-    // Return empty array on error to prevent build failure
     return [];
   }
 }

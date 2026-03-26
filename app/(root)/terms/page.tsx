@@ -1,128 +1,189 @@
-import React from 'react';
+import React from "react";
 
 const TermsOfService = () => {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
-    <main className="flex-grow container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Terms of Service</h1>
-          <p className="text-gray-600 mb-4">Last updated: {currentDate}</p>
+    <main className="flex-grow container mx-auto px-4 py-10">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg">
+        <div className="p-6 md:p-10">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+            Terms of Service
+          </h1>
 
-          <div className="space-y-4">
+          <p className="text-gray-600 dark:text-gray-400 mb-8">
+            Last updated: {currentDate}
+          </p>
+
+          <div className="space-y-10 text-gray-700 dark:text-gray-300 leading-relaxed">
+
+            {/* 1 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">1. Acceptance of Terms</h2>
-              <p className="text-gray-700 ">
-                By accessing and using GeokHub, you accept and agree to be bound by these Terms of Service. 
-                If you do not agree to these terms, please do not use our Site.
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                1. Acceptance of Terms
+              </h2>
+              <p>
+                By accessing and using GeokHub, you agree to be bound by these
+                Terms of Service. If you do not agree, you must not use this
+                website.
               </p>
             </section>
 
+            {/* 2 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">2. Description of Service</h2>
-              <p className="text-gray-700">
-                GeokHub provides a platform for reading and sharing blog content about [describe your blog&apos;s focus]. 
-                We reserve the right to modify or discontinue the service at any time without notice.
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                2. Description of Service
+              </h2>
+              <p>
+                GeokHub is a digital publishing platform that provides content
+                related to world news, business, technology, and lifestyle.
+                Content is for informational and educational purposes only.
               </p>
             </section>
 
+            {/* 3 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">3. User Responsibilities</h2>
-              <p className="text-gray-700 mb-2">When using our Site, you agree to:</p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                <li>Provide accurate information when creating an account (if applicable)</li>
-                <li>Maintain the confidentiality of your account credentials</li>
-                <li>Not use the Site for any illegal or unauthorized purpose</li>
-                <li>Not interfere with or disrupt the Site&apos;s operation</li>
-                <li>Not upload or share content that violates intellectual property rights</li>
-                <li>Comply with all applicable laws and regulations</li>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                3. User Responsibilities
+              </h2>
+              <ul className="list-disc pl-6 space-y-3">
+                <li>Use the website only for lawful purposes</li>
+                <li>Do not attempt to hack, disrupt, or damage the platform</li>
+                <li>Do not post false, misleading, or harmful content</li>
+                <li>Respect intellectual property rights</li>
               </ul>
             </section>
 
+            {/* 4 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">4. Intellectual Property</h2>
-              <p className="text-gray-700 mb-2">
-                All content on the Site, including text, graphics, logos, and software, is the property of GeokHub or 
-                its content suppliers and protected by intellectual property laws.
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                4. Intellectual Property
+              </h2>
+              <p>
+                All content on GeokHub, including text, images, logos, and design,
+                is owned by or licensed to us and is protected by copyright and
+                intellectual property laws.
               </p>
-              <p className="text-gray-700">
-                You may access and use the content for personal, non-commercial purposes only. Any other use requires 
-                prior written permission from GeokHub.
+              <p className="mt-3">
+                You may not reproduce, distribute, or exploit any content without
+                prior written permission.
               </p>
             </section>
 
+            {/* 5 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">5. User-Generated Content</h2>
-              <p className="text-gray-700 mb-2">
-                If you submit content to the Site (comments, posts, etc.), you grant GeokHub a non-exclusive, 
-                royalty-free license to use, display, and distribute that content.
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                5. User-Generated Content
+              </h2>
+              <p className="mb-3">
+                By submitting content (comments or other materials), you grant us
+                a non-exclusive, royalty-free license to use and display such
+                content.
               </p>
-              <p className="text-gray-700">
-                You are solely responsible for any content you submit and agree not to post:
-              </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-700 mt-2">
-                <li>Content that is unlawful, harmful, or offensive</li>
-                <li>Content that infringes on intellectual property rights</li>
-                <li>Spam or unauthorized promotional content</li>
-                <li>False or misleading information</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">6. Termination</h2>
-              <p className="text-gray-700">
-                We may terminate or suspend your access to the Site immediately, without prior notice, for any reason, 
-                including if you breach these Terms. All provisions of these Terms which should survive termination will do so.
+              <p>
+                You are responsible for your content and must not post anything
+                unlawful, abusive, or misleading.
               </p>
             </section>
 
+            {/* 6 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">7. Disclaimers</h2>
-              <p className="text-gray-700 mb-2">
-                The Site is provided &quot;as is&quot; without warranties of any kind. GeokHub does not warrant that:
-              </p>
-              <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                <li>The Site will be uninterrupted or error-free</li>
-                <li>The content is accurate, complete, or reliable</li>
-                <li>The Site is free of viruses or other harmful components</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">8. Limitation of Liability</h2>
-              <p className="text-gray-700">
-                GeokHub shall not be liable for any indirect, incidental, special, or consequential damages resulting 
-                from your use of or inability to use the Site, even if we have been advised of the possibility of such damages.
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                6. Advertising and Monetization
+              </h2>
+              <p>
+                We may display advertisements, including through third-party
+                providers such as Google AdSense. These ads help support the
+                operation of the website.
               </p>
             </section>
 
+            {/* 7 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">9. Changes to Terms</h2>
-              <p className="text-gray-700">
-                We reserve the right to modify these Terms at any time. We will notify users of significant changes by 
-                posting the new Terms on this page. Your continued use of the Site after changes constitutes acceptance.
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                7. Content Disclaimer
+              </h2>
+              <p>
+                The information provided on GeokHub is for general informational
+                purposes only. We do not guarantee the accuracy, completeness, or
+                reliability of any content.
+              </p>
+              <p className="mt-3">
+                You use the information at your own risk.
               </p>
             </section>
 
+            {/* 8 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">10. Governing Law</h2>
-              <p className="text-gray-700">
-                These Terms shall be governed by the laws of [Your Country/State] without regard to its conflict of law provisions.
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                8. External Links Disclaimer
+              </h2>
+              <p>
+                Our website may contain links to third-party websites. We do not
+                control or endorse their content and are not responsible for
+                their practices.
               </p>
             </section>
 
+            {/* 9 */}
             <section>
-              <h2 className="text-xl text-gray-900 font-semibold mb-2">11. Contact Information</h2>
-              <p className="text-gray-700">
-                For questions about these Terms, please contact us at:
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                9. Limitation of Liability
+              </h2>
+              <p>
+                We are not liable for any indirect, incidental, or consequential
+                damages arising from your use of the website.
               </p>
-              <p className="text-gray-700 mt-2">Email: legal@geokhub.com</p>
             </section>
+
+            {/* 10 */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                10. Termination
+              </h2>
+              <p>
+                We may suspend or terminate access to the website at any time
+                without notice if you violate these Terms.
+              </p>
+            </section>
+
+            {/* 11 */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                11. Changes to Terms
+              </h2>
+              <p>
+                We reserve the right to update these Terms at any time. Continued
+                use of the site means you accept the updated Terms.
+              </p>
+            </section>
+
+            {/* 12 */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                12. Governing Law
+              </h2>
+              <p>
+                These Terms shall be governed by and interpreted in accordance
+                with the laws of Nigeria.
+              </p>
+            </section>
+
+            {/* 13 */}
+            <section>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                13. Contact Information
+              </h2>
+              <p>
+                If you have any questions about these Terms, please contact us:
+              </p>
+              <p className="mt-2">Email: legal@geokhub.com</p>
+            </section>
+
           </div>
         </div>
       </div>

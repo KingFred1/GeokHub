@@ -3,25 +3,30 @@ import { BLOGS_BY_CATEGORY_SLUGS, LIFESTYLE_CATEGORIES } from "@/sanity/lib/quer
 import LifestyleServer from "@/components/category/LifestyleServer";
 import { Category, Post } from "@/type";
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 interface LifestylePageProps {
-  params: Promise<{ category?: string[] }>;
+  params: Promise<{ slug?: string[] }>;
 }
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 2592000; // 1 hour
-// // or
-// export const revalidate = 1800; // 30 minutes
-// // or  
-// export const revalidate = 900; // 15 minutes
+export const revalidate = 2592000; // 30 days
 
 export async function generateMetadata({ params }: LifestylePageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  // Join all category segments for nested categories, e.g. ["mentalhealth"] or ["wellness", "subcat"]
-  const categorySegments = resolvedParams.category || ["lifestyle"];
-  const categorySlug = categorySegments.join("/");
+  const slugSegments = resolvedParams.slug || ["lifestyle"];
+  const categorySlug = slugSegments.join("/");
 
-  // Map for top-level categories only
+  const validCategories = ['lifestyle', 'mentalhealth', 'wellness', 'weightloss'];
+  const topCategory = slugSegments[0];
+  
+  if (topCategory && !validCategories.includes(topCategory) && topCategory !== 'lifestyle') {
+    return {
+      title: "Page Not Found",
+      robots: { index: false, follow: false }
+    };
+  }
+
   const categoryTitles: Record<string, string> = {
     lifestyle: "Lifestyle & Wellness",
     mentalhealth: "Mental Health",
@@ -29,8 +34,6 @@ export async function generateMetadata({ params }: LifestylePageProps): Promise<
     weightloss: "Weight Loss",
   };
 
-  // Use the first segment for title/description
-  const topCategory = categorySegments[0] || "lifestyle";
   const title = categoryTitles[topCategory] || "Lifestyle";
   const descriptionMap: Record<string, string> = {
     lifestyle: "Discover inspiration for living well - from mental health and wellness to weight loss, and personal growth",
@@ -47,27 +50,31 @@ export async function generateMetadata({ params }: LifestylePageProps): Promise<
       title: `${title} - Health & Wellness Articles`,
       description: descriptionMap[topCategory] || "Discover inspiration for living well",
       type: 'website',
-      url: `https://geokhub.com/lifestyles/${categorySlug}`,
+      url: `https://geokhub.com/lifestyle/category/${categorySlug}`,
     },
     alternates: {
-      canonical: `https://geokhub.com/lifestyles/${categorySlug}`
+      canonical: `https://geokhub.com/lifestyle/category/${categorySlug}`
     }
   };
 }
 
 async function LifestyleContent({ params }: LifestylePageProps) {
   const resolvedParams = await params;
-  // Join all category segments for nested categories
-  const categorySegments = resolvedParams.category || ["lifestyle"];
-  const categorySlug = categorySegments.join("/");
+  const slugSegments = resolvedParams.slug || ["lifestyle"];
+  const categorySlug = slugSegments.join("/");
 
-  // Fetch posts for the full slug (e.g. "mentalhealth" or "wellness/subcat")
+  const validCategories = ['lifestyle', 'mentalhealth', 'wellness', 'weightloss'];
+  const topCategory = slugSegments[0];
+  
+  if (topCategory && !validCategories.includes(topCategory) && categorySlug !== 'lifestyle') {
+    notFound();
+  }
+
   const [posts, lifestyleCategories] = await Promise.all([
     client.fetch<Post[]>(BLOGS_BY_CATEGORY_SLUGS, { slugs: [categorySlug] }),
     client.fetch<Category[]>(LIFESTYLE_CATEGORIES)
   ]);
 
-  // Manually add the main lifestyle category if not included
   const allCategories: Category[] = [
     {
       _id: "lifestyle-main",
@@ -98,3 +105,5 @@ export default async function LifestylePage(props: LifestylePageProps) {
     </div>
   );
 }
+
+

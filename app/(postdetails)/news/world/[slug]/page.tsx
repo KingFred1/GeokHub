@@ -33,7 +33,6 @@ import {
   BLOG_BY_CATEGORY_SLUG,
   RELATED_POSTS_QUERY,
 } from "@/sanity/lib/queries";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
 
 // Initialize markdown parser with better configuration
@@ -50,8 +49,51 @@ const md = markdownit({
   },
 });
 
-
 export const revalidate = 2592000;
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -61,14 +103,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    // decode slug so canonical URL matches the page URL exactly
     const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         seoTitle,
         metaDescription,
@@ -85,6 +126,25 @@ export async function generateMetadata({
       return {
         title: "World News Article Not Found - GeokHub",
         description: "The requested world news article could not be found.",
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    // Verify this is a world news post
+    const isWorldPost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "world" || catSlug === "world" || parentSlug === "world"
+      );
+    });
+
+    if (!isWorldPost) {
+      return {
         robots: {
           index: false,
           follow: false,
@@ -113,9 +173,9 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub World News`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
-
-      // FIX: explicitly allow indexing on the success path
+      alternates: { 
+        canonical: canonicalUrl,
+      },
       robots: {
         index: true,
         follow: true,
@@ -127,7 +187,6 @@ export async function generateMetadata({
           "max-snippet": -1,
         },
       },
-
       openGraph: {
         title: post.title,
         description,
@@ -148,19 +207,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // On transient errors, keep pages indexable so we don't accidentally
-    // de-index content due to a temporary fetch failure.
+    console.error("Error generating world news metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -201,40 +252,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "news" or "world"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (categoryTitle === "news" || categorySlug === "news") {
-      return `/news/${slugValue}`;
-    }
-
-    if (categoryTitle === "world" || categorySlug === "world") {
-      return `/news/world/${slugValue}`;
-    }
-
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (parentTitle === "news" || parentSlug === "news") {
-        return `/news/${slugValue}`;
-      }
-
-      if (parentTitle === "world" || parentSlug === "world") {
-        return `/news/world/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get continent/region from location
@@ -301,10 +320,14 @@ export default async function WorldDetailPage({
         },
         mainImage,
         galleryImages[] {
-      asset->,
-      alt,
-      caption
-    },
+          asset->,
+          alt,
+          caption
+        },
+        images[]{
+          ...,
+          asset->
+        },
         body,
         seoTitle,
         metaDescription,
@@ -330,7 +353,7 @@ export default async function WorldDetailPage({
     }
 
     // ========== WORLD CATEGORY CHECK ==========
-    const isWorldPost = post.categories?.some((cat) => {
+    const isWorldPost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
@@ -372,14 +395,15 @@ export default async function WorldDetailPage({
           publishedAt,
           mainImage,
           galleryImages[] {
-      asset->,
-      alt,
-      caption
-    },
+            asset->,
+            alt,
+            caption
+          },
           excerpt,
           views,
           categories[]->{title, slug}
         }`,
+        { next: { revalidate: 2592000 } },
       ),
     ]);
 
@@ -441,6 +465,10 @@ export default async function WorldDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
         "@type": "NewsMediaOrganization",
         name: "GeokHub World News",
@@ -463,6 +491,13 @@ export default async function WorldDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -474,7 +509,7 @@ export default async function WorldDetailPage({
           />
         </div>
 
-        <div className="min-h-screen bg-background dark:bg-background-dark ">
+        <div className="min-h-screen bg-background dark:bg-background-dark">
           {/* Global Navigation Indicator */}
           <div className="bg-gradient-to-r from-blue-900 via-indigo-800 to-purple-900 text-white">
             <div className="max-w-7xl mx-auto px-4 py-2">
@@ -592,28 +627,21 @@ export default async function WorldDetailPage({
 
                 {/* Hero Image */}
                 <div className="mb-4">
-                  {/* Check if we have gallery images */}
                   {post.galleryImages && post.galleryImages.length > 0 ? (
-                    <>
-                      <ImageSliderWrapper
-                        images={post.galleryImages}
-                        className="h-64 md:h-80 lg:h-[72vh]"
-                      />
-                    </>
+                    <ImageSliderWrapper
+                      images={post.galleryImages}
+                      className="h-64 md:h-80 lg:h-[72vh]"
+                    />
                   ) : post.images && post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
-                    <>
-                      <ImageSliderWrapper
-                        images={post.images.map((img: any) => ({
-                          asset: img.asset,
-                          alt: img.alt || post.title,
-                          caption: img.caption,
-                        }))}
-                        className="h-64 md:h-80 lg:h-96"
-                      />
-                    </>
+                    <ImageSliderWrapper
+                      images={post.images.map((img: any) => ({
+                        asset: img.asset,
+                        alt: img.alt || post.title,
+                        caption: img.caption,
+                      }))}
+                      className="h-64 md:h-80 lg:h-96"
+                    />
                   ) : (
-                    // Fallback to single main image
                     <div className="relative h-64 md:h-80 lg:h-96">
                       <img
                         src={imageUrl}
@@ -738,7 +766,7 @@ export default async function WorldDetailPage({
                 )}
 
                 {/* Social Share & Engagement */}
-                <div className=" bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-700">
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 border border-gray-100 dark:border-gray-700">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -809,8 +837,50 @@ export default async function WorldDetailPage({
                     </div>
                   </div>
 
+                  {/* Trending Stories */}
+                  {/* {trendingWorldWithUrls.length > 0 && (
+                    <div className="bg-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                      <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white p-5">
+                        <div className="flex items-center gap-3">
+                          <TrendingUp className="h-6 w-6" />
+                          <h2 className="text-xl font-bold">
+                            Trending Worldwide
+                          </h2>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        {trendingWorldWithUrls.map((newsItem: any, idx: number) => {
+                          const slugString = newsItem.slug?.current || newsItem.slug;
+                          if (!slugString) return null;
+
+                          return (
+                            <Link
+                              key={slugString}
+                              href={newsItem.url}
+                              className="group block mb-4 last:mb-0"
+                            >
+                              <div className="flex gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                  {idx + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 line-clamp-2 text-sm mb-1">
+                                    {newsItem.title}
+                                  </h3>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {formatReadableDate(newsItem.publishedAt)}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )} */}
+
                   {/* Global Newsletter */}
-                  <div className="bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 rounded-2xl p-6 text-white">
                     <div className="flex items-center gap-3 mb-4">
                       <Globe className="h-8 w-8" />
                       <div>
@@ -826,10 +896,10 @@ export default async function WorldDetailPage({
                       description="Get global news updates from all continents delivered to your inbox."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
 
                   {/* Support Global Journalism */}
-                  <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white">
                     <div className="text-center">
                       <Users className="h-10 w-10 mx-auto mb-3" />
                       <h3 className="text-lg font-bold mb-2">
@@ -846,7 +916,7 @@ export default async function WorldDetailPage({
                         Support Our Work
                       </Link>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </aside>
             </div>
@@ -890,11 +960,12 @@ export default async function WorldDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all world news slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
     *[_type == "post" && 
-      defined(categories) && 
+      defined(slug.current) && 
+      publishedAt <= now() &&
       count((categories[]->slug.current)[@ in ["world"]]) > 0
     ] {
       "slug": slug.current

@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// server-only view counter
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -35,7 +34,6 @@ import {
   BLOG_BY_CATEGORY_SLUG,
   RELATED_POSTS_QUERY,
 } from "@/sanity/lib/queries";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
 
 // Initialize markdown parser with better configuration
@@ -52,9 +50,113 @@ const md = markdownit({
   },
 });
 
-// CRITICAL: Force dynamic rendering
-export const dynamic = "force-dynamic";
-export const revalidate = 2592000;
+export const revalidate = 2592000; // 30 days
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (
+      categoryTitle === "ai" ||
+      categorySlug === "ai" ||
+      categoryTitle === "artificial intelligence" ||
+      categorySlug === "artificial-intelligence"
+    ) {
+      return `/technology/ai/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cybersecurity" ||
+      categorySlug === "cybersecurity" ||
+      categoryTitle === "security" ||
+      categorySlug === "security"
+    ) {
+      return `/technology/cybersecurity/${slug}`;
+    }
+
+    if (categoryTitle === "gadgets" || categorySlug === "gadgets") {
+      return `/technology/gadgets/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+
+      if (
+        parentTitle === "ai" ||
+        parentSlug === "ai" ||
+        parentTitle === "artificial intelligence" ||
+        parentSlug === "artificial-intelligence"
+      ) {
+        return `/technology/ai/${slug}`;
+      }
+
+      if (
+        parentTitle === "cybersecurity" ||
+        parentSlug === "cybersecurity" ||
+        parentTitle === "security" ||
+        parentSlug === "security"
+      ) {
+        return `/technology/cybersecurity/${slug}`;
+      }
+
+      if (parentTitle === "gadgets" || parentSlug === "gadgets") {
+        return `/technology/gadgets/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -64,23 +166,24 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
         body,
         publishedAt
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 2592000 } },
     );
 
@@ -88,11 +191,38 @@ export async function generateMetadata({
       return {
         title: "Cybersecurity Article Not Found - GeokHub",
         description: "The requested cybersecurity article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/technology/cybersecurity/${slug}`;
+    // Verify this is a cybersecurity post
+    const isCybersecurityPost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "cybersecurity" ||
+        catSlug === "cybersecurity" ||
+        catTitle === "security" ||
+        catSlug === "security" ||
+        parentSlug === "cybersecurity" ||
+        parentSlug === "security"
+      );
+    });
+
+    if (!isCybersecurityPost) {
+      return {
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    const canonicalUrl = `https://www.geokhub.com/technology/cybersecurity/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -113,7 +243,20 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub Cybersecurity`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
+      alternates: { 
+        canonical: canonicalUrl,
+      },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
       openGraph: {
         title: post.title,
         description,
@@ -133,18 +276,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    console.error("Error generating cybersecurity metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -185,42 +321,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "cybersecurity"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (
-      categoryTitle === "cybersecurity" ||
-      categorySlug === "cybersecurity" ||
-      categoryTitle === "security" ||
-      categorySlug === "security"
-    ) {
-      return `/technology/cybersecurity/${slugValue}`;
-    }
-
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (
-        parentTitle === "cybersecurity" ||
-        parentSlug === "cybersecurity" ||
-        parentTitle === "security" ||
-        parentSlug === "security"
-      ) {
-        return `/technology/cybersecurity/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get cybersecurity category
@@ -291,22 +393,22 @@ export default async function CybersecurityDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -333,7 +435,7 @@ export default async function CybersecurityDetailPage({
     }
 
     // ========== CYBERSECURITY CATEGORY CHECK ==========
-    const isCybersecurityPost = post.categories?.some((cat) => {
+    const isCybersecurityPost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
@@ -348,8 +450,6 @@ export default async function CybersecurityDetailPage({
     });
 
     // ========== REJECT NON-CYBERSECURITY POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Cybersecurity category
     if (!isCybersecurityPost) {
       notFound();
     }
@@ -391,6 +491,7 @@ export default async function CybersecurityDetailPage({
           technologyType,
           threatLevel
         }`,
+        { next: { revalidate: 2592000 } },
       ),
     ]);
 
@@ -440,7 +541,7 @@ export default async function CybersecurityDetailPage({
     // ========== JSON-LD ==========
     const jsonLd = {
       "@context": "https://schema.org",
-      "@type": "Article",
+      "@type": "TechArticle",
       headline: post.title || "Cybersecurity",
       description: post.excerpt || plainTextContent.substring(0, 160),
       author: {
@@ -453,8 +554,12 @@ export default async function CybersecurityDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
-        "@type": "Organization",
+        "@type": "NewsMediaOrganization",
         name: "GeokHub Cybersecurity",
         url: "https://www.geokhub.com/technology/cybersecurity",
         logo: {
@@ -475,6 +580,13 @@ export default async function CybersecurityDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -602,7 +714,7 @@ export default async function CybersecurityDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
                     <div className="flex items-center gap-1">
                       {post.author?.image && (
                         <img
@@ -637,8 +749,7 @@ export default async function CybersecurityDetailPage({
                 </header>
 
                 {/* Hero Image Slider */}
-                <div className="mb-5">
-                  {/* Check if we have gallery images */}
+                <div className="mb-5 relative">
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -647,9 +758,8 @@ export default async function CybersecurityDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* Business News Badge */}
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           CYBERSECURITY
                         </span>
                       </div>
@@ -657,7 +767,6 @@ export default async function CybersecurityDetailPage({
                   ) : post.images &&
                     Array.isArray(post.images) &&
                     post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
                     <>
                       <ImageSliderWrapper
                         images={post.images.map((img: any) => ({
@@ -668,13 +777,12 @@ export default async function CybersecurityDetailPage({
                         className="md:rounded-xl shadow-2xl"
                       />
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           CYBERSECURITY
                         </span>
                       </div>
                     </>
                   ) : (
-                    // Fallback to single main image
                     <div className="md:rounded-xl overflow-hidden shadow-2xl">
                       <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
                         <img
@@ -685,7 +793,7 @@ export default async function CybersecurityDetailPage({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute top-6 left-6">
-                          <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          <span className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                             CYBERSECURITY
                           </span>
                         </div>
@@ -921,7 +1029,7 @@ export default async function CybersecurityDetailPage({
                   </div>
 
                   {/* Security Newsletter */}
-                  <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 text-white">
                     <div className="flex items-center gap-3 mb-4">
                       <Shield className="h-8 w-8" />
                       <div>
@@ -937,7 +1045,7 @@ export default async function CybersecurityDetailPage({
                       description="Get security updates, threat alerts, and protection tips delivered."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </aside>
             </div>
@@ -984,11 +1092,12 @@ export default async function CybersecurityDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all cybersecurity slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
     *[_type == "post" && 
-      defined(categories) && 
+      defined(slug.current) && 
+      publishedAt <= now() &&
       count((categories[]->slug.current)[@ in ["cybersecurity", "security"]]) > 0
     ] {
       "slug": slug.current

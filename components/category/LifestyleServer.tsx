@@ -1,4 +1,3 @@
-// server component: interactivity moved to LifestyleClient
 import ClientNewsSwiper from "@/components/ClientNewsSwiper";
 import MasonryGrid from "@/components/World";
 import SideBlog from "@/components/SideBlog";
@@ -140,7 +139,7 @@ export default function LifestyleServer({
             return (
               <Link
                 key={category.slug}
-                href={`/lifestyles/${category.slug === "lifestyle" ? "" : category.slug}`}
+                href={`/lifestyle/${category.slug === "lifestyle" ? "" : category.slug}`}
                 className={`${category.color} px-4 py-2 rounded-full text-sm font-medium flex items-center transition-all ${
                   activeCategory === category.slug
                     ? "ring-2 ring-offset-2 ring-current scale-105"

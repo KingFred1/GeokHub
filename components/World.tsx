@@ -60,7 +60,7 @@ function getPostDetailUrl(post: Post): string {
     }
 
      if (categoryTitle === "lifestyle" || categorySlug === "lifestyle") {
-      return `/lifestyle/${slugValue}`;
+      return `/lifestyle/post/${slugValue}`;
     }
 
 
@@ -167,7 +167,7 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
             {/* Image */}
             <Link
               href={detailUrl}
-              className="block relative overflow-hidden md:h-40 h-44 "
+              className="block relative overflow-hidden md:h-48 h-48 "
             >
               <img
                 src={imageUrl}
@@ -204,7 +204,7 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
 
               {/* Title */}
               <Link href={detailUrl}>
-                <h3 className="md:text-lg text-2xl font-semibold text-gray-900 dark:text-white hover:underline transition-colors line-clamp-3 mb-3">
+                <h3 className="md:text-lg text-xl font-semibold text-gray-900 dark:text-white hover:underline transition-colors line-clamp-3 mb-3">
                   {title}
                 </h3>
               </Link>

@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// view count displayed directly
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -55,8 +54,69 @@ const md = markdownit({
   },
 });
 
-
 export const revalidate = 2592000;
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -66,18 +126,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    // FIX: decode slug so canonical URL matches the page URL exactly
     const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
@@ -93,8 +152,31 @@ export async function generateMetadata({
     if (!post) {
       return {
         title: "Tech News Article Not Found - GeokHub",
-        description:
-          "The requested technology news article could not be found.",
+        description: "The requested technology news article could not be found.",
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    // Verify this is a tech news post
+    const isTechPost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "tech-news" ||
+        catSlug === "tech-news" ||
+        catTitle === "technology" ||
+        catSlug === "technology" ||
+        parentSlug === "tech" ||
+        parentSlug === "technology"
+      );
+    });
+
+    if (!isTechPost) {
+      return {
         robots: {
           index: false,
           follow: false,
@@ -123,9 +205,9 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub Tech News`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
-
-      // FIX: explicitly allow indexing on the success path
+      alternates: { 
+        canonical: canonicalUrl,
+      },
       robots: {
         index: true,
         follow: true,
@@ -137,7 +219,6 @@ export async function generateMetadata({
           "max-snippet": -1,
         },
       },
-
       openGraph: {
         title: post.title,
         description,
@@ -158,19 +239,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // On transient errors, keep pages indexable so we don't accidentally
-    // de-index content due to a temporary fetch failure.
+    console.error("Error generating tech metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -211,42 +284,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "tech" or "technology"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (
-      categoryTitle === "tech-news" ||
-      categorySlug === "tech-news" ||
-      categoryTitle === "technology" ||
-      categorySlug === "technology"
-    ) {
-      return `/technology/tech-news/${slugValue}`;
-    }
-
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (
-        parentTitle === "tech-news" ||
-        parentSlug === "tech-news" ||
-        parentTitle === "technology" ||
-        parentSlug === "technology"
-      ) {
-        return `/technology/tech-news/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get tech category
@@ -323,22 +362,22 @@ export default async function TechDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -369,7 +408,7 @@ export default async function TechDetailPage({
     }
 
     // ========== TECH CATEGORY CHECK ==========
-    const isTechPost = post.categories?.some((cat) => {
+    const isTechPost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
@@ -384,8 +423,6 @@ export default async function TechDetailPage({
     });
 
     // ========== REJECT NON-TECH POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Tech News category
     if (!isTechPost) {
       notFound();
     }
@@ -411,7 +448,7 @@ export default async function TechDetailPage({
         { timeout: 10000 },
       ),
       client.fetch(
-        `*[_type == "post" && "tech-news" in categories[]->slug.current] | order(publishedAt desc)[0...5] {
+        `*[_type == "post" && count((categories[]->slug.current)[@ in ["tech-news", "technology"]]) > 0] | order(views desc)[0...5] {
           _id,
           title,
           "slug": slug.current,
@@ -422,6 +459,7 @@ export default async function TechDetailPage({
           categories[]->{title, slug},
           technologyType
         }`,
+        { next: { revalidate: 2592000 } },
       ),
     ]);
 
@@ -484,6 +522,10 @@ export default async function TechDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
         "@type": "NewsMediaOrganization",
         name: "GeokHub Tech News",
@@ -508,6 +550,13 @@ export default async function TechDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -631,7 +680,7 @@ export default async function TechDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
                     <div className="flex items-center gap-1">
                       {post.author?.image && (
                         <img
@@ -666,7 +715,7 @@ export default async function TechDetailPage({
                 </header>
 
                 {/* Hero Image Slider */}
-                <div className="mb-5">
+                <div className="mb-5 relative">
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -949,10 +998,10 @@ export default async function TechDetailPage({
                   {/* Tech Newsletter */}
                   <div className="bg-card shadow-md border rounded-2xl p-6 dark:gray-800 border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-3 mb-4">
-                      <Cpu className="h-8 w-8" />
+                      <Cpu className="h-8 w-8 text-purple-600" />
                       <div>
                         <h3 className="text-xl font-bold">Tech Pulse</h3>
-                        <p className="text-purple-200 text-sm">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
                           Daily tech updates
                         </p>
                       </div>
@@ -961,7 +1010,7 @@ export default async function TechDetailPage({
                       variant="inline"
                       title=""
                       description="Get the latest in AI, startups, gadgets, and coding delivered to your inbox."
-                      theme="dark"
+                      theme="light"
                     />
                   </div>
                 </div>
@@ -1006,11 +1055,12 @@ export default async function TechDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all tech news slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
     *[_type == "post" && 
-      defined(categories) && 
+      defined(slug.current) && 
+      publishedAt <= now() &&
       count((categories[]->slug.current)[@ in ["tech-news", "technology"]]) > 0
     ] {
       "slug": slug.current

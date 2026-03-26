@@ -342,13 +342,12 @@ export default function NewsClient({
       <div className="mb-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <Globe className="h-6 w-6 text-blue-600 dark:text-blue-400 mr-2" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               More News
             </h2>
-            <span className="ml-3 px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full">
+            {/* <span className="ml-3 px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-full">
               {currentPosts.length} of {filteredPosts.length} articles • Page {currentPage} of {totalPages}
-            </span>
+            </span> */}
           </div>
         </div>
         

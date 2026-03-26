@@ -57,19 +57,19 @@ export default async function ProgrammingPage() {
     <div className="min-h-screen bg-background">
       {/* Trending Section */}
       <section className="py-4 bg-background">
-        <div className="px-4 sm:px-6 lg:px-8">
+        <div className="px-0 md:px-4 lg:px-8">
           <div className="flex items-center justify-between pb-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+            <Link href="/technology/programming" className="hover:underline text-xl md:px-0 px-2 md:text-xl font-bold text-gray-900 dark:text-white flex items-center">
               <TrendingUp className="h-6 w-6 mr-2 text-green-600" />
               Trending Programming Topics
-            </h2>
+            </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
             {trending.length > 0 ? (
               trending.map((post) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>
-                  <article className="bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
-                    <div className="relative h-44 overflow-hidden">
+                  <article className="bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
+                    <div className="relative h-48 overflow-hidden">
                       <img
                         src={post.mainImage?.asset ? urlFor(post.mainImage).url() : "/fallback-image.jpg"}
                         alt={post.title}
@@ -82,7 +82,7 @@ export default async function ProgrammingPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="p-2">
+                    <div className="py-2 md:px-2 px-4">
                       <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
                         {post.author?.image && (
                           <img
@@ -96,7 +96,7 @@ export default async function ProgrammingPage() {
                         <Calendar size={12} />
                         <span>{formatTimeShort(post._createdAt)}</span>
                       </div>
-                      <h3 className="font-semibold text-xl text-gray-900 dark:text-white mb-2 line-clamp-3 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                      <h3 className="font-semibold text-xl text-gray-900 dark:text-white mb-2 line-clamp-3 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors mb-3">
                         {post.title}
                       </h3>
                       {post.excerpt && (
@@ -123,15 +123,12 @@ export default async function ProgrammingPage() {
       </section>
 
       {/* Main Content Section */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Latest Programming Insights & Tutorials
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Dive deep into programming languages, frameworks, development tools, and software engineering best practices.
-            </p>
+      <section className="py-6">
+        <div className="max-w-7xl mx-auto px-0 md:px-4 lg:px-8">
+          <div className="text-center mb-6">
+            <Link href="/technology/programming" className="hover:underline text-xl md:text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              Programming Insights & Tutorials
+            </Link>
           </div>
           {mainBlogs?.length > 3 ? (
             <MasonryGrid posts={mainBlogs.slice(4)} />

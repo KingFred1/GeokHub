@@ -75,7 +75,7 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
     },
     {
       name: "Lifestyle",
-      href: "/lifestyles",
+      href: "/lifestyle/category/lifestyle",
       icon: <HeartIcon className="w-5 h-5 cursor-pointer" />,
     },
     {
@@ -316,9 +316,9 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
                 transition={{ delay: 0.4 }}
               >
                 {/* Newsletter Form */}
-                <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+                {/* <div className="p-4 border-t border-gray-200 dark:border-gray-800">
                   <NewsletterForm variant="minimal" />
-                </div>
+                </div> */}
 
                 {/* Theme Switcher (only visible in toggle menu) */}
                 <div className="p-4 flex items-center justify-center">

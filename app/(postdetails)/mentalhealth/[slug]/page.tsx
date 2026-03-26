@@ -50,9 +50,154 @@ const md = markdownit({
   },
 });
 
-
-// export const revalidate = 86400;
 export const revalidate = 2592000; // 30 days
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (
+      categoryTitle === "ai" ||
+      categorySlug === "ai" ||
+      categoryTitle === "artificial intelligence" ||
+      categorySlug === "artificial-intelligence"
+    ) {
+      return `/technology/ai/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cybersecurity" ||
+      categorySlug === "cybersecurity" ||
+      categoryTitle === "security" ||
+      categorySlug === "security"
+    ) {
+      return `/technology/cybersecurity/${slug}`;
+    }
+
+    if (categoryTitle === "gadgets" || categorySlug === "gadgets") {
+      return `/technology/gadgets/${slug}`;
+    }
+
+    if (
+      categoryTitle === "lifestyle" ||
+      categorySlug === "lifestyle" ||
+      categoryTitle === "living" ||
+      categorySlug === "living"
+    ) {
+      return `/lifestyle/${slug}`;
+    }
+
+    // Check for mental health
+    const titleIsMental =
+      (categoryTitle?.includes("mental") && categoryTitle?.includes("health")) ||
+      categoryTitle?.includes("mentalhealth");
+    const slugIsMental =
+      (categorySlug?.includes("mental") && categorySlug?.includes("health")) ||
+      categorySlug?.includes("mentalhealth");
+
+    if (titleIsMental || slugIsMental) {
+      return `/mentalhealth/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+
+      if (
+        parentTitle === "ai" ||
+        parentSlug === "ai" ||
+        parentTitle === "artificial intelligence" ||
+        parentSlug === "artificial-intelligence"
+      ) {
+        return `/technology/ai/${slug}`;
+      }
+
+      if (
+        parentTitle === "cybersecurity" ||
+        parentSlug === "cybersecurity" ||
+        parentTitle === "security" ||
+        parentSlug === "security"
+      ) {
+        return `/technology/cybersecurity/${slug}`;
+      }
+
+      if (parentTitle === "gadgets" || parentSlug === "gadgets") {
+        return `/technology/gadgets/${slug}`;
+      }
+
+      if (
+        parentTitle === "lifestyle" ||
+        parentSlug === "lifestyle" ||
+        parentTitle === "living" ||
+        parentSlug === "living"
+      ) {
+        return `/lifestyle/${slug}`;
+      }
+
+      const parentTitleIsMental =
+        (parentTitle?.includes("mental") && parentTitle?.includes("health")) ||
+        parentTitle?.includes("mentalhealth");
+      const parentSlugIsMental =
+        (parentSlug?.includes("mental") && parentSlug?.includes("health")) ||
+        parentSlug?.includes("mentalhealth");
+
+      if (parentTitleIsMental || parentSlugIsMental) {
+        return `/mentalhealth/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -62,18 +207,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    // FIX: decode slug so canonical URL matches the page URL exactly
     const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
@@ -88,6 +232,30 @@ export async function generateMetadata({
       return {
         title: "Mental Health Article Not Found - GeokHub",
         description: "The requested mental health article could not be found.",
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    // Verify this is a mental health post
+    const isMentalHealthPost = post.categories?.some((cat: any) => {
+      const catTitle = (cat.title || "").toLowerCase();
+      const catSlug = (cat.slug?.current || "").toLowerCase();
+      const parentSlug = (cat.parent?.slug?.current || "").toLowerCase();
+      return (
+        catTitle.includes("mentalhealth") ||
+        catSlug.includes("mentalhealth") ||
+        (catTitle.includes("mental") && catTitle.includes("health")) ||
+        (catSlug.includes("mental") && catSlug.includes("health")) ||
+        parentSlug.includes("mentalhealth") ||
+        (parentSlug.includes("mental") && parentSlug.includes("health"))
+      );
+    });
+
+    if (!isMentalHealthPost) {
+      return {
         robots: {
           index: false,
           follow: false,
@@ -116,9 +284,9 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub Mental Health`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
-
-      // FIX: explicitly allow indexing on the success path
+      alternates: { 
+        canonical: canonicalUrl,
+      },
       robots: {
         index: true,
         follow: true,
@@ -130,7 +298,6 @@ export async function generateMetadata({
           "max-snippet": -1,
         },
       },
-
       openGraph: {
         title: post.title,
         description,
@@ -150,19 +317,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // On transient errors, keep pages indexable so we don't accidentally
-    // de-index content due to a temporary fetch failure.
+    console.error("Error generating mental health metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -203,28 +362,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  for (const category of post.categories) {
-    const categoryTitle = (category.title || "").toLowerCase();
-    const categorySlug = (category.slug?.current || "").toLowerCase();
-
-    const titleIsMental =
-      (categoryTitle.includes("mental") && categoryTitle.includes("health")) ||
-      categoryTitle.includes("mentalhealth");
-    const slugIsMental =
-      (categorySlug.includes("mental") && categorySlug.includes("health")) ||
-      categorySlug.includes("mentalhealth");
-
-    if (titleIsMental || slugIsMental) {
-      return `/mentalhealth/${slugValue}`;
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get mental health category
@@ -233,15 +372,19 @@ function getMentalHealthCategory(mentalHealthType: string): string {
 
   const mentalHealthMap: Record<string, string> = {
     anxiety: "Anxiety",
-    stress: "Stress",
+    stress: "Stress Management",
     depression: "Depression",
     mindfulness: "Mindfulness",
     therapy: "Therapy",
-    coping: "Coping",
+    coping: "Coping Strategies",
     selfcare: "Self-Care",
-    trauma: "Trauma",
-    sleep: "Sleep",
-    workplace: "Workplace",
+    trauma: "Trauma Recovery",
+    sleep: "Sleep Health",
+    workplace: "Workplace Wellness",
+    burnout: "Burnout Prevention",
+    resilience: "Building Resilience",
+    meditation: "Meditation",
+    wellness: "Mental Wellness",
   };
 
   const typeLower = mentalHealthType.toLowerCase();
@@ -305,25 +448,29 @@ export default async function MentalHealthDetailPage({
         categories[]->{
           _id,
           title,
-          slug
+          slug,
+          parent->{
+            title,
+            slug
+          }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -351,15 +498,17 @@ export default async function MentalHealthDetailPage({
     }
 
     // ========== MENTAL HEALTH CATEGORY CHECK ==========
-    // FIX: removed duplicate conditions and typo ("mentalheath")
     const isMentalHealthPost = post.categories?.some((cat: any) => {
       const catTitle = (cat.title || "").toLowerCase();
       const catSlug = (cat.slug?.current || "").toLowerCase();
+      const parentSlug = (cat.parent?.slug?.current || "").toLowerCase();
       return (
         catTitle.includes("mentalhealth") ||
         catSlug.includes("mentalhealth") ||
         (catTitle.includes("mental") && catTitle.includes("health")) ||
-        (catSlug.includes("mental") && catSlug.includes("health"))
+        (catSlug.includes("mental") && catSlug.includes("health")) ||
+        parentSlug.includes("mentalhealth") ||
+        (parentSlug.includes("mental") && parentSlug.includes("health"))
       );
     });
 
@@ -390,17 +539,18 @@ export default async function MentalHealthDetailPage({
           { timeout: 10000 },
         ),
         client.fetch(
-          `*[_type == "post" && categories[]->slug.current == "mentalhealth"] | order(views desc)[0...5] {
-          _id,
-          title,
-          "slug": slug.current,
-          publishedAt,
-          mainImage,
-          excerpt,
-          views,
-          categories[]->{title, slug},
-          mood
-        }`,
+          `*[_type == "post" && count((categories[]->slug.current)[@ in ["mentalhealth"]]) > 0] | order(views desc)[0...5] {
+            _id,
+            title,
+            "slug": slug.current,
+            publishedAt,
+            mainImage,
+            excerpt,
+            views,
+            categories[]->{title, slug},
+            mood
+          }`,
+          { next: { revalidate: 2592000 } },
         ),
       ]);
 
@@ -463,10 +613,18 @@ export default async function MentalHealthDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
-        "@type": "Organization",
+        "@type": "NewsMediaOrganization",
         name: "GeokHub Mental Health",
         url: "https://www.geokhub.com/mentalhealth",
+        logo: {
+          "@type": "ImageObject",
+          url: `${baseUrl}/icons/geokhub-mentalhealth.png`,
+        },
       },
       articleSection: "Mental Health",
     };
@@ -479,6 +637,13 @@ export default async function MentalHealthDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -509,7 +674,7 @@ export default async function MentalHealthDetailPage({
             </div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-0 md:px-4 lg:px-6 py-2">
+          <div className="max-w-7xl mx-auto px-0 md:px-4 lg:px-6 py-8">
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Left Sidebar - Desktop Tools */}
               <div className="hidden lg:block lg:w-20 flex-shrink-0">
@@ -530,6 +695,14 @@ export default async function MentalHealthDetailPage({
                       <Eye className="h-6 w-6 text-blue-600 mb-2" />
                       <View slug={decodedSlug} />
                       <span className="text-xs text-gray-500 mt-1">Views</span>
+                    </div>
+                  </div>
+
+                  {/* Mental Health Category Badge */}
+                  <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-4 text-white text-center">
+                    <Brain className="h-6 w-6 mx-auto mb-2" />
+                    <div className="text-sm font-bold">
+                      {mentalHealthCategory.split(" ")[0]}
                     </div>
                   </div>
                 </div>
@@ -567,10 +740,15 @@ export default async function MentalHealthDetailPage({
                     )}
                     {post.difficulty && (
                       <div className="flex items-center gap-2 bg-gradient-to-r from-teal-50 to-cyan-50 text-teal-700 px-4 py-2 rounded-xl">
-                        <Brain className="h-4 w-4" />
                         <span className="font-medium">
                           Level: {post.difficulty}
                         </span>
+                      </div>
+                    )}
+                    {post.timeRequired && (
+                      <div className="ml-auto flex items-center gap-2 text-sm font-medium text-gray-600">
+                        <Clock className="h-4 w-4" />
+                        <span>Time: {post.timeRequired}</span>
                       </div>
                     )}
                   </div>
@@ -584,7 +762,7 @@ export default async function MentalHealthDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
                     <div className="flex items-center gap-1">
                       {post.author?.image && (
                         <img
@@ -619,7 +797,7 @@ export default async function MentalHealthDetailPage({
                 </header>
 
                 {/* Hero Image Slider */}
-                <div className="mb-5">
+                <div className="mb-5 relative">
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -628,7 +806,6 @@ export default async function MentalHealthDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* FIX: was incorrectly using bg-green-600 (business color) */}
                       <div className="absolute top-6 left-6 z-20">
                         <span className="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           MENTAL HEALTH
@@ -852,14 +1029,9 @@ export default async function MentalHealthDetailPage({
                       </div>
                     </div>
                     <div className="p-2">
-                      {(trendingMentalHealthWithUrls?.length || 0) > 0 ||
-                      (mentalHealthPostsWithUrls?.length || 0) > 0 ? (
-                        (trendingMentalHealthWithUrls &&
-                        trendingMentalHealthWithUrls.length > 0
-                          ? trendingMentalHealthWithUrls
-                          : mentalHealthPostsWithUrls
-                        )
-                          .slice(0, 3)
+                      {trendingMentalHealthWithUrls?.length > 0 ? (
+                        trendingMentalHealthWithUrls
+                          .slice(1, 4)
                           .map((postItem: any, index: number) => {
                             const slugString =
                               postItem.slug?.current || postItem.slug;
@@ -869,25 +1041,32 @@ export default async function MentalHealthDetailPage({
                               <Link
                                 key={slugString}
                                 href={postItem.url}
-                                aria-label={`Read ${postItem.title}`}
-                                className="group block mb-2 last:mb-0 rounded-xl overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                                className="group block mb-2 last:mb-0"
                               >
-                                <div className="flex gap-3 p-2 sm:p-3 items-center hover:bg-blue-50 dark:hover:bg-gray-800 hover:shadow-lg transform transition-all duration-300 group-hover:translate-x-1 rounded-xl">
+                                <div className="flex gap-3 p-2 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200">
                                   <div className="flex-shrink-0">
-                                    <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-lg font-bold text-sm sm:text-base transition-transform duration-300 group-hover:scale-105">
+                                    <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-lg font-bold text-sm">
                                       {index + 1}
                                     </div>
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <h3 className="font-semibold text-gray-900 dark:text-gray-50 group-hover:text-blue-600 dark:group-hover:text-blue-300 line-clamp-2 text-sm md:text-base">
+                                    <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 text-sm">
                                       {postItem.title}
                                     </h3>
-                                    <div className="flex items-center gap-2 mt-1 text-xs md:text-sm">
-                                      <Eye className="h-3 w-3 text-gray-400" />
-                                      <span className="text-xs text-gray-500">
-                                        {postItem.views?.toLocaleString() || 0}{" "}
-                                        views
-                                      </span>
+                                    <div className="flex items-center justify-between mt-1">
+                                      <div className="flex items-center gap-2">
+                                        <Eye className="h-3 w-3 text-gray-400" />
+                                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                                          {postItem.views?.toLocaleString() ||
+                                            0}{" "}
+                                          views
+                                        </span>
+                                      </div>
+                                      {postItem.mood && (
+                                        <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                                          {postItem.mood}
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -903,7 +1082,7 @@ export default async function MentalHealthDetailPage({
                   </div>
 
                   {/* Crisis Support Card */}
-                  <div className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl p-6 text-white">
                     <div className="flex items-center gap-3 mb-4">
                       <AlertCircle className="h-8 w-8" />
                       <div>
@@ -931,10 +1110,10 @@ export default async function MentalHealthDetailPage({
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Mental Health Newsletter */}
-                  <div className="bg-gradient-to-br from-blue-800 via-indigo-700 to-purple-700 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-blue-800 via-indigo-700 to-purple-700 rounded-2xl p-6 text-white">
                     <div className="flex items-center gap-3 mb-4">
                       <Brain className="h-8 w-8" />
                       <div>
@@ -950,7 +1129,7 @@ export default async function MentalHealthDetailPage({
                       description="Get mental health tips, coping strategies, and emotional wellness guides delivered weekly."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </aside>
             </div>
@@ -968,12 +1147,12 @@ export default async function MentalHealthDetailPage({
                         More Mental Health Resources
                       </h2>
                     </div>
-                    <p className="text-gray-800 max-w-2xl mx-auto text-sm dark:text-gray-300">
+                    <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-sm">
                       Discover more ways to support your mental wellbeing
                     </p>
                   </div>
                   <MasonryGrid
-                    posts={relatedMentalHealthPostsWithUrls.slice(0, 8)}
+                    posts={relatedMentalHealthPostsWithUrls.slice(4, 12)}
                   />
                   <div className="text-center mt-12">
                     <Link
@@ -996,11 +1175,13 @@ export default async function MentalHealthDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all mental health slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
     *[_type == "post" && 
-      categories[]->slug.current == "mentalhealth"
+      defined(slug.current) && 
+      publishedAt <= now() &&
+      count((categories[]->slug.current)[@ in ["mentalhealth"]]) > 0
     ] {
       "slug": slug.current
     }

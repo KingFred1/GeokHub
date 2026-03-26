@@ -59,7 +59,7 @@ function getPostDetailUrl(post: Post): string {
     }
 
     if (categoryTitle === "lifestyle" || categorySlug === "lifestyle") {
-      return `/lifestyle/${post.slug?.current}`;
+      return `/lifestyle/post/${post.slug?.current}`;
     }
 
 

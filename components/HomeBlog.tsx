@@ -30,7 +30,7 @@ function getPostDetailUrl(post: Post): string {
     const categorySlug = category.slug?.current?.toLowerCase();
 
     if (categoryTitle === "lifestyle" || categorySlug === "lifestyle") {
-      return `/lifestyle/${post.slug?.current}`;
+      return `/lifestyle/post/${post.slug?.current}`;
     }
 
     if (categoryTitle === "mentalhealth" || categorySlug === "mentalhealth") {

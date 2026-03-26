@@ -35,7 +35,6 @@ import {
   BLOG_BY_CATEGORY_SLUG,
   RELATED_POSTS_QUERY,
 } from "@/sanity/lib/queries";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
 
 // Initialize markdown parser with better configuration
@@ -52,8 +51,87 @@ const md = markdownit({
   },
 });
 
-
 export const revalidate = 2592000;
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (
+      categoryTitle === "ai" ||
+      categorySlug === "ai" ||
+      categoryTitle === "artificial intelligence" ||
+      categorySlug === "artificial-intelligence"
+    ) {
+      return `/technology/ai/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+
+      if (
+        parentTitle === "ai" ||
+        parentSlug === "ai" ||
+        parentTitle === "artificial intelligence" ||
+        parentSlug === "artificial-intelligence"
+      ) {
+        return `/technology/ai/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -63,18 +141,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    // FIX: decode slug so canonical URL matches the page URL exactly
     const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
@@ -89,6 +166,30 @@ export async function generateMetadata({
       return {
         title: "AI Insights Article Not Found - GeokHub",
         description: "The requested AI Insights article could not be found.",
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    // Verify this is an AI post
+    const isAIPost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "ai" ||
+        catSlug === "ai" ||
+        catTitle === "artificial intelligence" ||
+        catSlug === "artificial-intelligence" ||
+        parentSlug === "ai" ||
+        parentSlug === "artificial-intelligence"
+      );
+    });
+
+    if (!isAIPost) {
+      return {
         robots: {
           index: false,
           follow: false,
@@ -117,9 +218,9 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub AI Insights`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
-
-      // FIX: explicitly allow indexing on the success path
+      alternates: { 
+        canonical: canonicalUrl,
+      },
       robots: {
         index: true,
         follow: true,
@@ -131,7 +232,6 @@ export async function generateMetadata({
           "max-snippet": -1,
         },
       },
-
       openGraph: {
         title: post.title,
         description,
@@ -151,19 +251,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // On transient errors, keep pages indexable so we don't accidentally
-    // de-index content due to a temporary fetch failure.
+    console.error("Error generating AI metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -202,40 +294,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (
-      categoryTitle === "ai" ||
-      categorySlug === "ai" ||
-      categoryTitle === "artificial intelligence" ||
-      categorySlug === "artificial-intelligence"
-    ) {
-      return `/technology/ai/${slugValue}`;
-    }
-
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (
-        parentTitle === "ai" ||
-        parentSlug === "ai" ||
-        parentTitle === "artificial intelligence" ||
-        parentSlug === "artificial-intelligence"
-      ) {
-        return `/technology/ai/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get AI category
@@ -306,22 +366,22 @@ export default async function AIDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -378,7 +438,11 @@ export default async function AIDetailPage({
 
     // ========== FETCH RELATED DATA ==========
     const [aiNews, relatedAINews, trendingAI] = await Promise.all([
-      client.fetch(BLOG_BY_CATEGORY_SLUG, { slug: "ai" }, { timeout: 10000 }),
+      client.fetch(
+        BLOG_BY_CATEGORY_SLUG, 
+        { slug: "ai" }, 
+        { timeout: 10000 }
+      ),
       client.fetch(
         RELATED_POSTS_QUERY,
         {
@@ -399,6 +463,7 @@ export default async function AIDetailPage({
           categories[]->{title, slug},
           technologyType
         }`,
+        { next: { revalidate: 2592000 } },
       ),
     ]);
 
@@ -461,6 +526,10 @@ export default async function AIDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
         "@type": "NewsMediaOrganization",
         name: "GeokHub AI Insights",
@@ -485,6 +554,13 @@ export default async function AIDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -608,7 +684,7 @@ export default async function AIDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
                     <div className="flex items-center gap-1">
                       {post.author?.image && (
                         <img
@@ -643,7 +719,7 @@ export default async function AIDetailPage({
                 </header>
 
                 {/* Hero Image Slider */}
-                <div className="mb-5">
+                <div className="mb-5 relative">
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -652,7 +728,6 @@ export default async function AIDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* FIX: was incorrectly using green/BUSINESS badge */}
                       <div className="absolute top-6 left-6 z-20">
                         <span className="bg-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           ARTIFICIAL INTELLIGENCE
@@ -901,7 +976,7 @@ export default async function AIDetailPage({
                   </div>
 
                   {/* AI Newsletter */}
-                  <div className="bg-gradient-to-br from-purple-900 via-indigo-800 to-blue-900 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-purple-900 via-indigo-800 to-blue-900 rounded-2xl p-6 text-white">
                     <div className="flex items-center gap-3 mb-4">
                       <Brain className="h-8 w-8" />
                       <div>
@@ -917,7 +992,7 @@ export default async function AIDetailPage({
                       description="Get the latest in AI, machine learning, and neural networks delivered to your inbox."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </aside>
             </div>
@@ -961,11 +1036,12 @@ export default async function AIDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all AI insights slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
-    *[_type == "post" &&  
-      defined(categories) && 
+    *[_type == "post" && 
+      defined(slug.current) && 
+      publishedAt <= now() &&
       count((categories[]->slug.current)[@ in ["ai", "artificial-intelligence"]]) > 0
     ] {
       "slug": slug.current

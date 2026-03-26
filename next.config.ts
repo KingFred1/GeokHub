@@ -3,20 +3,15 @@ import type { NextConfig } from "next";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.geokhub.com";
 
 const nextConfig: NextConfig = {
-  // disable turbopack to avoid worker errors during build
   turbopack: {},
 
   typescript: {
     ignoreBuildErrors: true,
   },
 
-  // dev webpack tweaks --------------------------------------------------
   webpack(config, options) {
-    // Avoid embedding full absolute paths in source maps; this sidesteps
-    // parentheses problems entirely by using resourcePath only.
     if (config.output) {
       config.output.devtoolModuleFilenameTemplate = (info: any) =>
-        // normalize windows backslashes and drop leading drive letters
         `webpack:///${info.resourcePath.replace(/\\/g, "/")}`;
     }
     return config;
@@ -41,39 +36,44 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: '/ads.txt',
-  //       destination: 'https://srv.adstxtmanager.com/19390/geokhub.com',
-  //     },
-  //   ];
-  // },
-
   // Permanent 301 redirects for URL structure changes
   async redirects() {
     return [
       {
         source: '/technology',
         destination: '/technology/tech-news',
-        permanent: true, // 301 redirect
+        permanent: true,
       },
+      // Only redirect specific category slugs, not all slugs
+      {
+        source: '/lifestyle/mentalhealth',
+        destination: '/lifestyle/category/mentalhealth',
+        permanent: true,
+      },
+      {
+        source: '/lifestyle/wellness',
+        destination: '/lifestyle/category/wellness',
+        permanent: true,
+      },
+      {
+        source: '/lifestyle/weightloss',
+        destination: '/lifestyle/category/weightloss',
+        permanent: true,
+      },
+      // Redirect the main lifestyle page
       {
         source: '/lifestyle',
-        destination: '/lifestyles',
-        permanent: true, // 301 redirect
+        destination: '/lifestyle/category/lifestyle',
+        permanent: true,
       },
-      {
-        source: '/lifestyle/:path*',
-        destination: '/lifestyles/:path*',
-        permanent: true, // 301 redirect
-      },
+      // Remove the catch-all redirect that's causing issues
+      // {
+      //   source: '/lifestyle/:slug',
+      //   destination: '/lifestyle/post/:slug',
+      //   permanent: true,
+      // },
     ];
   },
-
-  // compress: true,
-  // poweredByHeader: false,
-  // trailingSlash: false,
 
   async headers() {
     return [
@@ -82,15 +82,10 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
-          // { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
-          // {
-          //   key: "Cache-Control",
-          //   value: "public, max-age=3600, stale-while-revalidate=60",
-          // },
         ],
       },
       {

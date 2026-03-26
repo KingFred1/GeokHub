@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// Suspense removed for view counter
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -36,7 +35,6 @@ import {
   BLOG_BY_CATEGORY_SLUG,
   RELATED_POSTS_QUERY,
 } from "@/sanity/lib/queries";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
 
 // Initialize markdown parser with better configuration
@@ -53,8 +51,51 @@ const md = markdownit({
   },
 });
 
-
 export const revalidate = 2592000;
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -64,18 +105,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    // FIX: decode slug so canonical URL matches the page URL exactly
     const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
@@ -92,6 +132,27 @@ export async function generateMetadata({
       return {
         title: "Business News Article Not Found - GeokHub",
         description: "The requested business news article could not be found.",
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    // Verify this is a business news post
+    const isBusinessPost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "business" ||
+        catSlug === "business" ||
+        parentSlug === "business"
+      );
+    });
+
+    if (!isBusinessPost) {
+      return {
         robots: {
           index: false,
           follow: false,
@@ -120,9 +181,9 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub Business News`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
-
-      // FIX: explicitly allow indexing on the success path
+      alternates: { 
+        canonical: canonicalUrl,
+      },
       robots: {
         index: true,
         follow: true,
@@ -134,7 +195,6 @@ export async function generateMetadata({
           "max-snippet": -1,
         },
       },
-
       openGraph: {
         title: post.title,
         description,
@@ -155,19 +215,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // On transient errors, keep pages indexable so we don't accidentally
-    // de-index content due to a temporary fetch failure.
+    console.error("Error generating business metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -208,32 +260,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "business"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (categoryTitle === "business" || categorySlug === "business") {
-      return `/news/business/${slugValue}`;
-    }
-
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (parentTitle === "business" || parentSlug === "business") {
-        return `/news/business/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get market sector
@@ -303,22 +331,22 @@ export default async function BusinessDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -348,7 +376,7 @@ export default async function BusinessDetailPage({
     }
 
     // ========== BUSINESS CATEGORY CHECK ==========
-    const isBusinessPost = post.categories?.some((cat) => {
+    const isBusinessPost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
@@ -360,8 +388,6 @@ export default async function BusinessDetailPage({
     });
 
     // ========== REJECT NON-BUSINESS POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Business category
     if (!isBusinessPost) {
       notFound();
     }
@@ -388,18 +414,19 @@ export default async function BusinessDetailPage({
           { timeout: 10000 },
         ),
         client.fetch(
-          `*[_type == "post" && count((categories[]->slug.current)[@ == "business"]) ] | order(views desc)[0...5] {
-          _id,
-          title,
-          "slug": slug.current,
-          publishedAt,
-          mainImage,
-          excerpt,
-          views,
-          categories[]->{title, slug},
-          marketSector,
-          priceChange
-        }`,
+          `*[_type == "post" && count((categories[]->slug.current)[@ == "business"]) > 0] | order(views desc)[0...5] {
+            _id,
+            title,
+            "slug": slug.current,
+            publishedAt,
+            mainImage,
+            excerpt,
+            views,
+            categories[]->{title, slug},
+            marketSector,
+            priceChange
+          }`,
+          { next: { revalidate: 2592000 } },
         ),
       ]);
 
@@ -461,6 +488,10 @@ export default async function BusinessDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
         "@type": "NewsMediaOrganization",
         name: "GeokHub Business News",
@@ -484,6 +515,13 @@ export default async function BusinessDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -495,7 +533,7 @@ export default async function BusinessDetailPage({
           />
         </div>
 
-        <div className="min-h-screen bg-background dark:bg-background-dark ">
+        <div className="min-h-screen bg-background dark:bg-background-dark">
           {/* Business Navigation Indicator */}
           <div className="bg-gradient-to-r from-green-700 via-emerald-600 to-teal-700 text-white">
             <div className="max-w-7xl mx-auto px-4 py-2">
@@ -533,7 +571,7 @@ export default async function BusinessDetailPage({
                   <div className="bg-card dark:card rounded-2xl p-4 shadow-lg border border-gray-100 dark:border-gray-700">
                     <div className="flex flex-col items-center">
                       <Eye className="h-6 w-6 text-green-600 dark:text-green-400 mb-2" />
-                        <View slug={decodedSlug} />
+                      <View slug={decodedSlug} />
                       <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Views
                       </span>
@@ -574,7 +612,7 @@ export default async function BusinessDetailPage({
                 {/* Stock Symbol & Price Change */}
                 {post.stockSymbol && (
                   <div className="mb-6">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
                       <div className="bg-gradient-to-r from-gray-900 to-gray-700 text-white px-4 py-2 rounded-xl">
                         <div className="flex items-center gap-2">
                           <DollarSign className="h-4 w-4" />
@@ -618,7 +656,7 @@ export default async function BusinessDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
                     <div className="flex items-center gap-1">
                       {post.author?.image && (
                         <img
@@ -653,8 +691,7 @@ export default async function BusinessDetailPage({
                 </header>
 
                 {/* Hero Image Slider */}
-                <div className="mb-5">
-                  {/* Check if we have gallery images */}
+                <div className="mb-5 relative">
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -673,7 +710,6 @@ export default async function BusinessDetailPage({
                   ) : post.images &&
                     Array.isArray(post.images) &&
                     post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
                     <>
                       <ImageSliderWrapper
                         images={post.images.map((img: any) => ({
@@ -690,7 +726,6 @@ export default async function BusinessDetailPage({
                       </div>
                     </>
                   ) : (
-                    // Fallback to single main image
                     <div className="md:rounded-xl overflow-hidden shadow-2xl">
                       <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
                         <img
@@ -892,10 +927,10 @@ export default async function BusinessDetailPage({
                               >
                                 <div className="flex gap-3">
                                   <div className="flex-shrink-0">
-                                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                                   </div>
                                   <div>
-                                    <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-2 text-sm mb-1">
+                                    <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 line-clamp-2 text-sm mb-1">
                                       {newsItem.title}
                                     </h3>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -914,8 +949,50 @@ export default async function BusinessDetailPage({
                     </div>
                   </div>
 
+                  {/* Trending Business Stories */}
+                  {/* {trendingBusinessWithUrls.length > 0 && (
+                    <div className="bg-card rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                      <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white p-5">
+                        <div className="flex items-center gap-3">
+                          <TrendingUp className="h-6 w-6" />
+                          <h2 className="text-lg font-semibold">
+                            Trending in Business
+                          </h2>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        {trendingBusinessWithUrls.map((newsItem: any, idx: number) => {
+                          const slugString = newsItem.slug?.current || newsItem.slug;
+                          if (!slugString) return null;
+
+                          return (
+                            <Link
+                              key={slugString}
+                              href={newsItem.url}
+                              className="group block mb-4 last:mb-0"
+                            >
+                              <div className="flex gap-3">
+                                <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                  {idx + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 line-clamp-2 text-sm mb-1">
+                                    {newsItem.title}
+                                  </h3>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {formatReadableDate(newsItem.publishedAt)}
+                                  </p>
+                                </div>
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )} */}
+
                   {/* Business Newsletter */}
-                  <div className="bg-gradient-to-br from-green-900 via-emerald-800 to-teal-900 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-green-900 via-emerald-800 to-teal-900 rounded-2xl p-6 text-white">
                     <div className="flex items-center gap-3 mb-4">
                       <Building2 className="h-8 w-8" />
                       <div>
@@ -931,7 +1008,7 @@ export default async function BusinessDetailPage({
                       description="Get market updates, financial news, and business analysis delivered daily."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </aside>
             </div>
@@ -958,7 +1035,7 @@ export default async function BusinessDetailPage({
                   />
                   <div className="text-center mt-12">
                     <Link
-                      href="/business"
+                      href="/news/business"
                       className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-full font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
                       Explore All Business News
@@ -977,11 +1054,12 @@ export default async function BusinessDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all business news slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
     *[_type == "post" && 
-      defined(categories) && 
+      defined(slug.current) && 
+      publishedAt <= now() &&
       count((categories[]->slug.current)[@ in ["business"]]) > 0
     ] {
       "slug": slug.current

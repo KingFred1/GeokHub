@@ -87,19 +87,19 @@ export default async function GadgetsPage({ searchParams }: { searchParams?: { p
     <div className="min-h-screen bg-background">
       {/* Trending */}
       <section className="py-4 bg-gray-50 dark:bg-gray-800">
-        <div className="px-4 sm:px-6 lg:px-8">
+        <div className="px-0 md:px-4 lg:px-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+            <Link href="/technology/gadgets" className="hover:underline text-2xl md:text-3xl font-bold text-gray-900 dark:text-white flex items-center">
               <TrendingUp className="h-6 w-6 mr-2 text-orange-600" />
               Trending Gadgets
-            </h2>
+            </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
             {trending.length > 0 ? (
               trending.map((post) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>
-                  <article className="bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
-                    <div className="relative h-44 overflow-hidden">
+                  <article className="bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
+                    <div className="relative h-48 overflow-hidden">
                       <img
                         src={post.mainImage?.asset ? urlFor(post.mainImage).url() : "/fallback-image.jpg"}
                         alt={post.title}
@@ -112,7 +112,7 @@ export default async function GadgetsPage({ searchParams }: { searchParams?: { p
                         </span>
                       </div>
                     </div>
-                    <div className="p-2">
+                    <div className="py-2 md:px-2 px-4">
                       <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
                         {post.author?.image && (
                           <img
@@ -126,7 +126,7 @@ export default async function GadgetsPage({ searchParams }: { searchParams?: { p
                         <Calendar size={12} />
                         <span>{formatTimeShort(post._createdAt)}</span>
                       </div>
-                      <h3 className="font-semibold text-xl text-gray-900 dark:text-white mb-2 line-clamp-3 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                      <h3 className="font-semibold text-xl text-gray-900 dark:text-white mb-2 line-clamp-3 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors mb-3">
                         {post.title}
                       </h3>
                       {post.excerpt && (
@@ -153,15 +153,12 @@ export default async function GadgetsPage({ searchParams }: { searchParams?: { p
       </section>
 
       {/* Main Content */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+      <section className="py-8">
+        <div className="max-w-7xl mx-auto px-0 md:px-4 lg:px-8">
+          <div className="text-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Latest Gadget Reviews & News
+              Gadget Reviews & News
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Stay ahead with reviews of the newest gadgets and in-depth tech analysis.
-            </p>
           </div>
           {mainBlogs?.length > 3 ? (
             <>

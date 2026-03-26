@@ -29,7 +29,6 @@ import {
   BLOG_BY_CATEGORY_SLUG,
   RELATED_POSTS_QUERY,
 } from "@/sanity/lib/queries";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
 
 // Initialize markdown parser with better configuration
@@ -46,8 +45,78 @@ const md = markdownit({
   },
 });
 
-
 export const revalidate = 2592000;
+export const dynamic = 'force-static';
+
+// Helper function to determine the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  // Check each category for specific sections
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    // Check parent category if exists
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
+
+// Helper function to get primary section for a post
+function getPrimarySection(post: any): { slug: string; title?: string } | undefined {
+  if (!post?.categories) return undefined;
+
+  for (const cat of post.categories) {
+    const title = cat.title?.toLowerCase();
+    const slug = cat.slug?.current?.toLowerCase();
+    const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+
+    if (title === "news" || slug === "news" || parentSlug === "news") {
+      return { slug: "news", title: cat.title };
+    }
+
+    if (title === "world" || slug === "world" || parentSlug === "world") {
+      return { slug: "world", title: cat.title };
+    }
+
+    if (title === "business" || slug === "business" || parentSlug === "business") {
+      return { slug: "business", title: cat.title };
+    }
+  }
+
+  return undefined;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -57,14 +126,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
-    // FIX: decode slug so canonical URL matches the page URL exactly
     const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{
+          title,
+          slug,
+          parent->{title, slug}
+        },
         mainImage,
         seoTitle,
         metaDescription,
@@ -87,8 +159,11 @@ export async function generateMetadata({
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/news/${decodedSlug}`;
+    // Determine the correct URL path based on categories
+    const urlPath = getPostUrlPath(post, decodedSlug);
+    const canonicalUrl = `https://www.geokhub.com${urlPath}`;
     const baseUrl = "https://www.geokhub.com";
+    
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
           .width(1200)
@@ -108,9 +183,9 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub News`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
-
-      // FIX: explicitly allow indexing on the success path
+      alternates: { 
+        canonical: canonicalUrl,
+      },
       robots: {
         index: true,
         follow: true,
@@ -122,7 +197,6 @@ export async function generateMetadata({
           "max-snippet": -1,
         },
       },
-
       openGraph: {
         title: post.title,
         description,
@@ -142,19 +216,13 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // On transient errors, keep pages indexable so we don't accidentally
-    // de-index content due to a temporary fetch failure.
+    console.error("Error generating metadata:", error);
     return {
+      title: "GeokHub News",
+      description: "Latest news and updates from GeokHub",
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -177,57 +245,6 @@ function formatReadableDate(dateString: string): string {
   if (diffInDays < 7)
     return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-function getSlugValue(post: any): string | undefined {
-  return getSlugString(post?.slug) || undefined;
-}
-
-// Function to get post detail URL based on category
-function getPostUrl(post: any): string {
-  const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "news", "world" or "business"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (categoryTitle === "news" || categorySlug === "news") {
-      return `/news/${slugValue}`;
-    }
-
-    if (categoryTitle === "world" || categorySlug === "world") {
-      return `/news/world/${slugValue}`;
-    }
-
-    if (categoryTitle === "business" || categorySlug === "business") {
-      return `/news/business/${slugValue}`;
-    }
-
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (parentTitle === "news" || parentSlug === "news") {
-        return `/news/${slugValue}`;
-      }
-
-      if (parentTitle === "world" || parentSlug === "world") {
-        return `/news/world/${slugValue}`;
-      }
-
-      if (parentTitle === "business" || parentSlug === "business") {
-        return `/news/business/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
 }
 
 // MAIN COMPONENT
@@ -266,15 +283,15 @@ export default async function NewsDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->,
-      alt,
-      caption
-    },
-    images[]{
-      ...,
-      asset->
-    },
+        galleryImages[] {
+          asset->,
+          alt,
+          caption
+        },
+        images[]{
+          ...,
+          asset->
+        },
         body,
         seoTitle,
         metaDescription,
@@ -299,39 +316,7 @@ export default async function NewsDetailPage({
     }
 
     // ========== SECTION CHECK (news | world | business) ==========
-    function getPrimarySection(
-      post: any,
-    ): { slug: string; title?: string } | undefined {
-      if (!post?.categories) return undefined;
-
-      for (const cat of post.categories) {
-        const title = cat.title?.toLowerCase();
-        const slug = cat.slug?.current?.toLowerCase();
-        const parentSlug = cat.parent?.slug?.current?.toLowerCase();
-
-        if (title === "news" || slug === "news" || parentSlug === "news") {
-          return { slug: "news", title: cat.title };
-        }
-
-        if (title === "world" || slug === "world" || parentSlug === "world") {
-          return { slug: "world", title: cat.title };
-        }
-
-        // Treat business posts as a news sub-section: /news/business/slug
-        if (
-          title === "business" ||
-          slug === "business" ||
-          parentSlug === "business"
-        ) {
-          return { slug: "business", title: cat.title };
-        }
-      }
-
-      return undefined;
-    }
-
     const primarySection = getPrimarySection(post);
-
     
     if (!primarySection) {
       notFound();
@@ -362,6 +347,13 @@ export default async function NewsDetailPage({
         { timeout: 10000 },
       ),
     ]);
+
+    // Function to get post detail URL
+    const getPostUrl = (post: any): string => {
+      const slugValue = post.slug?.current || post.slug;
+      if (!slugValue) return "#";
+      return getPostUrlPath(post, slugValue);
+    };
 
     // Add URLs to related posts
     const breakingNewsWithUrls =
@@ -396,8 +388,9 @@ export default async function NewsDetailPage({
           .url()
       : `${baseUrl}/og-image.jpg`;
 
-    // Canonical URL for the article
-    const canonicalUrl = `https://www.geokhub.com/${sectionSlug}/${decodedSlug}`;
+    // Canonical URL for the article - consistent with metadata
+    const urlPath = getPostUrlPath(post, decodedSlug);
+    const canonicalUrl = `https://www.geokhub.com${urlPath}`;
 
     // ========== JSON-LD ==========
     const jsonLd = {
@@ -414,6 +407,10 @@ export default async function NewsDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
         "@type": "NewsMediaOrganization",
         name: "GeokHub News",
@@ -436,6 +433,13 @@ export default async function NewsDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -486,7 +490,7 @@ export default async function NewsDetailPage({
                 )}
 
                 {/* Article Container */}
-                <article className="bg-white dark:bg-card shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden md:px-">
+                <article className="bg-white dark:bg-card shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
                   {/* Article Header */}
                   <div className="p-2 md:p-3 lg:p-2">
                     <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2 leading-tight tracking-tight">
@@ -721,14 +725,14 @@ export default async function NewsDetailPage({
                   </div>
 
                   {/* Newsletter Signup */}
-                  <div className="bg-red-600 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-red-600 rounded-2xl p-6 text-white">
                     <NewsletterForm
                       variant="inline"
                       title="Breaking News Alerts"
                       description="Get the latest news updates delivered directly to your inbox."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </aside>
             </div>
@@ -773,19 +777,19 @@ export default async function NewsDetailPage({
       </>
     );
   } catch (error) {
+    console.error("Error rendering news detail page:", error);
     notFound();
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all possible slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
-      *[_type == "post" && 
-        defined(slug.current) && 
-        defined(categories) && 
-        count((categories[]->slug.current)[@ in ["news", "world", "business"]]) > 0
-      ]{
-      "slug": slug.current
+    *[_type == "post" && defined(slug.current) && publishedAt <= now()] {
+      "slug": slug.current,
+      categories[]->{
+        slug
+      }
     }
   `);
 

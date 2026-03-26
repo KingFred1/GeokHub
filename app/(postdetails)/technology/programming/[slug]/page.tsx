@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// view counter rendered directly on server
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -37,7 +36,6 @@ import {
   BLOG_BY_CATEGORY_SLUG,
   RELATED_POSTS_QUERY,
 } from "@/sanity/lib/queries";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
 
 // Initialize markdown parser with better configuration
@@ -54,8 +52,237 @@ const md = markdownit({
   },
 });
 
-// Allow static generation for SEO (Google crawling)
-export const revalidate = 2592000; // 24 hours
+export const revalidate = 2592000; // 30 days
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (
+      categoryTitle === "ai" ||
+      categorySlug === "ai" ||
+      categoryTitle === "artificial intelligence" ||
+      categorySlug === "artificial-intelligence"
+    ) {
+      return `/technology/ai/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cybersecurity" ||
+      categorySlug === "cybersecurity" ||
+      categoryTitle === "security" ||
+      categorySlug === "security"
+    ) {
+      return `/technology/cybersecurity/${slug}`;
+    }
+
+    if (categoryTitle === "gadgets" || categorySlug === "gadgets") {
+      return `/technology/gadgets/${slug}`;
+    }
+
+    if (
+      categoryTitle === "lifestyle" ||
+      categorySlug === "lifestyle" ||
+      categoryTitle === "living" ||
+      categorySlug === "living"
+    ) {
+      return `/lifestyle/${slug}`;
+    }
+
+    const titleIsMental =
+      (categoryTitle?.includes("mental") && categoryTitle?.includes("health")) ||
+      categoryTitle?.includes("mentalhealth");
+    const slugIsMental =
+      (categorySlug?.includes("mental") && categorySlug?.includes("health")) ||
+      categorySlug?.includes("mentalhealth");
+
+    if (titleIsMental || slugIsMental) {
+      return `/mentalhealth/${slug}`;
+    }
+
+    if (
+      categoryTitle === "wellness" ||
+      categorySlug === "wellness" ||
+      categoryTitle === "health" ||
+      categorySlug === "health"
+    ) {
+      return `/wellness/${slug}`;
+    }
+
+    if (
+      categoryTitle === "weightloss" ||
+      categorySlug === "weightloss" ||
+      categoryTitle === "weight-loss" ||
+      categorySlug === "weight-loss" ||
+      categoryTitle === "diet" ||
+      categorySlug === "diet"
+    ) {
+      return `/weightloss/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cloud-devops" ||
+      categorySlug === "cloud-devops" ||
+      categoryTitle === "cloud" ||
+      categorySlug === "cloud" ||
+      categoryTitle === "devops" ||
+      categorySlug === "devops" ||
+      categoryTitle === "infrastructure" ||
+      categorySlug === "infrastructure"
+    ) {
+      return `/technology/cloud-devops/${slug}`;
+    }
+
+    if (
+      categoryTitle === "programming" ||
+      categorySlug === "programming" ||
+      categoryTitle === "coding" ||
+      categorySlug === "coding"
+    ) {
+      return `/technology/programming/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+
+      if (
+        parentTitle === "ai" ||
+        parentSlug === "ai" ||
+        parentTitle === "artificial intelligence" ||
+        parentSlug === "artificial-intelligence"
+      ) {
+        return `/technology/ai/${slug}`;
+      }
+
+      if (
+        parentTitle === "cybersecurity" ||
+        parentSlug === "cybersecurity" ||
+        parentTitle === "security" ||
+        parentSlug === "security"
+      ) {
+        return `/technology/cybersecurity/${slug}`;
+      }
+
+      if (parentTitle === "gadgets" || parentSlug === "gadgets") {
+        return `/technology/gadgets/${slug}`;
+      }
+
+      if (
+        parentTitle === "lifestyle" ||
+        parentSlug === "lifestyle" ||
+        parentTitle === "living" ||
+        parentSlug === "living"
+      ) {
+        return `/lifestyle/${slug}`;
+      }
+
+      const parentTitleIsMental =
+        (parentTitle?.includes("mental") && parentTitle?.includes("health")) ||
+        parentTitle?.includes("mentalhealth");
+      const parentSlugIsMental =
+        (parentSlug?.includes("mental") && parentSlug?.includes("health")) ||
+        parentSlug?.includes("mentalhealth");
+
+      if (parentTitleIsMental || parentSlugIsMental) {
+        return `/mentalhealth/${slug}`;
+      }
+
+      if (
+        parentTitle === "wellness" ||
+        parentSlug === "wellness" ||
+        parentTitle === "health" ||
+        parentSlug === "health"
+      ) {
+        return `/wellness/${slug}`;
+      }
+
+      if (
+        parentTitle === "weightloss" ||
+        parentSlug === "weightloss" ||
+        parentTitle === "weight-loss" ||
+        parentSlug === "weight-loss" ||
+        parentTitle === "diet" ||
+        parentSlug === "diet"
+      ) {
+        return `/weightloss/${slug}`;
+      }
+
+      if (
+        parentTitle === "cloud-devops" ||
+        parentSlug === "cloud-devops" ||
+        parentTitle === "cloud" ||
+        parentSlug === "cloud" ||
+        parentTitle === "devops" ||
+        parentSlug === "devops" ||
+        parentTitle === "infrastructure" ||
+        parentSlug === "infrastructure"
+      ) {
+        return `/technology/cloud-devops/${slug}`;
+      }
+
+      if (
+        parentTitle === "programming" ||
+        parentSlug === "programming" ||
+        parentTitle === "coding" ||
+        parentSlug === "coding"
+      ) {
+        return `/technology/programming/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -65,23 +292,24 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
         body,
         publishedAt
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 2592000 } },
     );
 
@@ -89,11 +317,38 @@ export async function generateMetadata({
       return {
         title: "Programming Tutorial Not Found - GeokHub",
         description: "The requested programming tutorial could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/technology/programming/${slug}`;
+    // Verify this is a programming post
+    const isProgrammingPost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "programming" ||
+        catSlug === "programming" ||
+        catTitle === "coding" ||
+        catSlug === "coding" ||
+        parentSlug === "programming" ||
+        parentSlug === "coding"
+      );
+    });
+
+    if (!isProgrammingPost) {
+      return {
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    const canonicalUrl = `https://www.geokhub.com/technology/programming/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -114,7 +369,20 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub Programming`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
+      alternates: { 
+        canonical: canonicalUrl,
+      },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
       openGraph: {
         title: post.title,
         description,
@@ -134,18 +402,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    console.error("Error generating programming metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -186,42 +447,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "programming"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (
-      categoryTitle === "programming" ||
-      categorySlug === "programming" ||
-      categoryTitle === "coding" ||
-      categorySlug === "coding"
-    ) {
-      return `/technology/programming/${slugValue}`;
-    }
-
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (
-        parentTitle === "programming" ||
-        parentSlug === "programming" ||
-        parentTitle === "coding" ||
-        parentSlug === "coding"
-      ) {
-        return `/technology/programming/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get programming language category
@@ -306,22 +533,22 @@ export default async function ProgrammingDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -350,7 +577,7 @@ export default async function ProgrammingDetailPage({
     }
 
     // ========== PROGRAMMING CATEGORY CHECK ==========
-    const isProgrammingPost = post.categories?.some((cat) => {
+    const isProgrammingPost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
@@ -365,8 +592,6 @@ export default async function ProgrammingDetailPage({
     });
 
     // ========== REJECT NON-PROGRAMMING POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Programming category
     if (!isProgrammingPost) {
       notFound();
     }
@@ -394,17 +619,18 @@ export default async function ProgrammingDetailPage({
         ),
         client.fetch(
           `*[_type == "post" && count((categories[]->slug.current)[@ in ["programming", "coding"]]) > 0] | order(views desc)[0...5] {
-          _id,
-          title,
-          "slug": slug.current,
-          publishedAt,
-          mainImage,
-          excerpt,
-          views,
-          categories[]->{title, slug},
-          technologyType,
-          difficulty
-        }`,
+            _id,
+            title,
+            "slug": slug.current,
+            publishedAt,
+            mainImage,
+            excerpt,
+            views,
+            categories[]->{title, slug},
+            technologyType,
+            difficulty
+          }`,
+          { next: { revalidate: 2592000 } },
         ),
       ]);
 
@@ -467,8 +693,12 @@ export default async function ProgrammingDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
-        "@type": "Organization",
+        "@type": "NewsMediaOrganization",
         name: "GeokHub Programming",
         url: "https://www.geokhub.com/technology/programming",
         logo: {
@@ -490,6 +720,13 @@ export default async function ProgrammingDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -604,7 +841,7 @@ export default async function ProgrammingDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
                     <div className="flex items-center gap-1">
                       {post.author?.image && (
                         <img
@@ -639,8 +876,7 @@ export default async function ProgrammingDetailPage({
                 </header>
 
                 {/* Hero Image Slider */}
-                <div className="mb-5">
-                  {/* Check if we have gallery images */}
+                <div className="mb-5 relative">
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -649,9 +885,8 @@ export default async function ProgrammingDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* Business News Badge */}
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           PROGRAMMING
                         </span>
                       </div>
@@ -659,7 +894,6 @@ export default async function ProgrammingDetailPage({
                   ) : post.images &&
                     Array.isArray(post.images) &&
                     post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
                     <>
                       <ImageSliderWrapper
                         images={post.images.map((img: any) => ({
@@ -670,13 +904,12 @@ export default async function ProgrammingDetailPage({
                         className="md:rounded-xl shadow-2xl"
                       />
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           PROGRAMMING
                         </span>
                       </div>
                     </>
                   ) : (
-                    // Fallback to single main image
                     <div className="md:rounded-xl overflow-hidden shadow-2xl">
                       <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
                         <img
@@ -687,7 +920,7 @@ export default async function ProgrammingDetailPage({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute top-6 left-6">
-                          <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          <span className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                             PROGRAMMING
                           </span>
                         </div>
@@ -939,7 +1172,7 @@ export default async function ProgrammingDetailPage({
                   </div>
 
                   {/* Programming Newsletter */}
-                  <div className="bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 rounded-2xl p-6 text-white">
+                  {/* <div className="bg-gradient-to-br from-blue-900 via-indigo-800 to-purple-900 rounded-2xl p-6 text-white">
                     <div className="flex items-center gap-3 mb-4">
                       <Code className="h-8 w-8" />
                       <div>
@@ -955,7 +1188,7 @@ export default async function ProgrammingDetailPage({
                       description="Get programming tips, tutorials, and coding challenges delivered weekly."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
                 </div>
               </aside>
             </div>
@@ -1001,11 +1234,12 @@ export default async function ProgrammingDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all programming slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
     *[_type == "post" && 
-      defined(categories) && 
+      defined(slug.current) && 
+      publishedAt <= now() &&
       count((categories[]->slug.current)[@ in ["programming", "coding"]]) > 0
     ] {
       "slug": slug.current

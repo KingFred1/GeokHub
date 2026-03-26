@@ -116,7 +116,7 @@ export default async function Technology({
   return (
     <div className="min-h-screen bg-background dark:bg-darkbackground transition-colors">
       {/* Main Content */}
-      <main className="px-0 md:px-6 lg:px-8 py-8">
+      <main className="px-0 md:px-4 lg:px-8 py-8">
         {/* Featured Tech News Section */}
         <section className="mb-16">
           <div className="flex items-center justify-between mb-8">

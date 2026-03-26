@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-// Suspense/skeleton removed; view counter is server-rendered
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -15,12 +14,27 @@ import FloatingActionBar from "@/components/global/FloatingActionBar";
 import markdownItLinkAttributes from "markdown-it-link-attributes";
 import BlogContentWithReadMore from "@/components/global/BlogContentWithReadMore";
 import SidebarShareButton from "@/components/global/SidebarShareButton";
-import { Calendar, ArrowRight, BookOpen, Clock, Heart, Coffee, Home, Utensils, Palette, Music, Eye, Share2, TrendingUp, Sparkles, Users } from "lucide-react";
+import InlineArticleAd from "@/components/ads/InlineArticleAd";
+import {
+  Calendar,
+  ArrowRight,
+  BookOpen,
+  Clock,
+  Heart,
+  Coffee,
+  Home,
+  Utensils,
+  Palette,
+  Music,
+  Eye,
+  Share2,
+  TrendingUp,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import { NewsletterForm } from "@/components/global/Newsletter-form";
 import { BLOG_BY_CATEGORY_SLUG, RELATED_POSTS_QUERY } from "@/sanity/lib/queries";
-
 import ImageSliderWrapper from "@/components/ImageSliderWrapper";
-
 
 // Initialize markdown parser with better configuration
 const md = markdownit({
@@ -36,9 +50,133 @@ const md = markdownit({
   },
 });
 
-// CRITICAL: Force dynamic rendering
-export const dynamic = "force-dynamic";
-export const revalidate = 2592000;
+export const revalidate = 2592000; // 30 days
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (
+      categoryTitle === "ai" ||
+      categorySlug === "ai" ||
+      categoryTitle === "artificial intelligence" ||
+      categorySlug === "artificial-intelligence"
+    ) {
+      return `/technology/ai/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cybersecurity" ||
+      categorySlug === "cybersecurity" ||
+      categoryTitle === "security" ||
+      categorySlug === "security"
+    ) {
+      return `/technology/cybersecurity/${slug}`;
+    }
+
+    if (categoryTitle === "gadgets" || categorySlug === "gadgets") {
+      return `/technology/gadgets/${slug}`;
+    }
+
+    // FIX: Changed from "lifestyles" to "lifestyle" - removed the 's'
+    if (
+      categoryTitle === "lifestyle" ||
+      categorySlug === "lifestyle" ||
+      categoryTitle === "living" ||
+      categorySlug === "living"
+    ) {
+      return `/lifestyle/post/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+
+      if (
+        parentTitle === "ai" ||
+        parentSlug === "ai" ||
+        parentTitle === "artificial intelligence" ||
+        parentSlug === "artificial-intelligence"
+      ) {
+        return `/technology/ai/${slug}`;
+      }
+
+      if (
+        parentTitle === "cybersecurity" ||
+        parentSlug === "cybersecurity" ||
+        parentTitle === "security" ||
+        parentSlug === "security"
+      ) {
+        return `/technology/cybersecurity/${slug}`;
+      }
+
+      if (parentTitle === "gadgets" || parentSlug === "gadgets") {
+        return `/technology/gadgets/${slug}`;
+      }
+
+      // FIX: Changed from "lifestyles" to "lifestyle" - removed the 's'
+      if (
+        parentTitle === "lifestyle" ||
+        parentSlug === "lifestyle" ||
+        parentTitle === "living" ||
+        parentSlug === "living"
+      ) {
+        return `/lifestyle/post/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -48,23 +186,24 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
         body,
         publishedAt
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 2592000 } }
     );
 
@@ -72,11 +211,39 @@ export async function generateMetadata({
       return {
         title: "Lifestyle Article Not Found - GeokHub",
         description: "The requested lifestyle article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/lifestyle/${slug}`;
+    // Verify this is a lifestyle post
+    const isLifestylePost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "lifestyle" ||
+        catSlug === "lifestyle" ||
+        catTitle === "living" ||
+        catSlug === "living" ||
+        parentSlug === "lifestyle" ||
+        parentSlug === "living"
+      );
+    });
+
+    if (!isLifestylePost) {
+      return {
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    // FIX: Changed from "lifestyles" to "lifestyle" - removed the 's'
+    const canonicalUrl = `https://www.geokhub.com/lifestyle/post/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage).width(1200).height(630).quality(80).format("webp").url()
@@ -90,7 +257,20 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub Lifestyle`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
+      alternates: { 
+        canonical: canonicalUrl,
+      },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
       openGraph: {
         title: post.title,
         description,
@@ -110,18 +290,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    console.error("Error generating lifestyle metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -159,34 +332,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "lifestyle"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-    
-    if (categoryTitle === "lifestyle" || categorySlug === "lifestyle" || 
-        categoryTitle === "living" || categorySlug === "living") {
-      return `/lifestyle/${slugValue}`;
-    }
-    
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-      
-      if (parentTitle === "lifestyle" || parentSlug === "lifestyle" || 
-          parentTitle === "living" || parentSlug === "living") {
-        return `/lifestyle/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get lifestyle category
@@ -266,22 +413,22 @@ export default async function LifestyleDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -309,18 +456,21 @@ export default async function LifestyleDetailPage({
     }
 
     // ========== LIFESTYLE CATEGORY CHECK ==========
-    const isLifestylePost = post.categories?.some(cat => {
+    const isLifestylePost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
-      return catTitle === "lifestyle" || catSlug === "lifestyle" || 
-             catTitle === "living" || catSlug === "living" ||
-             parentSlug === "lifestyle" || parentSlug === "living";
+      return (
+        catTitle === "lifestyle" || 
+        catSlug === "lifestyle" || 
+        catTitle === "living" || 
+        catSlug === "living" ||
+        parentSlug === "lifestyle" || 
+        parentSlug === "living"
+      );
     });
 
     // ========== REJECT NON-LIFESTYLE POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Lifestyle category
     if (!isLifestylePost) {
       notFound();
     }
@@ -357,7 +507,8 @@ export default async function LifestyleDetailPage({
           categories[]->{title, slug},
           lifestyleType,
           mood
-        }`
+        }`,
+        { next: { revalidate: 2592000 } }
       ),
     ]);
 
@@ -387,7 +538,8 @@ export default async function LifestyleDetailPage({
       ? urlFor(post.mainImage).width(1200).height(630).quality(80).format("webp").url()
       : `${baseUrl}/og-image.jpg`;
 
-    const canonicalUrl = `https://www.geokhub.com/lifestyle/${decodedSlug}`;
+    // FIX: Changed from "lifestyles" to "lifestyle" - removed the 's'
+    const canonicalUrl = `https://www.geokhub.com/lifestyle/post/${decodedSlug}`;
 
     // ========== JSON-LD ==========
     const jsonLd = {
@@ -405,11 +557,18 @@ export default async function LifestyleDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
-        "@type": "Organization",
+        "@type": "NewsMediaOrganization",
         name: "GeokHub Lifestyle",
         url: "https://www.geokhub.com/lifestyle",
-        logo: { "@type": "ImageObject", url: `${baseUrl}/icons/geokhub-lifestyle.png` },
+        logo: { 
+          "@type": "ImageObject", 
+          url: `${baseUrl}/icons/geokhub-lifestyle.png` 
+        },
       },
       articleSection: post.categories?.[0]?.title || "Lifestyle",
       ...(post.lifestyleType && { articleSection: post.lifestyleType }),
@@ -425,6 +584,13 @@ export default async function LifestyleDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -472,7 +638,7 @@ export default async function LifestyleDetailPage({
                   <div className="bg-card dark:card rounded-2xl p-4 shadow-lg border border-gray-100 dark:border-gray-700">
                     <div className="flex flex-col items-center">
                       <Eye className="h-6 w-6 text-rose-600 dark:text-rose-400 mb-2" />
-                        <View slug={decodedSlug} />
+                      <View slug={decodedSlug} />
                       <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">Views</span>
                     </div>
                   </div>
@@ -550,100 +716,97 @@ export default async function LifestyleDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                        <div className="flex items-center gap-1">
-                                          {post.author?.image && (
-                                            <img
-                                              src={urlFor(post.author.image).url()}
-                                              alt={post.author.name}
-                                              className="rounded-full h-5 w-5"
-                                            />
-                                          )}
-                                          <div>
-                                            <p className="font-semibold text-gray-900 dark:text-white">
-                                              {post.author?.name || "GeokHub Reporter"}
-                                            </p>
-                                          </div>
-                                        </div>
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
+                    <div className="flex items-center gap-1">
+                      {post.author?.image && (
+                        <img
+                          src={urlFor(post.author.image).url()}
+                          alt={post.author.name}
+                          className="rounded-full h-5 w-5"
+                        />
+                      )}
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">
+                          {post.author?.name || "GeokHub Reporter"}
+                        </p>
+                      </div>
+                    </div>
                   
-                                        <div className="flex items-center gap-4 sm:ml-auto">
-                                          <div className="flex items-center gap-1">
-                                            <Calendar size={16} />
-                                            <time
-                                              dateTime={post.publishedAt}
-                                              className="font-medium"
-                                            >
-                                              {formatReadableDate(post.publishedAt)}
-                                            </time>
-                                          </div>
-                                          <div className="flex items-center gap-1">
-                                            <BookOpen size={16} />
-                                            <span className="font-medium">
-                                              {readTime} min read
-                                            </span>
-                                          </div>
-                                        </div>
-                                      </div>
+                    <div className="flex items-center gap-4 sm:ml-auto">
+                      <div className="flex items-center gap-1">
+                        <Calendar size={16} />
+                        <time
+                          dateTime={post.publishedAt}
+                          className="font-medium"
+                        >
+                          {formatReadableDate(post.publishedAt)}
+                        </time>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <BookOpen size={16} />
+                        <span className="font-medium">
+                          {readTime} min read
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </header>
 
-{/* Hero Image Slider */}
-<div className="mb-5">
-  {/* Check if we have gallery images */}
-  {post.galleryImages && Array.isArray(post.galleryImages) && post.galleryImages.length > 0 ? (
-    <>
-      <ImageSliderWrapper
-        images={post.galleryImages}
-        className="md:rounded-xl shadow-2xl"
-      />
-      {/* Business News Badge */}
-      <div className="absolute top-6 left-6 z-20">
-        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
-          LIFESTYLE
-        </span>
-      </div>
-    </>
-  ) : post.images && Array.isArray(post.images) && post.images.length > 0 ? (
-    // Fallback to images[] array if galleryImages doesn't exist but images[] does
-    <>
-      <ImageSliderWrapper
-        images={post.images.map((img: any) => ({
-          asset: img.asset,
-          alt: img.alt || post.title,
-          caption: img.caption,
-        }))}
-        className="md:rounded-xl shadow-2xl"
-      />
-      <div className="absolute top-6 left-6 z-20">
-        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
-          LIFESTYLE
-        </span>
-      </div>
-    </>
-  ) : (
-    // Fallback to single main image
-    <div className="md:rounded-xl overflow-hidden shadow-2xl">
-      <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
-        <img
-          src={imageUrl}
-          alt={post.title}
-          className="w-full h-full object-cover"
-          loading="eager"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        <div className="absolute top-6 left-6">
-          <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
-            LIFESTYLE
-          </span>
-        </div>
-      </div>
-      {post.mainImage?.caption && (
-        <div className="bg-gray-50 dark:bg-gray-800 p-4 text-sm text-gray-600 dark:text-gray-400 italic border-t">
-          {post.mainImage.caption}
-        </div>
-      )}
-    </div>
-  )}
-</div>
+                {/* Hero Image Slider */}
+                <div className="mb-5 relative">
+                  {post.galleryImages && Array.isArray(post.galleryImages) && post.galleryImages.length > 0 ? (
+                    <>
+                      <ImageSliderWrapper
+                        images={post.galleryImages}
+                        className="md:rounded-xl shadow-2xl"
+                      />
+                      <div className="absolute top-6 left-6 z-20">
+                        <span className="bg-rose-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          LIFESTYLE
+                        </span>
+                      </div>
+                    </>
+                  ) : post.images && Array.isArray(post.images) && post.images.length > 0 ? (
+                    <>
+                      <ImageSliderWrapper
+                        images={post.images.map((img: any) => ({
+                          asset: img.asset,
+                          alt: img.alt || post.title,
+                          caption: img.caption,
+                        }))}
+                        className="md:rounded-xl shadow-2xl"
+                      />
+                      <div className="absolute top-6 left-6 z-20">
+                        <span className="bg-rose-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          LIFESTYLE
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="md:rounded-xl overflow-hidden shadow-2xl">
+                      <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
+                        <img
+                          src={imageUrl}
+                          alt={post.title}
+                          className="w-full h-full object-cover"
+                          loading="eager"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        <div className="absolute top-6 left-6">
+                          <span className="bg-rose-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                            LIFESTYLE
+                          </span>
+                        </div>
+                      </div>
+                      {post.mainImage?.caption && (
+                        <div className="bg-gray-50 dark:bg-gray-800 p-4 text-sm text-gray-600 dark:text-gray-400 italic border-t">
+                          {post.mainImage.caption}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 {/* Text-to-Speech Player */}
                 <div className="mb-10 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-rose-100 dark:border-rose-800">
                   <TextToSpeechPlayer content={plainTextContent} />
@@ -717,6 +880,8 @@ export default async function LifestyleDetailPage({
                     </div>
                   </div>
                 </article>
+
+                <InlineArticleAd />
 
                 {/* Tips & Resources */}
                 {post.sources && post.sources.length > 0 && (
@@ -852,24 +1017,6 @@ export default async function LifestyleDetailPage({
                       theme="dark"
                     />
                   </div>
-
-                  {/* Community */}
-                  {/* <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-6 text-white">
-                    <div className="text-center">
-                      <Users className="h-10 w-10 mx-auto mb-3" />
-                      <h3 className="text-lg font-bold mb-2">Join Our Community</h3>
-                      <p className="text-sm opacity-90 mb-4">
-                        Share tips, ideas, and inspiration with fellow lifestyle enthusiasts
-                      </p>
-                      <Link
-                        href="/community/lifestyle"
-                        className="inline-block bg-white text-blue-600 hover:bg-gray-100 px-6 py-2 rounded-full font-semibold text-sm transition-colors"
-                      >
-                        Join Community
-                      </Link>
-                    </div>
-                  </div> */}
-
                 </div>
               </aside>
             </div>
@@ -893,7 +1040,7 @@ export default async function LifestyleDetailPage({
                 <MasonryGrid posts={relatedLifestylePostsWithUrls.slice(4, 12)} />
                 <div className="text-center mt-12">
                   <Link
-                    href="/lifestylesw"
+                    href="/lifestyle"
                     className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white rounded-full font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
                     Explore All Lifestyle
@@ -912,18 +1059,24 @@ export default async function LifestyleDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all lifestyle slugs for static generation
 export async function generateStaticParams() {
-  const posts = await client.fetch(`
-    *[_type == "post" &&  
-      defined(categories) && 
-      count((categories[]->slug.current)[@ in ["lifestyle", "living"]]) > 0
-    ] {
-      "slug": slug.current
-    }
-  `);
-
-  return posts.map((post: { slug: string }) => ({
-    slug: post.slug,
-  }));
+  try {
+    const posts = await client.fetch(`
+      *[_type == "post" && 
+        defined(slug.current) && 
+        publishedAt <= now() &&
+        count((categories[]->slug.current)[@ in ["lifestyle", "living"]]) > 0
+      ] {
+        "slug": slug.current
+      }
+    `);
+    
+    return posts.map((post: { slug: string }) => ({
+      slug: post.slug,
+    }));
+  } catch (error) {
+    console.error("Error generating static params for lifestyle:", error);
+    return [];
+  }
 }

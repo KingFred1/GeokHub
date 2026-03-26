@@ -63,7 +63,7 @@ export default async function AI() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-0 md:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-0 md:px-4 lg:px-8 relative z-10">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white my-4 md:px-0 px-4">
           Artificial Intelligence
         </h1>
@@ -77,7 +77,7 @@ export default async function AI() {
               trendingPosts.map((post: any) => (
                 <Link key={post._id} href={getPostDetailUrl(post)}>
                   <article className="bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer">
-                    <div className="relative h-44 overflow-hidden">
+                    <div className="relative h-48 overflow-hidden">
                       <img
                         src={post.mainImage?.asset ? urlFor(post.mainImage).url() : "/fallback-image.jpg"}
                         alt={post.title}
@@ -90,7 +90,7 @@ export default async function AI() {
                         </span>
                       </div>
                     </div>
-                    <div className="py-2 md:px-0 px-4">
+                    <div className="py-2 md:px-2 px-4">
                       <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 mb-3">
                         {post.author?.image && (
                           <img

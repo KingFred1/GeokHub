@@ -7,7 +7,6 @@ import { Metadata } from "next";
 import { CodeScript } from "@/components/CodeScript";
 import Link from "next/link";
 import View from "@/components/View";
-
 import TextToSpeechPlayer from "@/components/global/TextToSpeechPlayer";
 import SocialShare from "@/components/global/SocialShare";
 import MasonryGrid from "@/components/World";
@@ -57,10 +56,171 @@ const md = markdownit({
   },
 });
 
-// Allow static generation for SEO (Google crawling)
-// export const revalidate = 86400; // 24 hours
-
 export const revalidate = 2592000; // 30 days
+export const dynamic = 'force-static';
+
+// Helper function to get the correct URL path for a post
+function getPostUrlPath(post: any, slug: string): string {
+  if (!post.categories || post.categories.length === 0) {
+    return `/blogs/${slug}`;
+  }
+
+  for (const category of post.categories) {
+    const categoryTitle = category.title?.toLowerCase();
+    const categorySlug = category.slug?.current?.toLowerCase();
+
+    if (categoryTitle === "news" || categorySlug === "news") {
+      return `/news/${slug}`;
+    }
+
+    if (categoryTitle === "world" || categorySlug === "world") {
+      return `/news/world/${slug}`;
+    }
+
+    if (categoryTitle === "business" || categorySlug === "business") {
+      return `/news/business/${slug}`;
+    }
+
+    if (
+      categoryTitle === "tech-news" ||
+      categorySlug === "tech-news" ||
+      categoryTitle === "technology" ||
+      categorySlug === "technology"
+    ) {
+      return `/technology/tech-news/${slug}`;
+    }
+
+    if (
+      categoryTitle === "ai" ||
+      categorySlug === "ai" ||
+      categoryTitle === "artificial intelligence" ||
+      categorySlug === "artificial-intelligence"
+    ) {
+      return `/technology/ai/${slug}`;
+    }
+
+    if (
+      categoryTitle === "cybersecurity" ||
+      categorySlug === "cybersecurity" ||
+      categoryTitle === "security" ||
+      categorySlug === "security"
+    ) {
+      return `/technology/cybersecurity/${slug}`;
+    }
+
+    if (categoryTitle === "gadgets" || categorySlug === "gadgets") {
+      return `/technology/gadgets/${slug}`;
+    }
+
+    if (
+      categoryTitle === "lifestyle" ||
+      categorySlug === "lifestyle" ||
+      categoryTitle === "living" ||
+      categorySlug === "living"
+    ) {
+      return `/lifestyle/${slug}`;
+    }
+
+    const titleIsMental =
+      (categoryTitle?.includes("mental") && categoryTitle?.includes("health")) ||
+      categoryTitle?.includes("mentalhealth");
+    const slugIsMental =
+      (categorySlug?.includes("mental") && categorySlug?.includes("health")) ||
+      categorySlug?.includes("mentalhealth");
+
+    if (titleIsMental || slugIsMental) {
+      return `/mentalhealth/${slug}`;
+    }
+
+    if (
+      categoryTitle === "wellness" ||
+      categorySlug === "wellness" ||
+      categoryTitle === "health" ||
+      categorySlug === "health"
+    ) {
+      return `/wellness/${slug}`;
+    }
+
+    if (category.parent) {
+      const parentTitle = category.parent.title?.toLowerCase();
+      const parentSlug = category.parent.slug?.current?.toLowerCase();
+
+      if (parentTitle === "news" || parentSlug === "news") {
+        return `/news/${slug}`;
+      }
+
+      if (parentTitle === "world" || parentSlug === "world") {
+        return `/news/world/${slug}`;
+      }
+
+      if (parentTitle === "business" || parentSlug === "business") {
+        return `/news/business/${slug}`;
+      }
+
+      if (
+        parentTitle === "tech-news" ||
+        parentSlug === "tech-news" ||
+        parentTitle === "technology" ||
+        parentSlug === "technology"
+      ) {
+        return `/technology/tech-news/${slug}`;
+      }
+
+      if (
+        parentTitle === "ai" ||
+        parentSlug === "ai" ||
+        parentTitle === "artificial intelligence" ||
+        parentSlug === "artificial-intelligence"
+      ) {
+        return `/technology/ai/${slug}`;
+      }
+
+      if (
+        parentTitle === "cybersecurity" ||
+        parentSlug === "cybersecurity" ||
+        parentTitle === "security" ||
+        parentSlug === "security"
+      ) {
+        return `/technology/cybersecurity/${slug}`;
+      }
+
+      if (parentTitle === "gadgets" || parentSlug === "gadgets") {
+        return `/technology/gadgets/${slug}`;
+      }
+
+      if (
+        parentTitle === "lifestyle" ||
+        parentSlug === "lifestyle" ||
+        parentTitle === "living" ||
+        parentSlug === "living"
+      ) {
+        return `/lifestyle/${slug}`;
+      }
+
+      const parentTitleIsMental =
+        (parentTitle?.includes("mental") && parentTitle?.includes("health")) ||
+        parentTitle?.includes("mentalhealth");
+      const parentSlugIsMental =
+        (parentSlug?.includes("mental") && parentSlug?.includes("health")) ||
+        parentSlug?.includes("mentalhealth");
+
+      if (parentTitleIsMental || parentSlugIsMental) {
+        return `/mentalhealth/${slug}`;
+      }
+
+      if (
+        parentTitle === "wellness" ||
+        parentSlug === "wellness" ||
+        parentTitle === "health" ||
+        parentSlug === "health"
+      ) {
+        return `/wellness/${slug}`;
+      }
+    }
+  }
+
+  return `/blogs/${slug}`;
+}
 
 // METADATA
 export async function generateMetadata({
@@ -70,23 +230,24 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await client.fetch(
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title},
+        categories[]->{title, slug, parent->{title, slug}},
         mainImage,
         galleryImages[] {
-      asset->
-    },
+          asset->
+        },
         seoTitle,
         metaDescription,
         excerpt,
         body,
         publishedAt
       }`,
-      { slug },
+      { slug: decodedSlug },
       { next: { revalidate: 2592000 } },
     );
 
@@ -94,11 +255,38 @@ export async function generateMetadata({
       return {
         title: "Wellness Article Not Found - GeokHub",
         description: "The requested wellness article could not be found.",
-        robots: "noindex, nofollow",
+        robots: {
+          index: false,
+          follow: false,
+        },
       };
     }
 
-    const canonicalUrl = `https://www.geokhub.com/wellness/${slug}`;
+    // Verify this is a wellness post
+    const isWellnessPost = post.categories?.some((cat: any) => {
+      const catTitle = cat.title?.toLowerCase();
+      const catSlug = cat.slug?.current?.toLowerCase();
+      const parentSlug = cat.parent?.slug?.current?.toLowerCase();
+      return (
+        catTitle === "wellness" ||
+        catSlug === "wellness" ||
+        catTitle === "health" ||
+        catSlug === "health" ||
+        parentSlug === "wellness" ||
+        parentSlug === "health"
+      );
+    });
+
+    if (!isWellnessPost) {
+      return {
+        robots: {
+          index: false,
+          follow: false,
+        },
+      };
+    }
+
+    const canonicalUrl = `https://www.geokhub.com/wellness/${decodedSlug}`;
     const baseUrl = "https://www.geokhub.com";
     const imageUrl = post.mainImage?.asset
       ? urlFor(post.mainImage)
@@ -119,7 +307,20 @@ export async function generateMetadata({
       metadataBase: new URL("https://www.geokhub.com"),
       title: post.seoTitle || `${post.title} - GeokHub Wellness`,
       description: post.metaDescription || description,
-      alternates: { canonical: canonicalUrl },
+      alternates: { 
+        canonical: canonicalUrl,
+      },
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
       openGraph: {
         title: post.title,
         description,
@@ -139,18 +340,11 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    // Avoid signaling "noindex" on transient errors — keep pages indexable by default.
+    console.error("Error generating wellness metadata:", error);
     return {
       robots: {
         index: true,
         follow: true,
-        googleBot: {
-          index: true,
-          follow: true,
-          "max-video-preview": -1,
-          "max-image-preview": "large",
-          "max-snippet": -1,
-        },
       },
     };
   }
@@ -191,42 +385,8 @@ function getSlugValue(post: any): string | undefined {
 // Function to get post detail URL based on category
 function getPostUrl(post: any): string {
   const slugValue = getSlugValue(post) ?? "";
-
-  if (!post.categories || post.categories.length === 0) {
-    return `/blogs/${slugValue}`;
-  }
-
-  // Check each category for "wellness"
-  for (const category of post.categories) {
-    const categoryTitle = category.title?.toLowerCase();
-    const categorySlug = category.slug?.current?.toLowerCase();
-
-    if (
-      categoryTitle === "wellness" ||
-      categorySlug === "wellness" ||
-      categoryTitle === "health" ||
-      categorySlug === "health"
-    ) {
-      return `/wellness/${slugValue}`;
-    }
-
-    // Also check parent category if exists
-    if (category.parent) {
-      const parentTitle = category.parent.title?.toLowerCase();
-      const parentSlug = category.parent.slug?.current?.toLowerCase();
-
-      if (
-        parentTitle === "wellness" ||
-        parentSlug === "wellness" ||
-        parentTitle === "health" ||
-        parentSlug === "health"
-      ) {
-        return `/wellness/${slugValue}`;
-      }
-    }
-  }
-
-  return `/blogs/${slugValue}`;
+  if (!slugValue) return "#";
+  return getPostUrlPath(post, slugValue);
 }
 
 // Function to get wellness category
@@ -370,22 +530,22 @@ export default async function WellnessDetailPage({
           }
         },
         mainImage,
-    galleryImages[] {
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
-    images[]{
-      asset->{
-        ...,
-        metadata
-      },
-      alt,
-      caption
-    },
+        galleryImages[] {
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
+        images[]{
+          asset->{
+            ...,
+            metadata
+          },
+          alt,
+          caption
+        },
         body,
         seoTitle,
         metaDescription,
@@ -416,7 +576,7 @@ export default async function WellnessDetailPage({
     }
 
     // ========== WELLNESS CATEGORY CHECK ==========
-    const isWellnessPost = post.categories?.some((cat) => {
+    const isWellnessPost = post.categories?.some((cat: any) => {
       const catTitle = cat.title?.toLowerCase();
       const catSlug = cat.slug?.current?.toLowerCase();
       const parentSlug = cat.parent?.slug?.current?.toLowerCase();
@@ -431,8 +591,6 @@ export default async function WellnessDetailPage({
     });
 
     // ========== REJECT NON-WELLNESS POSTS WITH 404 ==========
-    // Don't redirect - this creates "Page with redirect" issues in Search Console
-    // Instead, return 404 for posts not in the Wellness category
     if (!isWellnessPost) {
       notFound();
     }
@@ -460,17 +618,18 @@ export default async function WellnessDetailPage({
         ),
         client.fetch(
           `*[_type == "post" && count((categories[]->slug.current)[@ in ["wellness", "health"]]) > 0] | order(views desc)[0...5] {
-          _id,
-          title,
-          "slug": slug.current,
-          publishedAt,
-          mainImage,
-          excerpt,
-          views,
-          categories[]->{title, slug},
-          wellnessType,
-          mood
-        }`,
+            _id,
+            title,
+            "slug": slug.current,
+            publishedAt,
+            mainImage,
+            excerpt,
+            views,
+            categories[]->{title, slug},
+            wellnessType,
+            mood
+          }`,
+          { next: { revalidate: 2592000 } },
         ),
       ]);
 
@@ -533,8 +692,12 @@ export default async function WellnessDetailPage({
       dateModified: post._updatedAt || post.publishedAt || post._createdAt,
       image: imageUrl,
       url: canonicalUrl,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+      },
       publisher: {
-        "@type": "Organization",
+        "@type": "NewsMediaOrganization",
         name: "GeokHub Wellness",
         url: "https://www.geokhub.com/wellness",
         logo: {
@@ -557,6 +720,13 @@ export default async function WellnessDetailPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <CodeScript />
+        
+        {/* Explicit robots meta tag for HTML head */}
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1" />
+        
+        {/* Canonical link tag */}
+        <link rel="canonical" href={canonicalUrl} />
 
         {/* Mobile Floating Action Bar */}
         <div className="lg:hidden fixed bottom-6 right-6 z-40">
@@ -692,7 +862,7 @@ export default async function WellnessDetailPage({
                   </h1>
 
                   {/* Subtitle & Metadata */}
-                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <div className="flex sm:flex-row sm:items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2 flex-wrap">
                     <div className="flex items-center gap-1">
                       {post.author?.image && (
                         <img
@@ -727,8 +897,7 @@ export default async function WellnessDetailPage({
                 </header>
 
                 {/* Hero Image Slider */}
-                <div className="mb-5">
-                  {/* Check if we have gallery images */}
+                <div className="mb-5 relative">
                   {post.galleryImages &&
                   Array.isArray(post.galleryImages) &&
                   post.galleryImages.length > 0 ? (
@@ -737,9 +906,8 @@ export default async function WellnessDetailPage({
                         images={post.galleryImages}
                         className="md:rounded-xl shadow-2xl"
                       />
-                      {/* Business News Badge */}
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           WELLNESS
                         </span>
                       </div>
@@ -747,7 +915,6 @@ export default async function WellnessDetailPage({
                   ) : post.images &&
                     Array.isArray(post.images) &&
                     post.images.length > 0 ? (
-                    // Fallback to images[] array if galleryImages doesn't exist but images[] does
                     <>
                       <ImageSliderWrapper
                         images={post.images.map((img: any) => ({
@@ -758,13 +925,12 @@ export default async function WellnessDetailPage({
                         className="md:rounded-xl shadow-2xl"
                       />
                       <div className="absolute top-6 left-6 z-20">
-                        <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                        <span className="bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                           WELLNESS
                         </span>
                       </div>
                     </>
                   ) : (
-                    // Fallback to single main image
                     <div className="md:rounded-xl overflow-hidden shadow-2xl">
                       <div className="relative h-[300px] md:h-[300px] lg:h-[400px]">
                         <img
@@ -775,7 +941,7 @@ export default async function WellnessDetailPage({
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                         <div className="absolute top-6 left-6">
-                          <span className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
+                          <span className="bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wider">
                             WELLNESS
                           </span>
                         </div>
@@ -846,7 +1012,7 @@ export default async function WellnessDetailPage({
                       prose-headings:text-gray-900 
                       prose-headings:dark:text-white
                       prose-headings:border-l-4
-                      prose-headings:border-${wellnessColors.primary}-500
+                      prose-headings:border-emerald-500
                       prose-headings:pl-4
                       prose-headings:mt-10
                       prose-headings:mb-6
@@ -854,22 +1020,22 @@ export default async function WellnessDetailPage({
                       prose-p:dark:text-gray-300
                       prose-p:leading-relaxed
                       prose-p:text-lg
-                      prose-a:text-${wellnessColors.text} 
-                      prose-a:dark:text-${wellnessColors.textDark}
+                      prose-a:text-emerald-600 
+                      prose-a:dark:text-emerald-400
                       prose-a:font-medium
                       prose-a:underline
-                      prose-a:decoration-${wellnessColors.primary}-300
-                      prose-a:hover:text-${wellnessColors.primary}-700
-                      prose-a:dark:hover:text-${wellnessColors.textDark}
+                      prose-a:decoration-emerald-300
+                      prose-a:hover:text-emerald-700
+                      prose-a:dark:hover:text-emerald-300
                       prose-strong:text-gray-900 
                       prose-strong:dark:text-white
                       prose-strong:font-bold
                       prose-blockquote:border-l-4
-                      prose-blockquote:border-${wellnessColors.primary}-400
+                      prose-blockquote:border-emerald-400
                       prose-blockquote:pl-6
                       prose-blockquote:italic
-                      prose-blockquote:bg-${wellnessColors.primary}-50
-                      prose-blockquote:dark:bg-${wellnessColors.primary}-900/20
+                      prose-blockquote:bg-emerald-50
+                      prose-blockquote:dark:bg-emerald-900/20
                       prose-blockquote:py-4
                       prose-blockquote:rounded-r-lg
                       prose-blockquote:text-gray-700
@@ -879,8 +1045,8 @@ export default async function WellnessDetailPage({
                       first-letter:float-left
                       first-letter:mr-4
                       first-letter:mt-2
-                      first-letter:text-${wellnessColors.text}
-                      dark:first-letter:text-${wellnessColors.textDark}
+                      first-letter:text-emerald-600
+                      dark:first-letter:text-emerald-400
                       first-letter:leading-none
                     `}
                     >
@@ -991,7 +1157,7 @@ export default async function WellnessDetailPage({
                         <Link
                           key={index}
                           href={`/?query=${encodeURIComponent(tag)}`}
-                          className={`px-4 py-2 bg-gradient-to-r ${wellnessColors.gradientLight} dark:${wellnessColors.gradientDark} text-${wellnessColors.text} dark:text-${wellnessColors.textDark} hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-800/50 dark:hover:to-teal-800/50 rounded-full text-sm font-medium transition-all duration-200 border border-${wellnessColors.border} dark:border-${wellnessColors.borderDark}`}
+                          className={`px-4 py-2 bg-gradient-to-r text-emerald-600 dark:text-emerald-400 hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-800/50 dark:hover:to-teal-800/50 rounded-full text-sm font-medium transition-all duration-200 border border-emerald-100 dark:border-emerald-800`}
                         >
                           #{tag}
                         </Link>
@@ -1073,7 +1239,7 @@ export default async function WellnessDetailPage({
                                       </div>
                                       {postItem.mood && (
                                         <span
-                                          className={`text-xs text-${wellnessColors.text} dark:text-${wellnessColors.textDark} font-medium`}
+                                          className={`text-xs text-emerald-600 dark:text-emerald-400 font-medium`}
                                         >
                                           {postItem.mood}
                                         </span>
@@ -1093,7 +1259,7 @@ export default async function WellnessDetailPage({
                   </div>
 
                   {/* Wellness Newsletter */}
-                  <div
+                  {/* <div
                     className={`bg-gradient-to-br from-emerald-800 via-teal-700 to-green-700 rounded-2xl p-6 text-white`}
                   >
                     <div className="flex items-center gap-3 mb-4">
@@ -1111,7 +1277,7 @@ export default async function WellnessDetailPage({
                       description="Get wellness tips, health advice, mindfulness practices, and holistic living guides delivered weekly."
                       theme="dark"
                     />
-                  </div>
+                  </div> */}
 
                   {/* Wellness Quick Tips */}
                   <div className="bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl p-6 text-white">
@@ -1138,7 +1304,7 @@ export default async function WellnessDetailPage({
             {/* Related Wellness Section */}
             {relatedWellnessPostsWithUrls &&
               relatedWellnessPostsWithUrls.length > 0 && (
-                <section className="mt-20 20 max-w-7xl mx-auto px-4 md:px-0">
+                <section className="mt-20 max-w-7xl mx-auto px-4 md:px-0">
                   <div className="text-center mb-6">
                     <div className="inline-flex items-center gap-3 mb-4">
                       <div
@@ -1159,7 +1325,7 @@ export default async function WellnessDetailPage({
                   />
                   <div className="text-center mt-12">
                     <Link
-                      href="/lifestyles/wellness"
+                      href="/wellness"
                       className={`inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r ${wellnessColors.gradient} hover:from-emerald-700 hover:to-teal-700 text-white rounded-full font-semibold transition-all duration-200 shadow-lg hover:shadow-xl`}
                     >
                       Explore All Wellness
@@ -1178,11 +1344,12 @@ export default async function WellnessDetailPage({
   }
 }
 
-// STATIC PARAMS
+// STATIC PARAMS - Generate all wellness slugs for static generation
 export async function generateStaticParams() {
   const posts = await client.fetch(`
-    *[_type == "post" &&  
-      defined(categories) && 
+    *[_type == "post" && 
+      defined(slug.current) && 
+      publishedAt <= now() &&
       count((categories[]->slug.current)[@ in ["wellness", "health"]]) > 0
     ] {
       "slug": slug.current

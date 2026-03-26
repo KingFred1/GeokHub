@@ -110,7 +110,7 @@ export function BlogNavigationMenu() {
         <NavigationMenuItem className="flex-shrink-0">
           <NavigationMenuLink asChild>
             <Link
-              href="/lifestyles"
+              href="/lifestyle/category/lifestyle"
               className={cn(
                 navigationMenuTriggerStyle(),
                 "text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-3 py-2"
