@@ -3,7 +3,7 @@ import { client } from '@/sanity/lib/client'
 import { getCanonicalPath, getSlugString } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 86400; // 24 hours
+export const revalidate = 86400; // 3600 Change to 1 hour for faster updates
 
 // Simple XML escaping
 function escapeXml(unsafe: string): string {
@@ -33,10 +33,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // ========================
-    // FETCH ONLY ESSENTIAL POSTS - FIXED QUERY
+    // FETCH ALL PUBLISHED POSTS
     // ========================
     const posts = await client.fetch<SanityPost[]>(`
-      *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc)[0...2000] {
+      *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
         "slug": slug.current,
         _updatedAt,
         publishedAt,
@@ -47,16 +47,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     `, {}, { next: { revalidate: 86400 } });
 
     console.log(`📊 Total posts fetched: ${posts?.length || 0}`);
-    
-    if (posts && posts.length > 0) {
-      console.log('🔍 Sample post data:');
-      console.log('First post:', {
-        slug: posts[0].slug,
-        hasSlug: !!posts[0].slug,
-        slugType: typeof posts[0].slug,
-        categories: posts[0].categories
-      });
-    }
 
     // ========================
     // STATIC PAGES (HIGH PRIORITY)
@@ -71,50 +61,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { 
         url: escapeUrl(`${baseUrl}/about`), 
         lastModified: new Date(), 
+        changeFrequency: 'weekly',
+        priority: 0.5 
+      },
+      { 
+        url: escapeUrl(`${baseUrl}/contact`), 
+        lastModified: new Date(), 
         changeFrequency: 'monthly',
-        priority: 0.3 
+        priority: 0.4 
       },
     ];
 
     // ========================
-    // MAIN CATEGORY PAGES (MEDIUM PRIORITY)
+    // MAIN CATEGORY PAGES
     // ========================
-    // NOTE: /technology and /lifestyle redirect to /technology/tech-news and /lifestyles
-    // so we exclude them from sitemap to avoid "Page with redirect" errors in Search Console
     const mainCategoryRoutes: MetadataRoute.Sitemap = [
       { 
         url: escapeUrl(`${baseUrl}/news`), 
         lastModified: new Date(), 
         changeFrequency: 'daily',
-        priority: 0.8 
+        priority: 0.9 
       },
-      // Include direct lifestyle destination instead of redirect
       { 
-        url: escapeUrl(`${baseUrl}/lifestyles`), 
+        url: escapeUrl(`${baseUrl}/lifestyle/category/lifestyle`), 
         lastModified: new Date(), 
         changeFrequency: 'daily',
-        priority: 0.8 
+        priority: 0.9 
       },
     ];
 
     // ========================
-    // CATEGORY SUBCATEGORIES (LOWER PRIORITY)
+    // CATEGORY SUBCATEGORIES
     // ========================
-    // NOTE: /technology redirects to /technology/tech-news, so include tech-news with higher priority
     const subcategoryRoutes: MetadataRoute.Sitemap = [
-      // Technology - tech-news is the default landing
+      // Technology
       { url: escapeUrl(`${baseUrl}/technology/tech-news`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
       { url: escapeUrl(`${baseUrl}/technology/ai`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      { url: escapeUrl(`${baseUrl}/technology/cybersecurity`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
-      { url: escapeUrl(`${baseUrl}/technology/programming`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
-      { url: escapeUrl(`${baseUrl}/technology/gadgets`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
-      { url: escapeUrl(`${baseUrl}/technology/emerging-tech`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
-      { url: escapeUrl(`${baseUrl}/technology/cloud-devops`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
+      { url: escapeUrl(`${baseUrl}/technology/cybersecurity`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/technology/programming`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/technology/gadgets`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/technology/emerging-tech`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/technology/cloud-devops`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
       
-      // Lifestyle subpages (now top‑level)
-      { url: escapeUrl(`${baseUrl}/mentalhealth`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      { url: escapeUrl(`${baseUrl}/wellness`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-      { url: escapeUrl(`${baseUrl}/weightloss`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.6 },
+      // Lifestyle categories
+      { url: escapeUrl(`${baseUrl}/lifestyle/category/mentalhealth`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/lifestyle/category/wellness`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+      { url: escapeUrl(`${baseUrl}/lifestyle/category/weightloss`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
       
       // News
       { url: escapeUrl(`${baseUrl}/news/world`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
@@ -122,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 
     // ========================
-    // POST URLS (ONLY CANONICAL - NO /blogs/ AT ALL)
+    // POST URLS - Optimized for indexing
     // ========================
     const postRoutes: MetadataRoute.Sitemap = [];
 
@@ -130,26 +122,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const canonicalPath = getCanonicalPath(post);
       const slugValue = getSlugString(post.slug);
 
-      // filter out fallback /blogs entries (we don't want them in sitemap)
       if (canonicalPath.startsWith("/blogs/")) {
         console.log(`⚠️ Skipping post with uncategorised slug: ${slugValue}`);
         continue;
       }
 
-      console.log(`🔗 Processing post with slug: ${slugValue} – canonical ${canonicalPath}`);
-
       const lastModified = new Date(post._updatedAt || post.publishedAt);
       const postAge = Date.now() - lastModified.getTime();
       const daysOld = postAge / (1000 * 60 * 60 * 24);
 
+      // Higher priority for newer posts to get indexed faster
       let priority = 0.6;
       let changeFrequency: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'weekly';
 
-      if (daysOld < 7) {
+      if (daysOld < 1) { // Less than 1 day old
+        priority = 0.9;
+        changeFrequency = 'daily';
+      } else if (daysOld < 7) { // Less than 1 week
         priority = 0.8;
         changeFrequency = 'daily';
-      } else if (daysOld < 30) {
+      } else if (daysOld < 30) { // Less than 1 month
         priority = 0.7;
+        changeFrequency = 'weekly';
+      } else if (daysOld < 90) { // Less than 3 months
+        priority = 0.6;
         changeFrequency = 'weekly';
       } else {
         priority = 0.5;
@@ -157,8 +153,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
 
       const postUrl = `${baseUrl}${canonicalPath}`;
-      console.log(`   📝 Adding to sitemap: ${postUrl}`);
-
       postRoutes.push({
         url: escapeUrl(postUrl),
         lastModified,
@@ -167,9 +161,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    // ========================
-    // COMBINE ALL URLS
-    // ========================
+    // Sort posts by lastModified (newest first) for better indexing
+    postRoutes.sort((a, b) => {
+      if (!a.lastModified || !b.lastModified) return 0;
+      return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime();
+    });
+
     const allUrls = [
       ...staticRoutes,
       ...mainCategoryRoutes,
@@ -177,62 +174,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...postRoutes,
     ];
 
-    console.log(`\n✅ Clean sitemap generated with ${allUrls.length} URLs`);
-    console.log(`📊 Posts included: ${postRoutes.length}`);
-    console.log(`🚫 Posts skipped: ${(posts?.length || 0) - postRoutes.length}`);
-
-    // Log a few sample URLs to verify
-    console.log('\n📝 Sample post URLs in sitemap:');
-    postRoutes.slice(0, 5).forEach((route, i) => {
-      console.log(`  ${i + 1}. ${route.url}`);
-    });
-
-    // Log a few skipped posts for debugging
-    const skippedPosts = (posts || []).filter(post => {
-      const slug = getSlugString(post.slug);
-      return !postRoutes.find(route => route.url.includes(slug));
-    }).slice(0, 3);
-    
-    if (skippedPosts.length > 0) {
-      console.log('\n⚠️ Sample skipped posts:');
-      skippedPosts.forEach((post, i) => {
-        const slug = getSlugString(post.slug);
-        console.log(`  ${i + 1}. ${slug} - Categories:`,
-          post.categories?.map(c => getSlugString(c.slug)));
-      });
-    }
+    console.log(`\n✅ Sitemap generated with ${allUrls.length} URLs`);
+    console.log(`📊 New posts (last 24h): ${postRoutes.filter(p => p.priority === 0.9).length}`);
+    console.log(`📊 Recent posts (last 7d): ${postRoutes.filter(p => p.priority === 0.8).length}`);
 
     return allUrls;
 
   } catch (error) {
     console.error('❌ Error generating sitemap:', error);
-    
-    // Ultra simple fallback - NO /blogs/ URLs
     return [
-      {
-        url: escapeUrl(baseUrl),
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 1.0,
-      },
-      {
-        url: escapeUrl(`${baseUrl}/technology`),
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
-      },
-      {
-        url: escapeUrl(`${baseUrl}/news`),
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
-      },
-      {
-        url: escapeUrl(`${baseUrl}/lifestyle`),
-        lastModified: new Date(),
-        changeFrequency: 'daily',
-        priority: 0.8,
-      },
+      { url: escapeUrl(baseUrl), lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
+      { url: escapeUrl(`${baseUrl}/news`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+      { url: escapeUrl(`${baseUrl}/lifestyle/category/lifestyle`), lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
     ];
   }
 }
