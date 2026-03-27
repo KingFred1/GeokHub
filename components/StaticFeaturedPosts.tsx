@@ -99,7 +99,7 @@ export default function StaticFeaturedPosts({ posts }: Props) {
                       .url()
                   : "/fallback-image.jpg"}
                 alt={post.title}
-                className="w-full h-full md:h-[55vh] object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-full md:aspect-[18/9] object-cover group-hover:scale-105 transition-transform duration-300"
                 loading={index < 2 ? "eager" : "lazy"}
               />
             </div>
