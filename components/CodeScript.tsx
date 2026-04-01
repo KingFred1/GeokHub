@@ -126,17 +126,6 @@ export function CodeScript() {
 
     // Multiple event listeners for content expansion
     window.addEventListener('contentExpanded', handleContentExpanded);
-    
-    // Also listen for click events on continue reading buttons as fallback
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      const button = target.closest('button');
-      if (button && (button.textContent?.includes('Continue Reading') || 
-                     button.innerHTML?.includes('Continue Reading'))) {
-        console.log('Continue Reading button clicked');
-        handleContentExpanded();
-      }
-    });
 
     // Periodic check as ultimate fallback (less frequent)
     const interval = setInterval(() => {
