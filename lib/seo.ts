@@ -19,15 +19,35 @@ export function getCanonicalPath(post: any): string {
   const cats: any[] = post?.categories || [];
 
   for (const cat of cats) {
-    const cslug = getSlugString(cat?.slug || cat?.title).toLowerCase();
-    const parentSlug = getSlugString(cat?.parent?.slug || cat?.parent?.title).toLowerCase();
+    const cslug = getSlugString(cat?.slug).toLowerCase();
+    const ctitle = getSlugString(cat?.title).toLowerCase();
+    const parentSlug = getSlugString(cat?.parent?.slug).toLowerCase();
+    const parentTitle = getSlugString(cat?.parent?.title).toLowerCase();
+
+    // AI canonical path support
+    if (
+      ["ai", "artificial-intelligence"].includes(cslug) ||
+      ["ai", "artificial intelligence"].includes(ctitle) ||
+      ["ai", "artificial-intelligence"].includes(parentSlug) ||
+      ["ai", "artificial intelligence"].includes(parentTitle)
+    ) {
+      return `/technology/ai/${slugVal}`;
+    }
+
+    // Cybersecurity canonical path support
+    if (
+      ["cybersecurity", "security"].includes(cslug) ||
+      ["cybersecurity", "security"].includes(ctitle) ||
+      ["cybersecurity", "security"].includes(parentSlug) ||
+      ["cybersecurity", "security"].includes(parentTitle)
+    ) {
+      return `/technology/cybersecurity/${slugVal}`;
+    }
 
     // Technology sub‑categories
     if (
       [
-        "ai",
         "tech-news",
-        "cybersecurity",
         "programming",
         "gadgets",
         "emerging-tech",

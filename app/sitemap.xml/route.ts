@@ -31,8 +31,12 @@ async function generateSitemapUrls() {
 
   // Fetch only AI and Cybersecurity published posts for better performance
   const posts = await client.fetch<SanityPost[]>(`
-    *[_type == "post" && defined(slug.current) && publishedAt <= now() && 
-     categories[]->slug.current in ["ai", "cybersecurity"]] | order(publishedAt desc) {
+    *[_type == "post" && defined(slug.current) && publishedAt <= now() && (
+      count((categories[]->slug.current)[@ in ["ai", "artificial-intelligence", "cybersecurity", "security"]]) > 0 ||
+      count((categories[]->parent->slug.current)[@ in ["ai", "artificial-intelligence", "cybersecurity", "security"]]) > 0 ||
+      count((lower(categories[]->title))[@ in ["ai", "artificial intelligence", "cybersecurity", "security"]]) > 0 ||
+      count((lower(categories[]->parent->title))[@ in ["ai", "artificial intelligence", "cybersecurity", "security"]]) > 0
+    )] | order(publishedAt desc) {
       "slug": slug.current,
       _updatedAt,
       publishedAt,
@@ -52,8 +56,7 @@ async function generateSitemapUrls() {
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
-        { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
-    { url: `${baseUrl}/disclaimer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },    
+    { url: `${baseUrl}/disclaimer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
   ];
 
   // Active category pages - only AI and Cybersecurity
