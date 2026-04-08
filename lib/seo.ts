@@ -39,7 +39,7 @@ export function getCanonicalPath(post: any): string {
 
     // Lifestyle and related categories
     if (cslug === "lifestyle") {
-      return `/lifestyle/${slugVal}`;
+      return `/lifestyle/post/${slugVal}`;
     }
     if (cslug === "mentalhealth") {
       return `/mentalhealth/${slugVal}`;

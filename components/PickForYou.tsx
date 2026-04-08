@@ -5,7 +5,16 @@ import Link from "next/link";
 // import LikeButton from "./global/LikeButton";
 // import CommentCount from "./global/CommentCount";
 import { Clock } from "lucide-react";
-import { formatTimeShort } from "@/lib/formatTime";
+// import { formatTimeShort } from "@/lib/formatTime";
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
 
 
 type PickForYouProps = {
@@ -97,14 +106,14 @@ export default function PickForYou({ post }: PickForYouProps) {
     plainText = plainText + "...";
   }
 
-    const formattedTime = formatTimeShort(publishedAt || "");
+    // const formattedTime = formatTimeShort(publishedAt || "");
 
 
   // Get the correct detail page URL based on category
     const detailUrl = getPostDetailUrl(post);
 
   return (
-    <article className="bg-card dark:bg-card  border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+    <article className="bg-card dark:bg-card border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden grid md:grid-cols-2 cursor-pointer">
       {/* Image Section */}
       <Link href={detailUrl} className="block relative overflow-hidden">
         <img
@@ -116,9 +125,9 @@ export default function PickForYou({ post }: PickForYouProps) {
           loading="eager"
         />
         {/* Featured Badge */}
-        <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
+        {/* <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
           Featured
-        </div>
+        </div> */}
       </Link>
 
       {/* Content Section */}
@@ -126,7 +135,7 @@ export default function PickForYou({ post }: PickForYouProps) {
 
         {/* Title */}
         <Link href={detailUrl}>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:underline lg:line-clamp-3 line-clamp-3 mb-2 transition-colors">
+          <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white hover:underline lg:line-clamp-3 line-clamp-3 mb-2 transition-colors">
             {title}
           </h3>
         </Link>
@@ -147,7 +156,7 @@ export default function PickForYou({ post }: PickForYouProps) {
           <span className="mx-1">•</span> */}
           <Clock size={14} />
           <time dateTime={publishedAt} className="ml-1">
-            {formattedTime}
+            {formatDate(publishedAt)}
           </time>
         </div>
 

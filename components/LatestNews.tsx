@@ -6,8 +6,18 @@ import { ArrowUpRightIcon, Calendar} from "lucide-react";
 // import LikeButton from "./global/LikeButton";
 // import CommentCount from "./global/CommentCount";
 
-import { formatTimeShort } from "@/lib/formatTime";
+// import { formatTimeShort } from "@/lib/formatTime";
 import Link from "next/link";
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
 
 const ArrowRightIcon = () => (
   <svg
@@ -126,14 +136,14 @@ export default function LatestNews({ posts }: LatestNewsProps) {
           <Link 
           href="/technology/tech-news"
           className="flex text-lg hover:underline sm:text-lg font-semibold text-gray-900 dark:text-white md:px-0 px-4">
-            Latest Tech News
+            More on AI
             <ArrowRightIcon />
           </Link>
           
           
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:gap-4 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 md:gap-6 ">
           {displayPosts.map((post) => {
             const imageUrl = post.mainImage?.asset
               ? urlFor(post.mainImage)
@@ -157,7 +167,7 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                 // Get the correct detail page URL based on category
     const detailUrl = getPostDetailUrl(post);
 
-        const formattedTime = formatTimeShort(post.publishedAt);
+        // const formattedTime = formatTimeShort(post.publishedAt);
 
 
             return (
@@ -185,9 +195,9 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                     )}
                     {post.categories && post.categories.length > 0 && (
                       <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                        <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
+                        {/* <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
                           {post.categories[0]?.title || "News"}
-                        </span>
+                        </span> */}
                       </div>
                     )}
                   </div>
@@ -198,7 +208,7 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                   
 
                   <Link href={detailUrl}>
-                    <h3 className="text-xl sm:text-lg font-semibold text-gray-900 dark:text-white mb-2 sm:mb-3 hover:underline transition-colors line-clamp-2 leading-tight">
+                    <h3 className="md:text-xl text-lg font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 hover:underline transition-colors line-clamp-2 leading-tight">
                       {post.title}
                     </h3>
                   </Link>
@@ -225,9 +235,9 @@ export default function LatestNews({ posts }: LatestNewsProps) {
                     <div className="flex items-center gap-1">
                       <Calendar size={12} className="sm:hidden" />
                       <Calendar size={14} className="hidden sm:block" />
-                      <span className="text-xs sm:text-sm">
-                        {formattedTime}
-                      </span>
+                      <time dateTime={post.publishedAt}>
+                  {formatDate(post.publishedAt)}
+                </time>
                     </div>
                   </div>
 

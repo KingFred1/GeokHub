@@ -13,7 +13,16 @@ import { FaInternetExplorer } from "react-icons/fa6";
 // import LikeButton from "./global/LikeButton";
 // import CommentCount from "./global/CommentCount";
 
-import { formatTimeShort } from "@/lib/formatTime";
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+// 
 
 const ArrowRightIcon = () => (
   <svg
@@ -177,7 +186,7 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
     displayedPosts = posts.slice();
   }
 
-  displayedPosts = displayedPosts.slice(0, 8);
+  displayedPosts = displayedPosts.slice(0, 30);
 
   return (
     <section className="w-full max-w-7xl mx-auto py-5 border-y">
@@ -213,23 +222,15 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
             <span className="text-lg font-semibold">CyberSecurity</span>
             <ArrowRightIcon />
           </Link>
-          <Link
-            href="/technology/gadgets"
-            className="flex items-center px-4 py-2 hover:underline"
-          >
-            {/* <Laptop size={16} className="text-blue-600" /> */}
-            <span className="text-lg font-semibold">Gadgets</span>
-            <ArrowRightIcon />
-          </Link>
         </div>
       </div>
 
     
       {/* Featured Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 md:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 md:gap-6">
         {displayedPosts.map((post) => {
           // Format time for each post individually 
-          const formattedTime = formatTimeShort(post?._updatedAt || post?.publishedAt);
+              // const formattedTime = formatTimeShort(post?._updatedAt || post?.publishedAt);
           
           return (
             <article
@@ -252,15 +253,15 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
 
                 {/* Category Badge */}
                 <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium ">
+                  {/* <span className="px-3 py-1 bg-blue-600 text-white text-xs font-medium ">
                     Tech
-                  </span>
+                  </span> */}
                 </div>
               </div>
 
               <div className="p-4">
                 <Link href={getPostDetailUrl(post)}>
-                  <h3 className="font-semibold text-xl mb-2 line-clamp-3 text-gray-900 dark:text-white hover:underline transition-colors">
+                  <h3 className="font-bold text-xl mb-2 line-clamp-3 text-gray-900 dark:text-white hover:underline transition-colors">
                     {post.title}
                   </h3>
                 </Link>
@@ -279,7 +280,7 @@ const TechnologyCat = ({ posts }: { posts: Post[] }) => {
                   <div className="flex items-center gap-1">
                     <Calendar size={14} />
                     <time dateTime={post.publishedAt || post._updatedAt}>
-                      {formattedTime}
+                      {formatDate(post.publishedAt || post._updatedAt)}
                     </time>
                   </div>
                 </div>

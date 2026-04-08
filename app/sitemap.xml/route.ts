@@ -3,7 +3,7 @@ import { client } from '@/sanity/lib/client';
 import { getCanonicalPath, getSlugString } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 86400; // 24 hours
+export const revalidate = 3600; // Revalidate every hour for faster updates
 
 function escapeXml(unsafe: string): string {
   if (!unsafe) return '';
@@ -19,51 +19,47 @@ interface SanityPost {
   slug: { current: string }
   _updatedAt: string
   publishedAt: string
-  categories?: Array<{ slug?: { current: string } }>
+  categories?: Array<{ 
+    slug?: { current: string }
+    title?: string
+    parent?: { slug?: { current: string }, title?: string }
+  }>
 }
 
 async function generateSitemapUrls() {
   const baseUrl = 'https://www.geokhub.com';
 
-  // Fetch all published posts
+  // Fetch only AI and Cybersecurity published posts for better performance
   const posts = await client.fetch<SanityPost[]>(`
-    *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
+    *[_type == "post" && defined(slug.current) && publishedAt <= now() && 
+     categories[]->slug.current in ["ai", "cybersecurity"]] | order(publishedAt desc) {
       "slug": slug.current,
       _updatedAt,
       publishedAt,
       categories[]->{
-        "slug": slug.current
+        title,
+        "slug": slug.current,
+        parent->{
+          title,
+          "slug": slug.current
+        }
       }
     }
-  `, {}, { next: { revalidate: 86400 } });
+  `, {}, { next: { revalidate: 3600 } }); // Revalidate every hour
 
-  // Static pages
+  // Static pages - keep only essential ones
   const staticRoutes = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
+        { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
+    { url: `${baseUrl}/disclaimer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },    
   ];
 
-  // Main category pages
-  const mainCategoryRoutes = [
-    { url: `${baseUrl}/news`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/lifestyle/category/lifestyle`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-  ];
-
-  // Subcategory pages
-  const subcategoryRoutes = [
-    { url: `${baseUrl}/technology/tech-news`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
-    { url: `${baseUrl}/technology/ai`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/technology/cybersecurity`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/technology/programming`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/technology/gadgets`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/technology/emerging-tech`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/technology/cloud-devops`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/lifestyle/category/mentalhealth`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/lifestyle/category/wellness`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/lifestyle/category/weightloss`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/news/world`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
-    { url: `${baseUrl}/news/business`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.7 },
+  // Active category pages - only AI and Cybersecurity
+  const categoryRoutes = [
+    { url: `${baseUrl}/technology/ai`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/technology/cybersecurity`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
   ];
 
   // Post routes
@@ -112,7 +108,7 @@ async function generateSitemapUrls() {
     return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime();
   });
 
-  return [...staticRoutes, ...mainCategoryRoutes, ...subcategoryRoutes, ...postRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...postRoutes];
 }
 
 export async function GET() {
@@ -132,11 +128,11 @@ ${urls.map(url => `  <url>
     return new NextResponse(xml, {
       headers: {
         'Content-Type': 'application/xml',
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+        'Cache-Control': 'public, max-age=1800, s-maxage=1800', // Cache for 30 minutes
       },
     });
   } catch {
-    // Fallback sitemap on error
+    // Fallback sitemap on error - only active pages
     const fallbackXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -146,16 +142,16 @@ ${urls.map(url => `  <url>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.geokhub.com/news</loc>
+    <loc>https://www.geokhub.com/technology/ai</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.geokhub.com/lifestyle/category/lifestyle</loc>
+    <loc>https://www.geokhub.com/technology/cybersecurity</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 </urlset>`;
 

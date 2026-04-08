@@ -51,7 +51,7 @@ export default function StaticFeaturedPosts({ posts }: Props) {
   const featuredPosts = posts.slice(0, 1);
 
   return (
-    <div className="grid grid-cols-1 mt-2">
+    <div className="grid grid-cols-1 mt-5">
       {featuredPosts.map((post, index) => (
         <Link 
           key={post._id} 
@@ -59,6 +59,24 @@ export default function StaticFeaturedPosts({ posts }: Props) {
           className="group block"
         >
           <article className="bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700 h-full flex flex-col">
+
+
+           {/* Image */}
+            <div className="overflow-hidden">
+              <img
+                src={post.mainImage?.asset
+                  ? urlFor(post.mainImage)
+                      .width(600)
+                      .height(340)
+                      .quality(80)
+                      .format('webp')
+                      .url()
+                  : "/fallback-image.jpg"}
+                alt={post.title}
+                className="w-full h-full md:aspect-[18/9] object-cover group-hover:scale-105 transition-transform duration-300"
+                loading={index < 2 ? "eager" : "lazy"}
+              />
+            </div>
 
           {/* Content */}
             <div className="p-4 flex-1">
@@ -87,22 +105,7 @@ export default function StaticFeaturedPosts({ posts }: Props) {
               </div>
             </div>
                         
-            {/* Image */}
-            <div className="overflow-hidden">
-              <img
-                src={post.mainImage?.asset
-                  ? urlFor(post.mainImage)
-                      .width(600)
-                      .height(340)
-                      .quality(80)
-                      .format('webp')
-                      .url()
-                  : "/fallback-image.jpg"}
-                alt={post.title}
-                className="w-full h-full md:aspect-[18/9] object-cover group-hover:scale-105 transition-transform duration-300"
-                loading={index < 2 ? "eager" : "lazy"}
-              />
-            </div>
+           
           </article>
         </Link>
       ))}

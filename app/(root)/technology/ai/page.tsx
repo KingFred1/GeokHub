@@ -6,19 +6,13 @@ import { NewsletterForm } from "@/components/global/Newsletter-form";
 import Link from "next/link";
 import { urlFor } from "@/sanity/lib/image";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 2592000; // 1 day
-// // or
-// export const revalidate = 1800; // 30 minutes
-// // or  
-// export const revalidate = 900; // 15 minutes
+export const revalidate = 2592000; // Revalidate every hour
 
 export default async function AI() {
   const mainBlogs = await client.fetch(
     BLOG_BY_CATEGORY_SLUG,
     { slug: "ai" },
     {
-      cache: "no-store",
       next: {
         tags: ["technology/ai"],
         revalidate: 2592000,
@@ -27,18 +21,27 @@ export default async function AI() {
   );
   const trendingPosts = mainBlogs?.slice(0, 4) || [];
 
-  function formatTimeShort(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  // function formatTimeShort(dateString: string): string {
+  //   const date = new Date(dateString);
+  //   const now = new Date();
+  //   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return "just now";
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    return `${Math.floor(diffInHours / 24)}d ago`;
-  }
+  //   if (diffInSeconds < 60) return "just now";
+  //   const diffInMinutes = Math.floor(diffInSeconds / 60);
+  //   if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  //   const diffInHours = Math.floor(diffInMinutes / 60);
+  //   if (diffInHours < 24) return `${diffInHours}h ago`;
+  //   return `${Math.floor(diffInHours / 24)}d ago`;
+  // }
+
+  function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
 
   function getPostDetailUrl(post: any): string {
     if (!post.categories || post.categories.length === 0) {
@@ -102,7 +105,7 @@ export default async function AI() {
                         <span className="font-medium">{post.author?.name}</span>
                         <span>•</span>
                         <Calendar size={12} />
-                        <span>{formatTimeShort(post._createdAt)}</span>
+                        <span>{formatDate(post._createdAt)}</span>
                       </div>
                       <h3 className="font-semibold text-xl text-gray-900 dark:text-white md:mb-2 mb-4 line-clamp-3 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors ">
                         {post.title}

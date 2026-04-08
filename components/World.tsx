@@ -7,7 +7,15 @@ import Link from "next/link";
 // import CommentCount from "./global/CommentCount";
 import { User, Clock } from "lucide-react";
 
-import { formatTimeShort } from "@/lib/formatTime";
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}// 
 
 interface MasonryGridProps {
   posts: Post[];
@@ -156,7 +164,7 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
         // Get the correct detail page URL based on category
         const detailUrl = getPostDetailUrl(post);
 
-        const formattedTime = formatTimeShort(post._updatedAt);
+        // const formattedTime = formatTimeShort(post._updatedAt);
 
         return (
           <article
@@ -196,9 +204,9 @@ export default function MasonryGrid({ posts }: MasonryGridProps) {
                 <span>•</span> */}
                 <div className="flex items-center gap-1">
                   <Clock size={14} />
-                  <time dateTime={publishedAt}>
-                    {formattedTime}
-                  </time>
+                  <time dateTime={post.publishedAt}>
+                  {formatDate(post.publishedAt)}
+                </time>
                 </div>
               </div>
 

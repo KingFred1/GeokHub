@@ -77,6 +77,34 @@ export function BlogNavigationMenu() {
         <NavigationMenuItem className="flex-shrink-0">
           <NavigationMenuLink asChild>
             <Link
+              href="/technology/ai"
+              className={cn(
+                navigationMenuTriggerStyle(),
+                "text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-3 py-2"
+              )}
+            >
+              AI
+            </Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
+        <NavigationMenuItem className="flex-shrink-0">
+          <NavigationMenuLink asChild>
+            <Link
+              href="/technology/cybersecurity"
+              className={cn(
+                navigationMenuTriggerStyle(),
+                "text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground px-3 py-2"
+              )}
+            >
+              Cybersecurity
+            </Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
+        {/* <NavigationMenuItem className="flex-shrink-0">
+          <NavigationMenuLink asChild>
+            <Link
               href="/news"
               className={cn(
                 navigationMenuTriggerStyle(),
@@ -86,10 +114,10 @@ export function BlogNavigationMenu() {
               News
             </Link>
           </NavigationMenuLink>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
 
         {/* Dynamic Dropdowns */}
-        {navlinks.map((menu) => (
+        {/* {navlinks.map((menu) => (
           <NavigationMenuItem key={menu.title} className="flex-shrink-0">
             <NavigationMenuTrigger className="text-sm font-medium px-3 py-2">
               {menu.title}
@@ -104,10 +132,10 @@ export function BlogNavigationMenu() {
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-        ))}
+        ))} */}
 
         {/* Other links */}
-        <NavigationMenuItem className="flex-shrink-0">
+        {/* <NavigationMenuItem className="flex-shrink-0">
           <NavigationMenuLink asChild>
             <Link
               href="/lifestyle/category/lifestyle"
@@ -119,7 +147,7 @@ export function BlogNavigationMenu() {
               Lifestyle
             </Link>
           </NavigationMenuLink>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
 
         <NavigationMenuItem className="flex-shrink-0">
           <NavigationMenuLink asChild>

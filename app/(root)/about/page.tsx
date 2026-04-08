@@ -3,15 +3,16 @@ import { urlFor } from "@/sanity/lib/image";
 import { getAboutPageContent } from "@/sanity/lib/queries";
 import Head from "next/head";
 import Image from "next/image";
-import PortableTextComponent from "@/components/global/PortableTextComponent";
 import Link from "next/link";
 import {
-  Globe,
-  Briefcase,
   Cpu,
-  HeartPulse,
+  ShieldCheck,
+  Brain,
+  Lock,
   ChevronRight,
-  ShieldCheck
+  Target,
+  Eye,
+  Award
 } from "lucide-react";
 
 async function AboutPage() {
@@ -24,124 +25,211 @@ async function AboutPage() {
   return (
     <div className="bg-white dark:bg-gray-950 min-h-screen">
       <Head>
-        <title>About GeokHub</title>
+        <title>About GeokHub | AI & Cybersecurity Insights</title>
         <meta
           name="description"
-          content="GeokHub is a digital publication covering world news, business, technology, and lifestyle insights."
+          content="GeokHub delivers expert analysis on Artificial Intelligence and Cybersecurity. Stay informed about AI developments, security threats, and protective strategies."
         />
       </Head>
 
-      {/* HERO */}
+      {/* HERO - Focused on AI + Cybersecurity */}
       <section className="border-b bg-white dark:bg-gray-950">
         <div className="max-w-6xl mx-auto px-4 py-20 grid lg:grid-cols-2 gap-12 items-center">
           
           <div className="space-y-6">
-            <span className="text-sm uppercase tracking-wider text-indigo-600 font-semibold">
-              About GeokHub
-            </span>
+            <div className="flex gap-2">
+              <span className="text-sm uppercase tracking-wider text-blue-600 font-semibold">
+                AI & Cybersecurity
+              </span>
+              <span className="text-sm uppercase tracking-wider text-green-600 font-semibold">
+                Expert Analysis
+              </span>
+            </div>
 
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              A modern platform for news, technology, and digital insights
+              Artificial Intelligence & <span className="text-blue-600">Cybersecurity</span> Insights
             </h1>
 
             <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              GeokHub is a digital publication focused on delivering clear,
-              reliable, and insightful content across world news, business,
-              technology, and lifestyle. Our goal is to help readers stay informed
-              and make better decisions in a fast-changing world.
+              GeokHub delivers expert analysis on Artificial Intelligence developments 
+              and Cybersecurity threats. Our mission is to help you understand AI's 
+              evolving landscape and protect your digital assets with actionable security insights.
             </p>
 
             <div className="flex gap-4">
               <Link
-                href="/"
-                className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
+                href="/technology/ai"
+                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center gap-2"
               >
-                Explore Articles
+                <Brain size={18} />
+                Explore AI
               </Link>
               <Link
-                href="/contact"
-                className="px-6 py-3 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                href="/technology/cybersecurity"
+                className="px-6 py-3 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition flex items-center gap-2"
               >
-                Contact
+                <ShieldCheck size={18} />
+                Explore Security
               </Link>
             </div>
           </div>
 
-          {/* Founder */}
-          <div className="flex items-center gap-6">
-            <div className="w-28 h-28 rounded-xl overflow-hidden border">
-              <Image
-                src={profileImageUrl}
-                alt="Founder"
-                width={112}
-                height={112}
-                className="object-cover"
-              />
-            </div>
+          {/* Founder Section */}
+          <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-xl">
+            <div className="flex items-center gap-6">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-blue-500">
+                <Image
+                  src={profileImageUrl}
+                  alt="Founder"
+                  width={96}
+                  height={96}
+                  className="object-cover"
+                />
+              </div>
 
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Iria Fredrick
-              </h3>
-              <p className="text-gray-500 text-sm">
-                Founder & Editor
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                Fullstack developer and content creator focused on building
-                useful digital platforms and simplifying complex topics.
-              </p>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Iria Fredrick
+                </h3>
+                <p className="text-blue-600 text-sm font-medium">
+                  AI & Cybersecurity Analyst
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 max-w-md">
+                  Fullstack developer and security researcher focused on AI applications 
+                  and digital threat mitigation.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CATEGORIES (STRONG BRAND SIGNAL) */}
+      {/* FOCUS AREAS - AI & Cybersecurity Only */}
       <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-4">
           
-          <h2 className="text-2xl font-semibold text-center text-gray-900 dark:text-white mb-12">
-            What We Cover
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+              Our Focus Areas
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Specialized coverage of Artificial Intelligence and Cybersecurity
+            </p>
+          </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 gap-8">
             
-            <div className="p-6 border rounded-lg bg-white dark:bg-gray-950">
-              <Globe className="text-indigo-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">
-                World News
+            {/* AI Card */}
+            <div className="p-6 border rounded-lg bg-white dark:bg-gray-950 hover:shadow-lg transition">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4">
+                <Brain className="text-blue-600" size={24} />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Artificial Intelligence
               </h3>
-              <p className="text-sm text-gray-500 mt-2">
-                Global events, trends, and important updates shaping the world.
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Latest AI breakthroughs, practical applications, ethical considerations, 
+                and future predictions. From machine learning to generative AI.
+              </p>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li className="flex items-center gap-2">
+                  <ChevronRight size={14} className="text-blue-600" />
+                  AI Tools & Reviews
+                </li>
+                <li className="flex items-center gap-2">
+                  <ChevronRight size={14} className="text-blue-600" />
+                  Machine Learning Insights
+                </li>
+                <li className="flex items-center gap-2">
+                  <ChevronRight size={14} className="text-blue-600" />
+                  AI Ethics & Policy
+                </li>
+              </ul>
+            </div>
+
+            {/* Cybersecurity Card */}
+            <div className="p-6 border rounded-lg bg-white dark:bg-gray-950 hover:shadow-lg transition">
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
+                <ShieldCheck className="text-green-600" size={24} />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Cybersecurity
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                Threat analysis, security best practices, breach investigations, 
+                and protective strategies for individuals and organizations.
+              </p>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li className="flex items-center gap-2">
+                  <ChevronRight size={14} className="text-green-600" />
+                  Threat Intelligence
+                </li>
+                <li className="flex items-center gap-2">
+                  <ChevronRight size={14} className="text-green-600" />
+                  Security Tools Review
+                </li>
+                <li className="flex items-center gap-2">
+                  <ChevronRight size={14} className="text-green-600" />
+                  Privacy & Compliance
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* WHY TRUST US - E-E-A-T Signals */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+              Why Trust GeokHub
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Our commitment to quality and expertise
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            
+            <div className="text-center p-6">
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Target size={24} className="text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                Accuracy First
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Every AI claim and security recommendation is verified against 
+                primary sources and industry standards.
               </p>
             </div>
 
-            <div className="p-6 border rounded-lg bg-white dark:bg-gray-950">
-              <Briefcase className="text-indigo-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">
-                Business
+            <div className="text-center p-6">
+              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Eye size={24} className="text-green-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                Independent Analysis
               </h3>
-              <p className="text-sm text-gray-500 mt-2">
-                Markets, entrepreneurship, finance, and economic insights.
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Unbiased reviews and objective analysis of AI tools and security 
+                solutions without vendor influence.
               </p>
             </div>
 
-            <div className="p-6 border rounded-lg bg-white dark:bg-gray-950">
-              <Cpu className="text-indigo-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">
-                Technology
+            <div className="text-center p-6">
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award size={24} className="text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                Practical Insights
               </h3>
-              <p className="text-sm text-gray-500 mt-2">
-                AI, cybersecurity, programming, and emerging innovations.
-              </p>
-            </div>
-
-            <div className="p-6 border rounded-lg bg-white dark:bg-gray-950">
-              <HeartPulse className="text-indigo-600 mb-3" />
-              <h3 className="font-semibold text-gray-900 dark:text-white">
-                Lifestyle
-              </h3>
-              <p className="text-sm text-gray-500 mt-2">
-                Wellness, mental health, productivity, and daily living.
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Actionable takeaways you can apply immediately, whether you're 
+                implementing AI or securing your systems.
               </p>
             </div>
 
@@ -149,38 +237,32 @@ async function AboutPage() {
         </div>
       </section>
 
-      {/* EDITORIAL PRINCIPLES */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-4 space-y-6">
+      {/* MISSION STATEMENT */}
+      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Editorial Approach
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+            Our Mission
           </h2>
 
-          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            At GeokHub, we prioritize clarity, accuracy, and usefulness. Content
-            is created to inform and educate, with a focus on breaking down
-            complex topics into understandable insights for a broad audience.
+          <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
+            To bridge the gap between complex AI technology and practical cybersecurity 
+            by delivering clear, actionable insights that empower our readers to 
+            leverage AI safely and protect what matters most.
           </p>
 
-          <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            We aim to maintain a balanced and responsible approach to publishing,
-            ensuring that readers can trust the information presented.
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-6 pt-6">
-            <div className="p-5 border rounded-lg text-center">
-              <ShieldCheck className="mx-auto text-indigo-600 mb-2" />
-              <p className="font-medium">Accuracy</p>
-            </div>
-            <div className="p-5 border rounded-lg text-center">
-              <ShieldCheck className="mx-auto text-indigo-600 mb-2" />
-              <p className="font-medium">Clarity</p>
-            </div>
-            <div className="p-5 border rounded-lg text-center">
-              <ShieldCheck className="mx-auto text-indigo-600 mb-2" />
-              <p className="font-medium">Trust</p>
-            </div>
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
+            <span className="flex items-center gap-1">
+              <Cpu size={14} /> AI Expertise
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <Lock size={14} /> Security Focus
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <ShieldCheck size={14} /> Trusted Analysis
+            </span>
           </div>
         </div>
       </section>
@@ -190,20 +272,29 @@ async function AboutPage() {
         <div className="max-w-3xl mx-auto px-4">
           
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Stay Informed
+            Stay Ahead in AI & Cybersecurity
           </h2>
 
           <p className="text-gray-600 dark:text-gray-400 mt-3 mb-6">
-            Explore our latest content across news, business, technology, and lifestyle.
+            Get the latest insights on Artificial Intelligence and Cybersecurity delivered to your inbox.
           </p>
 
-          <Link
-            href="/"
-            className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-          >
-            Browse Articles
-            <ChevronRight className="ml-2 h-4 w-4" />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/technology/ai"
+              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              Explore AI Articles
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Link>
+            <Link
+              href="/technology/cybersecurity"
+              className="inline-flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+            >
+              Explore Security Articles
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
     </div>
@@ -211,12 +302,6 @@ async function AboutPage() {
 }
 
 export default AboutPage;
-
-
-
-
-
-
 
 
 

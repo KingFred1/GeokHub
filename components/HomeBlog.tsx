@@ -16,7 +16,17 @@ import {
   Calendar,
 } from "lucide-react";
 
-import { formatTimeShort } from "@/lib/formatTime";
+// import { formatTimeShort } from "@/lib/formatTime";
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
 
 function getPostDetailUrl(post: Post): string {
   // Check if post has categories
@@ -122,7 +132,7 @@ const HomeBlog = ({ post }: { post: Post }) => {
   const detailUrl = getPostDetailUrl(post);
 
   // relative time computed at render (server) to avoid client hook
-  const formattedTime = formatTimeShort(publishedAt || "");
+  // const formattedTime = formatTimeShort(publishedAt || "");
 
   return (
     <article className="group relative bg-white dark:bg-card overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
@@ -132,9 +142,9 @@ const HomeBlog = ({ post }: { post: Post }) => {
       {/* Category badge */}
       {categories && categories.length > 0 && (
         <div className="absolute top-4 left-4 z-10">
-          <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-600 text-white shadow-md">
+          {/* <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-blue-600 text-white shadow-md">
             {categories[0]?.title || "Uncategorized"}
-          </span>
+          </span> */}
         </div>
       )}
 
@@ -189,7 +199,7 @@ const HomeBlog = ({ post }: { post: Post }) => {
 
         {/* Title */}
         <Link href={detailUrl}>
-          <h2 className=" text-xl font-semibold text-gray-900 dark:text-white mb-2 group-hover:underline transition-colors duration-300 line-clamp-3 leading-tight">
+          <h2 className=" text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:underline transition-colors duration-300 line-clamp-3 leading-tight">
             {title}
           </h2>
         </Link>
@@ -197,7 +207,7 @@ const HomeBlog = ({ post }: { post: Post }) => {
         <div className="flex items-center my-2 gap-1 text-xs text-gray-500 dark:text-gray-400">
             <Calendar size={12} />
             <time dateTime={publishedAt}>
-              {formatTimeShort(_updatedAt)}
+              {formatDate(publishedAt)}
             </time>
         </div>
 

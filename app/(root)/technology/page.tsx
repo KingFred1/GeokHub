@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function TechnologyPage() {
-  redirect('/technology/tech-news');
+  redirect('/technology/ai');
 }

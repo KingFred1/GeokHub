@@ -79,12 +79,30 @@ const HOME_CATEGORIES_QUERY = `{
       categories[]->{title,slug,parent->{title,slug}},
       mainImage,body,seoTitle,metaDescription,keywords
     },
+    "ai": *[_type=="post" && (
+      count((categories[]->slug.current)[@=="ai"])>0 ||
+      count((categories[]->parent->slug.current)[@=="ai"])>0
+    )] | order(publishedAt desc)[0..8] {
+      _id,title,slug,publishedAt,_updatedAt,
+      author->{name,image},
+      categories[]->{title,slug,parent->{title,slug}},
+      mainImage,body,seoTitle,metaDescription,keywords
+    },
+    "cybersecurity": *[_type=="post" && (
+      count((categories[]->slug.current)[@=="cybersecurity"])>0 ||
+      count((categories[]->parent->slug.current)[@=="cybersecurity"])>0
+    )] | order(publishedAt desc)[0..8] {
+      _id,title,slug,publishedAt,_updatedAt,
+      author->{name,image},
+      categories[]->{title,slug,parent->{title,slug}},
+      mainImage,body,seoTitle,metaDescription,keywords
+    },
   "technology": *[_type=="post" && (
       count((categories[]->slug.current)[@=="ai"])>0 ||
-      count((categories[]->slug.current)[@=="programming"])>0 ||
-      count((categories[]->slug.current)[@=="cloud-devops"])>0 ||
-      count((categories[]->slug.current)[@=="emerging-tech"])>0 ||
-      count((categories[]->slug.current)[@=="gadgets"])>0 ||
+      // count((categories[]->slug.current)[@=="programming"])>0 ||
+      // count((categories[]->slug.current)[@=="cloud-devops"])>0 ||
+      // count((categories[]->slug.current)[@=="emerging-tech"])>0 ||
+      // count((categories[]->slug.current)[@=="gadgets"])>0 ||
       count((categories[]->slug.current)[@=="cybersecurity"])>0 ||
       count((categories[]->parent->slug.current)[@=="ai"])>0 ||
       count((categories[]->parent->slug.current)[@=="programming"])>0 ||
@@ -92,7 +110,7 @@ const HOME_CATEGORIES_QUERY = `{
       count((categories[]->parent->slug.current)[@=="emerging-tech"])>0 ||
       count((categories[]->parent->slug.current)[@=="gadgets"])>0 ||
       count((categories[]->parent->slug.current)[@=="cybersecurity"])>0
-    )] | order(publishedAt desc)[0..8] {
+    )] | order(publishedAt desc)[0..30] {
       _id,title,slug,publishedAt,_updatedAt,
       author->{name,image},
       categories[]->{title,slug,parent->{title,slug}},
@@ -104,8 +122,8 @@ async function getHomeData(searchTerm?: string) {
   try {
     const result: {
       news: any[];
-      techNews: any[];
-      gadgets: any[];
+      ai: any[];
+      cybersecurity: any[];
       lifestyle: any[];
       technology: any[];
     } = await client.fetch(HOME_CATEGORIES_QUERY);
@@ -115,10 +133,10 @@ async function getHomeData(searchTerm?: string) {
       : [];
 
     return [
-      result.news,
-      result.techNews,
-      result.gadgets,
-      result.lifestyle,
+      // result.news,
+      result.ai,
+      result.cybersecurity,
+      // result.lifestyle,
       result.technology,
       searchResults,
     ];
@@ -138,10 +156,10 @@ export default async function Home({
 
   const data = await getHomeData(searchTerm);
   const [
-    forYou = [],
-    latestNews = [],
-    gadgets = [],
-    lifestyle = [],
+    ai = [],
+    cybersecurity = [],
+    // gadgets = [],
+    // lifestyle = [],
     technology = [],
     searchResults = [],
   ] = data;
@@ -157,25 +175,25 @@ export default async function Home({
 
   return (
     <div className="w-full min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto md:px-4">
+      <div className="max-w-7xl mx-auto md:px-12">
         {/* Hero Section */}
         {!searchTerm && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
             <div className="lg:col-span-6 col-span-12">
-              <StaticFeaturedPosts posts={forYou.slice(0, 1)} />
+              <StaticFeaturedPosts posts={ai.slice(0, 1)} />
             </div>
             <div className="lg:col-span-6 col-span-12">
-              <div className="md:mt-16">
+              <div className="md:mt-7">
                 <Link 
-                  href="/technology/tech-news"
+                  href="/technology/cybersecurity"
                   className="flex hover:underline font-bold text-xl mb-4 text-dark dark:text-gray-200 pl-2"
                 >
-                  Top Stories
+                  Cybersecurity Latest
                   <ArrowRightIcon />
                 </Link>
                 <div className="rounded-lg">
-                  <div className="grid md:grid-cols-2 md:gap-4">
-                    {latestNews
+                  <div className="grid md:grid-cols-1 md:gap-4">
+                    {cybersecurity
                       .slice(0, 2)
                       .map(
                         (post) =>
@@ -192,23 +210,23 @@ export default async function Home({
 
         {!searchTerm && (
           <>
-            <TextNewsGrid posts={forYou.slice(1, 4)} />
+            {/* <TextNewsGrid posts={forYou.slice(1, 4)} /> */}
             
             <div className="mb-12">
-              <LatestNews posts={latestNews.slice(2, 8)} />
+              <LatestNews posts={ai.slice(2, 8)} />
             </div>
 
-            <StaticGadgetsGrid post={gadgets} />
+            {/* <StaticGadgetsGrid post={gadgets} /> */}
 
             <div className="mb-12">
-              <Link href="/lifestyle/category/lifestyle" className=" flex hover:underline font-semibold text-xl mb-4 text-dark dark:text-gray-200 pl-2">
-                Lifestyle 
+              <Link href="/technology/cybersecurity" className=" flex hover:underline font-semibold text-xl mb-4 text-dark dark:text-gray-200 pl-2">
+                Cybersecurity
                 <ArrowRightIcon />
               </Link>
               <div></div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 md:gap-4">
-                {lifestyle
-                  .slice(0, 8)
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+                {cybersecurity
+                  .slice(0, 6)
                   .map(
                     (post) =>
                       post?._id && <HomeBlog key={post._id} post={post} />,

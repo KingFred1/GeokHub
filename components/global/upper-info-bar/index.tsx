@@ -23,6 +23,7 @@ import {
   ChevronDownIcon,
   Cpu,
   HeartIcon,
+  Shield,
 } from "lucide-react";
 import SearchBar from "./upper-info-search";
 import { motion, AnimatePresence } from "framer-motion";
@@ -69,14 +70,14 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
       icon: <HomeIcon className="w-5 h-5 cursor-pointer" />,
     },
     {
-      name: "Technology",
-      href: "/technology/tech-news",
+      name: "AI",
+      href: "/technology/ai",
       icon: <Cpu className="w-5 h-5 cursor-pointer" />,
     },
     {
-      name: "Lifestyle",
-      href: "/lifestyle/category/lifestyle",
-      icon: <HeartIcon className="w-5 h-5 cursor-pointer" />,
+      name: "Cybersecurity",
+      href: "/technology/cybersecurity",
+      icon: <Shield className="w-5 h-5 cursor-pointer" />,
     },
     {
       name: "Newsletter",
@@ -109,23 +110,23 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
   ];
 
   const navCategories: NavCategory[] = [
-    {
-      title: "News",
-      links: [
-        { title: "Latest News", href: "/news" },
-        // { title: "Business", href: "/news/business" },
-        // { title: "Global News", href: "/news/world" },
-      ],
-    },
-    {
-      title: "Technology",
-      links: [
-        { title: "Tech News", href: "/technology/tech-news" },
-        { title: "Artificial Intelligence", href: "/technology/ai" },
-        { title: "Cybersecurity", href: "/technology/cybersecurity" },
-        { title: "Gadgets", href: "/technology/gadgets" },
-      ],
-    },
+    // {
+    //   title: "News",
+    //   links: [
+    //     { title: "Latest News", href: "/news" },
+    //     // { title: "Business", href: "/news/business" },
+    //     // { title: "Global News", href: "/news/world" },
+    //   ],
+    // },
+    // {
+    //   title: "Technology",
+    //   links: [
+    //     { title: "Tech News", href: "/technology/tech-news" },
+    //     { title: "Artificial Intelligence", href: "/technology/ai" },
+    //     { title: "Cybersecurity", href: "/technology/cybersecurity" },
+    //     { title: "Gadgets", href: "/technology/gadgets" },
+    //   ],
+    // },
   ];
 
   const getCategoryIcon = (title: string) => {
@@ -145,20 +146,17 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
     open: {
       x: 0,
       transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 200,
-        when: "beforeChildren",
-        staggerChildren: 0.1,
+        type: "tween",
+        duration: 0.3,
+        ease: "easeOut",
       },
     },
     closed: {
       x: "100%",
       transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 200,
-        when: "afterChildren",
+        type: "tween",
+        duration: 0.3,
+        ease: "easeIn",
       },
     },
   };
@@ -178,14 +176,10 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50"
-        >
+        <>
+          {/* Click outside to close - only on mobile/tablet to avoid interfering with AdSense ads */}
           <motion.div
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 z-30 md:hidden"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -193,7 +187,7 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
           />
 
           <motion.div
-            className="absolute right-0 top-0 h-full w-80 bg-card shadow-xl border-l border-gray-200 dark:border-gray-800 overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-80 bg-card shadow-xl border-l border-gray-200 dark:border-gray-800 overflow-y-auto z-40"
             variants={menuVariants}
             initial="closed"
             animate="open"
@@ -233,9 +227,9 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <h3 className="px-3 text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                    {/* <h3 className="px-3 text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
                       Categories
-                    </h3>
+                    </h3> */}
                     <ul className="space-y-2">
                       {navCategories.map((category) => (
                         <motion.li key={category.title} variants={itemVariants}>
@@ -327,7 +321,7 @@ const NavMenu = ({ isOpen, onClose, session }: NavMenuProps) => {
               </motion.div>
             </div>
           </motion.div>
-        </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
