@@ -1002,17 +1002,17 @@ export default async function AIDetailPage({
               <section className="mt-20 max-w-7xl mx-auto px-4 md:px-0">
                 <div className="text-center mb-6">
                   <div className="inline-flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
+                    {/* <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
                       <Brain className="h-6 w-6 text-white" />
-                    </div>
+                    </div> */}
                     <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                      More AI Innovations
+                      Next in AI: Related Insights
                     </h2>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-sm">
+                  {/* <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-sm">
                     Discover more cutting-edge AI and machine learning
                     developments
-                  </p>
+                  </p> */}
                 </div>
                 <MasonryGrid posts={relatedAINewsWithUrls.slice(4, 12)} />
                 <div className="text-center mt-12">

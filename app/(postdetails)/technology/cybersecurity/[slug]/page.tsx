@@ -1056,17 +1056,17 @@ export default async function CybersecurityDetailPage({
                 <section className="mt-20 max-w-7xl mx-auto px-4 md:px-0">
                   <div className="text-center mb-6">
                     <div className="inline-flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-gray-800 to-gray-900 rounded-full flex items-center justify-center">
+                      {/* <div className="w-12 h-12 bg-gradient-to-r from-gray-800 to-gray-900 rounded-full flex items-center justify-center">
                         <Shield className="h-6 w-6 text-white" />
-                      </div>
+                      </div> */}
                       <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                        More Security Insights
+                        Next in Cybersecurity
                       </h2>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-sm">
+                    {/* <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-sm">
                       Discover more cybersecurity knowledge and protection
                       strategies
-                    </p>
+                    </p> */}
                   </div>
                   <MasonryGrid
                     posts={relatedCybersecurityPostsWithUrls.slice(4, 12)}
