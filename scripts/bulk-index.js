@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { createWriteStream } from 'fs';
 import { join } from 'path';
 
-console.log("🚀 Starting bulk-index-fixed.js script");
+console.log("🚀 Starting AI & Cybersecurity bulk-index script");
 
 // Load .env variables
 dotenv.config();
@@ -53,9 +53,8 @@ function getPathFromCategory(cat) {
   }
 
   // Special handling for news sub-sections
-  if (cat.slug === 'world') return `/news/world`;
-  if (cat.slug === 'business') return `/news/business`;
-  if (cat.slug === 'news') return `/news`;
+  if (cat.slug === 'ai') return `/technology/ai`;
+  if (cat.slug === 'cybersecurity') return `/technology/cybersecurity`;
 
   // Default: top-level category path
   return `/${cat.slug}`;
@@ -65,19 +64,18 @@ function getPublicUrlForPost(post) {
   // Tutorials and special content types
   if (post.contentType === 'tutorial') return `${BASE_URL}/tutorials/${post.slug}`;
 
-  // If categories exist, we try to pick the most specific candidate
+  // If categories exist, prioritize AI and Cybersecurity
   if (post.categories && post.categories.length > 0) {
-    // Prefer a category that has a parent, or one matching known sections
-    // 1) Find category with parent
+    // 1) Find AI or Cybersecurity first (our focus categories)
+    const aiCyber = post.categories.find(c => ['ai', 'cybersecurity'].includes(c.slug));
+    if (aiCyber) {
+      return `${BASE_URL}${getPathFromCategory(aiCyber)}/${post.slug}`;
+    }
+
+    // 2) Find category with parent
     const withParent = post.categories.find(c => c.parent && c.parent.slug);
     if (withParent) {
       return `${BASE_URL}${getPathFromCategory(withParent)}/${post.slug}`;
-    }
-
-    // 2) Find news/world/business first
-    const newsLike = post.categories.find(c => ['news','world','business'].includes(c.slug));
-    if (newsLike) {
-      return `${BASE_URL}${getPathFromCategory(newsLike)}/${post.slug}`;
     }
 
     // 3) Fallback to first category
@@ -319,10 +317,10 @@ async function submitPost(post, index, total) {
   log(`   Published: ${post.publishedAt}`);
   log(`   Categories: ${post.categories?.map(c => c.slug).join(', ') || 'None'}`);
 
-  // Determine content type
+  // Determine content type - focused on AI and Cybersecurity
   let contentType = post.contentType || 'article';
-  if (post.categories?.some(c => ['news', 'world', 'business'].includes(c.slug))) {
-    contentType = 'news';
+  if (post.categories?.some(c => ['ai', 'cybersecurity'].includes(c.slug))) {
+    contentType = 'technology';
   } else if (post.categories?.some(c => c.slug === 'tutorial')) {
     contentType = 'tutorial';
   }
@@ -484,9 +482,10 @@ async function fetchCategoryMap() {
   }
 }
 
-// Main bulk indexing function
+// Main bulk indexing function for AI and Cybersecurity posts
 async function bulkIndexSanityPosts() {
-  log('🚀 Starting bulk indexing of Sanity blog posts...');
+  log('🚀 Starting bulk indexing of AI and Cybersecurity blog posts...');
+  log('🎯 Focus: AI and Cybersecurity content only');
   log('📌 Base URL:', BASE_URL);
   log('📌 API Endpoint:', API_ENDPOINT);
   log('📌 IndexNow Key:', INDEXNOW_KEY);
@@ -512,10 +511,34 @@ async function bulkIndexSanityPosts() {
     // Fetch category map first to resolve parent slugs when missing on posts
     await fetchCategoryMap();
 
-    // Fetch all published posts with pagination to avoid memory issues
-    log('\n📡 Fetching posts from Sanity...');
+    // Fetch only AI and Cybersecurity published posts
+    log('\n📡 Fetching AI and Cybersecurity posts from Sanity...');
     
-    const query = `*[_type == "post" && !(_id in path("drafts.**")) && defined(publishedAt) && publishedAt <= now()]{
+    // First, let's see what categories exist and what posts we have
+    const debugQuery = `*[_type == "post" && !(_id in path("drafts.**")) && defined(publishedAt) && publishedAt <= now()]{
+      _id,
+      title,
+      "slug": slug.current,
+      publishedAt,
+      categories[]->{
+        "slug": slug.current,
+        title
+      }
+    } | order(publishedAt desc)[0..10]`;
+    
+    const samplePosts = await client.fetch(debugQuery);
+    log(`📊 Sample posts found: ${samplePosts.length}`);
+    
+    if (samplePosts.length > 0) {
+      log('📋 Sample post categories:');
+      samplePosts.forEach((post, i) => {
+        const cats = post.categories?.map(c => `${c.title}(${c.slug})`).join(', ') || 'None';
+        log(`   ${i + 1}. ${post.title} -> Categories: ${cats}`);
+      });
+    }
+    
+    const query = `*[_type == "post" && !(_id in path("drafts.**")) && defined(publishedAt) && publishedAt <= now() && 
+     categories[]->slug.current in ["ai", "cybersecurity"]]{
       _id,
       title,
       "slug": slug.current,
@@ -534,7 +557,38 @@ async function bulkIndexSanityPosts() {
 
     const allPosts = await client.fetch(query);
     
-    log(`📝 Found ${allPosts.length} eligible published posts`);
+    log(`📝 Found ${allPosts.length} posts with exact category match`);
+    
+    // If no posts found with exact match, try a broader search
+    if (allPosts.length === 0) {
+      log('🔄 No posts found with exact category match, trying broader search...');
+      const broadQuery = `*[_type == "post" && !(_id in path("drafts.**")) && defined(publishedAt) && publishedAt <= now() && 
+       (categories[]->slug.current match "ai" || categories[]->slug.current match "cybersecurity" ||
+        categories[]->title match "*AI*" || categories[]->title match "*Cybersecurity*")]{
+        _id,
+        title,
+        "slug": slug.current,
+        publishedAt,
+        contentType,
+        _type,
+        categories[]->{
+          "slug": slug.current,
+          title,
+          parent->{
+            "slug": slug.current,
+            title
+          }
+        }
+      } | order(publishedAt desc)`;
+      
+      const broadPosts = await client.fetch(broadQuery);
+      log(`📝 Found ${broadPosts.length} posts with broad category match`);
+      
+      if (broadPosts.length > 0) {
+        log('✅ Using broad match results');
+        allPosts.push(...broadPosts);
+      }
+    }
 
     if (!allPosts.length) {
       log('❌ No posts found.');
@@ -652,10 +706,10 @@ const BASE_URL = '${BASE_URL}';
 function getPublicUrlForPost(post) {
   if (post.contentType === 'tutorial') return '${BASE_URL}/tutorials/' + post.slug;
   if (post.categories && post.categories.length > 0) {
+    const aiCyber = post.categories.find(c => ['ai', 'cybersecurity'].includes(c.slug));
+    if (aiCyber) return '${BASE_URL}/technology/' + aiCyber.slug + '/' + post.slug;
     const withParent = post.categories.find(c => c.parent && c.parent.slug);
     if (withParent) return '${BASE_URL}/' + withParent.parent.slug + '/' + withParent.slug + '/' + post.slug;
-    const newsLike = post.categories.find(c => ['news','world','business'].includes(c.slug));
-    if (newsLike) return '${BASE_URL}/' + (newsLike.slug === 'world' ? 'news/world' : newsLike.slug === 'business' ? 'news/business' : 'news') + '/' + post.slug;
     return '${BASE_URL}/' + post.categories[0].slug + '/' + post.slug;
   }
   return '${BASE_URL}/blogs/' + post.slug;
@@ -758,7 +812,7 @@ retryFailedPosts();
     // Show completion message
     log('\n' + '='.repeat(60));
     if (errorCount === 0) {
-      log('🎉 ALL POSTS SUBMITTED SUCCESSFULLY!');
+      log('🎉 ALL AI & CYBERSECURITY POSTS SUBMITTED SUCCESSFULLY!');
     } else {
       log(`⚠️ ${errorCount} posts failed. Check ${join(logsDir, 'failed-posts-*.json')} for details.`);
     }

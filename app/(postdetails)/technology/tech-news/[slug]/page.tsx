@@ -132,7 +132,7 @@ export async function generateMetadata({
       `*[_type == "post" && slug.current == $slug][0] {
         title,
         author->{name},
-        categories[]->{title, slug, parent->{title, slug}},
+        categories[]->{_id, title, slug, parent->{_id, title, slug}},
         mainImage,
         galleryImages[] {
           asset->
@@ -442,7 +442,7 @@ export default async function TechDetailPage({
       client.fetch(
         RELATED_POSTS_QUERY,
         {
-          categoryId: post?.categories?.[0]?._id,
+          categoryId: post?.categories?.[0]?._id || "",
           slug: post?.slug?.current,
         },
         { timeout: 10000 },

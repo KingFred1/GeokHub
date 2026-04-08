@@ -11829,3 +11829,207 @@
 [2026-04-01T12:32:08.390Z]    Response: 
 [2026-04-01T12:32:09.938Z] ❌ API HTTP 405 (347ms)
 [2026-04-01T12:32:09.938Z]    Response: 
+[2026-04-08T01:00:57.321Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T01:00:57.323Z]    Response: 
+[2026-04-08T01:00:57.324Z]    ⚠️ This usually means:
+[2026-04-08T01:00:57.325Z]       1. Your Next.js app is not running
+[2026-04-08T01:00:57.325Z]       2. The API route does not exist at this URL
+[2026-04-08T01:00:57.326Z]       3. CORS or other middleware is blocking the request
+[2026-04-08T01:00:57.327Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-08T01:00:57.328Z]    This is okay - we can submit directly to IndexNow
+[2026-04-08T01:01:00.804Z] ❌ API HTTP 405 (884ms)
+[2026-04-08T01:01:00.806Z]    Response: 
+[2026-04-08T01:01:04.082Z] ❌ API HTTP 405 (507ms)
+[2026-04-08T01:01:04.085Z]    Response: 
+[2026-04-08T01:01:05.920Z] ❌ API HTTP 405 (464ms)
+[2026-04-08T01:01:05.920Z]    Response: 
+[2026-04-08T01:01:07.616Z] ❌ API HTTP 405 (414ms)
+[2026-04-08T01:01:07.617Z]    Response: 
+[2026-04-08T01:01:09.300Z] ❌ API HTTP 405 (398ms)
+[2026-04-08T01:01:09.301Z]    Response: 
+[2026-04-08T01:01:16.674Z] ❌ API HTTP 405 (1281ms)
+[2026-04-08T01:01:16.675Z]    Response: 
+[2026-04-08T01:03:49.343Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T01:03:49.344Z]    Response: 
+[2026-04-08T01:03:49.344Z]    ⚠️ This usually means:
+[2026-04-08T01:03:49.344Z]       1. Your Next.js app is not running
+[2026-04-08T01:03:49.344Z]       2. The API route does not exist at this URL
+[2026-04-08T01:03:49.345Z]       3. CORS or other middleware is blocking the request
+[2026-04-08T01:03:49.345Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-08T01:03:49.345Z]    This is okay - we can submit directly to IndexNow
+[2026-04-08T01:03:52.960Z] ❌ API HTTP 405 (475ms)
+[2026-04-08T01:03:52.961Z]    Response: 
+[2026-04-08T01:03:55.500Z] ❌ API HTTP 405 (421ms)
+[2026-04-08T01:03:55.502Z]    Response: 
+[2026-04-08T01:06:11.289Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T01:06:53.514Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T01:06:53.515Z]    Response: 
+[2026-04-08T01:06:53.516Z]    ⚠️ This usually means:
+[2026-04-08T01:06:53.517Z]       1. Your Next.js app is not running
+[2026-04-08T01:06:53.518Z]       2. The API route does not exist at this URL
+[2026-04-08T01:06:53.519Z]       3. CORS or other middleware is blocking the request
+[2026-04-08T01:06:53.520Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-08T01:06:53.521Z]    This is okay - we can submit directly to IndexNow
+[2026-04-08T01:07:47.730Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T01:07:47.734Z]    Response: 
+[2026-04-08T01:07:47.781Z]    ⚠️ This usually means:
+[2026-04-08T01:07:47.782Z]       1. Your Next.js app is not running
+[2026-04-08T01:07:47.783Z]       2. The API route does not exist at this URL
+[2026-04-08T01:07:47.783Z]       3. CORS or other middleware is blocking the request
+[2026-04-08T01:07:47.827Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-08T01:07:47.833Z]    This is okay - we can submit directly to IndexNow
+[2026-04-08T01:07:50.979Z] ❌ API HTTP 405 (418ms)
+[2026-04-08T01:07:50.980Z]    Response: 
+[2026-04-08T01:07:53.482Z] ❌ API HTTP 405 (461ms)
+[2026-04-08T01:07:53.483Z]    Response: 
+[2026-04-08T01:07:55.309Z] ❌ API HTTP 405 (402ms)
+[2026-04-08T01:07:55.310Z]    Response: 
+[2026-04-08T01:07:57.168Z] ❌ API HTTP 405 (441ms)
+[2026-04-08T01:07:57.171Z]    Response: 
+[2026-04-08T01:08:04.404Z] ❌ API HTTP 405 (996ms)
+[2026-04-08T01:08:04.404Z]    Response: 
+[2026-04-08T01:08:10.684Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T01:08:10.686Z]    Response: 
+[2026-04-08T01:08:10.686Z]    ⚠️ This usually means:
+[2026-04-08T01:08:10.687Z]       1. Your Next.js app is not running
+[2026-04-08T01:08:10.689Z]       2. The API route does not exist at this URL
+[2026-04-08T01:08:10.690Z]       3. CORS or other middleware is blocking the request
+[2026-04-08T01:08:10.692Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-08T01:08:10.693Z]    This is okay - we can submit directly to IndexNow
+[2026-04-08T01:08:14.268Z] ❌ API HTTP 405 (682ms)
+[2026-04-08T01:08:14.269Z]    Response: 
+[2026-04-08T01:08:16.862Z] ❌ API HTTP 405 (431ms)
+[2026-04-08T01:08:16.862Z]    Response: 
+[2026-04-08T01:08:19.694Z] ❌ API HTTP 405 (1520ms)
+[2026-04-08T01:08:19.695Z]    Response: 
+[2026-04-08T01:08:21.520Z] ❌ API HTTP 405 (392ms)
+[2026-04-08T01:08:21.521Z]    Response: 
+[2026-04-08T01:08:23.980Z] ❌ API HTTP 405 (506ms)
+[2026-04-08T01:08:23.981Z]    Response: 
+[2026-04-08T01:08:25.750Z] ❌ API HTTP 405 (414ms)
+[2026-04-08T01:08:25.765Z]    Response: 
+[2026-04-08T01:08:28.274Z] ❌ API HTTP 405 (379ms)
+[2026-04-08T01:08:28.274Z]    Response: 
+[2026-04-08T01:08:30.811Z] ❌ API HTTP 405 (765ms)
+[2026-04-08T01:08:30.833Z]    Response: 
+[2026-04-08T01:08:32.677Z] ❌ API HTTP 405 (432ms)
+[2026-04-08T01:08:32.678Z]    Response: 
+[2026-04-08T01:08:34.587Z] ❌ API HTTP 405 (389ms)
+[2026-04-08T01:08:34.588Z]    Response: 
+[2026-04-08T01:08:36.318Z] ❌ API HTTP 405 (401ms)
+[2026-04-08T01:08:36.319Z]    Response: 
+[2026-04-08T01:08:38.364Z] ❌ API HTTP 405 (378ms)
+[2026-04-08T01:08:38.364Z]    Response: 
+[2026-04-08T01:08:40.122Z] ❌ API HTTP 405 (388ms)
+[2026-04-08T01:08:40.122Z]    Response: 
+[2026-04-08T01:08:41.805Z] ❌ API HTTP 405 (376ms)
+[2026-04-08T01:08:41.806Z]    Response: 
+[2026-04-08T01:08:43.657Z] ❌ API HTTP 405 (494ms)
+[2026-04-08T01:08:43.658Z]    Response: 
+[2026-04-08T01:08:45.409Z] ❌ API HTTP 405 (448ms)
+[2026-04-08T01:08:45.410Z]    Response: 
+[2026-04-08T01:08:47.430Z] ❌ API HTTP 405 (709ms)
+[2026-04-08T01:08:47.431Z]    Response: 
+[2026-04-08T01:08:49.224Z] ❌ API HTTP 405 (377ms)
+[2026-04-08T01:08:49.225Z]    Response: 
+[2026-04-08T01:08:50.912Z] ❌ API HTTP 405 (394ms)
+[2026-04-08T01:08:50.913Z]    Response: 
+[2026-04-08T01:08:52.826Z] ❌ API HTTP 405 (460ms)
+[2026-04-08T01:08:52.827Z]    Response: 
+[2026-04-08T01:08:54.731Z] ❌ API HTTP 405 (425ms)
+[2026-04-08T01:08:54.733Z]    Response: 
+[2026-04-08T01:08:56.557Z] ❌ API HTTP 405 (378ms)
+[2026-04-08T01:08:56.558Z]    Response: 
+[2026-04-08T01:08:58.354Z] ❌ API HTTP 405 (428ms)
+[2026-04-08T01:08:58.354Z]    Response: 
+[2026-04-08T01:09:00.073Z] ❌ API HTTP 405 (389ms)
+[2026-04-08T01:09:00.073Z]    Response: 
+[2026-04-08T01:09:02.043Z] ❌ API HTTP 405 (371ms)
+[2026-04-08T01:09:02.043Z]    Response: 
+[2026-04-08T01:09:04.380Z] ❌ API HTTP 405 (992ms)
+[2026-04-08T01:09:04.385Z]    Response: 
+[2026-04-08T01:09:06.182Z] ❌ API HTTP 405 (418ms)
+[2026-04-08T01:09:06.183Z]    Response: 
+[2026-04-08T01:09:07.967Z] ❌ API HTTP 405 (450ms)
+[2026-04-08T01:09:07.968Z]    Response: 
+[2026-04-08T01:09:09.689Z] ❌ API HTTP 405 (391ms)
+[2026-04-08T01:09:09.692Z]    Response: 
+[2026-04-08T01:09:11.797Z] ❌ API HTTP 405 (393ms)
+[2026-04-08T01:09:11.799Z]    Response: 
+[2026-04-08T01:09:13.964Z] ❌ API HTTP 405 (515ms)
+[2026-04-08T01:09:13.965Z]    Response: 
+[2026-04-08T01:09:15.805Z] ❌ API HTTP 405 (447ms)
+[2026-04-08T01:09:15.806Z]    Response: 
+[2026-04-08T01:09:17.624Z] ❌ API HTTP 405 (443ms)
+[2026-04-08T01:09:17.624Z]    Response: 
+[2026-04-08T01:09:19.389Z] ❌ API HTTP 405 (402ms)
+[2026-04-08T01:09:19.390Z]    Response: 
+[2026-04-08T01:09:21.083Z] ❌ API HTTP 405 (374ms)
+[2026-04-08T01:09:21.083Z]    Response: 
+[2026-04-08T01:09:23.056Z] ❌ API HTTP 405 (599ms)
+[2026-04-08T01:09:23.074Z]    Response: 
+[2026-04-08T01:09:24.906Z] ❌ API HTTP 405 (466ms)
+[2026-04-08T01:09:24.908Z]    Response: 
+[2026-04-08T01:09:27.071Z] ❌ API HTTP 405 (412ms)
+[2026-04-08T01:09:27.072Z]    Response: 
+[2026-04-08T01:09:28.985Z] ❌ API HTTP 405 (410ms)
+[2026-04-08T01:09:28.986Z]    Response: 
+[2026-04-08T01:09:30.699Z] ❌ API HTTP 405 (390ms)
+[2026-04-08T01:09:30.711Z]    Response: 
+[2026-04-08T01:09:32.667Z] ❌ API HTTP 405 (577ms)
+[2026-04-08T01:09:32.668Z]    Response: 
+[2026-04-08T01:09:34.894Z] ❌ API HTTP 405 (754ms)
+[2026-04-08T01:09:34.896Z]    Response: 
+[2026-04-08T01:09:36.698Z] ❌ API HTTP 405 (416ms)
+[2026-04-08T01:09:36.699Z]    Response: 
+[2026-04-08T01:09:38.468Z] ❌ API HTTP 405 (400ms)
+[2026-04-08T01:09:38.470Z]    Response: 
+[2026-04-08T01:09:40.280Z] ❌ API HTTP 405 (427ms)
+[2026-04-08T01:09:40.281Z]    Response: 
+[2026-04-08T01:09:42.033Z] ❌ API HTTP 405 (388ms)
+[2026-04-08T01:09:42.034Z]    Response: 
+[2026-04-08T01:09:43.881Z] ❌ API HTTP 405 (424ms)
+[2026-04-08T01:09:43.882Z]    Response: 
+[2026-04-08T01:09:45.800Z] ❌ API HTTP 405 (511ms)
+[2026-04-08T01:09:45.803Z]    Response: 
+[2026-04-08T01:09:47.658Z] ❌ API HTTP 405 (419ms)
+[2026-04-08T01:09:47.659Z]    Response: 
+[2026-04-08T01:09:50.776Z] ❌ API HTTP 405 (1696ms)
+[2026-04-08T01:09:50.776Z]    Response: 
+[2026-04-08T01:09:53.269Z] ❌ API HTTP 405 (388ms)
+[2026-04-08T01:09:53.270Z]    Response: 
+[2026-04-08T01:09:55.060Z] ❌ API HTTP 405 (467ms)
+[2026-04-08T01:09:55.061Z]    Response: 
+[2026-04-08T01:09:56.868Z] ❌ API HTTP 405 (416ms)
+[2026-04-08T01:09:56.883Z]    Response: 
+[2026-04-08T01:09:58.693Z] ❌ API HTTP 405 (436ms)
+[2026-04-08T01:09:58.693Z]    Response: 
+[2026-04-08T01:10:00.423Z] ❌ API HTTP 405 (387ms)
+[2026-04-08T01:10:00.424Z]    Response: 
+[2026-04-08T01:10:02.124Z] ❌ API HTTP 405 (391ms)
+[2026-04-08T01:10:02.126Z]    Response: 
+[2026-04-08T01:10:04.038Z] ❌ API HTTP 405 (512ms)
+[2026-04-08T01:10:04.039Z]    Response: 
+[2026-04-08T01:10:05.789Z] ❌ API HTTP 405 (376ms)
+[2026-04-08T01:10:05.790Z]    Response: 
+[2026-04-08T01:10:07.478Z] ❌ API HTTP 405 (395ms)
+[2026-04-08T01:10:07.479Z]    Response: 
+[2026-04-08T01:10:09.355Z] ❌ API HTTP 405 (460ms)
+[2026-04-08T01:10:09.356Z]    Response: 
+[2026-04-08T01:10:11.122Z] ❌ API HTTP 405 (387ms)
+[2026-04-08T01:10:11.123Z]    Response: 
+[2026-04-08T01:10:12.889Z] ❌ API HTTP 405 (398ms)
+[2026-04-08T01:10:12.890Z]    Response: 
+[2026-04-08T01:10:14.785Z] ❌ API HTTP 405 (420ms)
+[2026-04-08T01:10:14.786Z]    Response: 
+[2026-04-08T01:10:16.629Z] ❌ API HTTP 405 (420ms)
+[2026-04-08T01:10:16.629Z]    Response: 
+[2026-04-08T01:10:18.452Z] ❌ API HTTP 405 (391ms)
+[2026-04-08T01:10:18.469Z]    Response: 
+[2026-04-08T01:10:20.310Z] ❌ API HTTP 405 (477ms)
+[2026-04-08T01:10:20.310Z]    Response: 

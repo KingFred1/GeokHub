@@ -552,7 +552,7 @@ export default async function BlogDetailPage({
       client.fetch(
         RELATED_POSTS_QUERY,
         {
-          categoryId: post?.categories?.[0]?._id,
+          categoryId: post?.categories?.[0]?._id || "",
           slug: post?.slug?.current,
         },
         { timeout: 10000 },
