@@ -59,8 +59,8 @@ function getPostDetailUrl(post: Post): string {
       return `/technology/ai/${slugValue}`;
     }
 
-    if (categoryTitle === "tech-news" || categorySlug === "tech-news") {
-      return `/technology/tech-news/${slugValue}`;
+    if (categoryTitle === "cybersecurity" || categorySlug === "cybersecurity") {
+      return `/technology/cybersecurity/${slugValue}`;
     }
     
     if (categoryTitle === "news" || categorySlug === "news") {

@@ -226,7 +226,7 @@ export default async function Home({
               <div></div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
                 {cybersecurity
-                  .slice(0, 6)
+                  .slice(2, 8)
                   .map(
                     (post) =>
                       post?._id && <HomeBlog key={post._id} post={post} />,

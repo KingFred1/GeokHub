@@ -44,9 +44,15 @@ function getPostDetailUrl(post: Post): string {
       return `/news/business/${post.slug?.current}`;
     }
 
-    if (categoryTitle === "tech-news" || categorySlug === "tech-news") {
-        return `/technology/tech-news/${post.slug?.current}`;
+    if (categoryTitle === "ai" || categorySlug === "ai") {
+        return `/technology/ai/${post.slug?.current}`;
       }
+
+      if (categoryTitle === "cybersecurity" || categorySlug === "cybersecurity") {
+        return `/technology/cybersecurity/${post.slug?.current}`;
+      }
+
+
     
     // Also check parent category if exists
     if (category.parent) {
