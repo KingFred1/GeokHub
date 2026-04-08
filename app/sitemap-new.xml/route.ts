@@ -29,9 +29,14 @@ interface SanityPost {
 async function generateSitemapUrls() {
   const baseUrl = 'https://www.geokhub.com';
 
-  // Fetch all published posts
+  // Fetch only AI and Cybersecurity published posts for better performance
   const posts = await client.fetch<SanityPost[]>(`
-    *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
+    *[_type == "post" && defined(slug.current) && publishedAt <= now() && (
+      count((categories[]->slug.current)[@ in ["ai", "artificial-intelligence", "cybersecurity", "security"]]) > 0 ||
+      count((categories[]->parent->slug.current)[@ in ["ai", "artificial-intelligence", "cybersecurity", "security"]]) > 0 ||
+      count((lower(categories[]->title))[@ in ["ai", "artificial intelligence", "cybersecurity", "security"]]) > 0 ||
+      count((lower(categories[]->parent->title))[@ in ["ai", "artificial intelligence", "cybersecurity", "security"]]) > 0
+    )] | order(publishedAt desc) {
       "slug": slug.current,
       _updatedAt,
       publishedAt,
