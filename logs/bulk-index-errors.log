@@ -12033,3 +12033,76 @@
 [2026-04-08T01:10:18.469Z]    Response: 
 [2026-04-08T01:10:20.310Z] ❌ API HTTP 405 (477ms)
 [2026-04-08T01:10:20.310Z]    Response: 
+[2026-04-08T15:57:49.085Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T15:57:49.086Z]    Response: 
+[2026-04-08T15:57:49.086Z]    ⚠️ This usually means:
+[2026-04-08T15:57:49.092Z]       1. Your Next.js app is not running
+[2026-04-08T15:57:49.093Z]       2. The API route does not exist at this URL
+[2026-04-08T15:57:49.094Z]       3. CORS or other middleware is blocking the request
+[2026-04-08T15:57:49.094Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-08T15:57:49.095Z]    This is okay - we can submit directly to IndexNow
+[2026-04-08T15:57:54.409Z] ❌ API HTTP 405 (1918ms)
+[2026-04-08T15:57:54.410Z]    Response: 
+[2026-04-08T15:58:00.268Z] ❌ API HTTP 405 (2347ms)
+[2026-04-08T15:58:00.269Z]    Response: 
+[2026-04-08T15:58:03.054Z] ❌ API HTTP 405 (1181ms)
+[2026-04-08T15:58:03.055Z]    Response: 
+[2026-04-08T15:58:05.162Z] ❌ API HTTP 405 (625ms)
+[2026-04-08T15:58:05.163Z]    Response: 
+[2026-04-08T23:29:57.301Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-08T23:29:57.303Z]    Response: 
+[2026-04-08T23:29:57.305Z]    ⚠️ This usually means:
+[2026-04-08T23:29:57.308Z]       1. Your Next.js app is not running
+[2026-04-08T23:29:57.310Z]       2. The API route does not exist at this URL
+[2026-04-08T23:29:57.316Z]       3. CORS or other middleware is blocking the request
+[2026-04-08T23:29:57.322Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-08T23:29:57.324Z]    This is okay - we can submit directly to IndexNow
+[2026-04-08T23:30:06.225Z] ❌ API HTTP 405 (3390ms)
+[2026-04-08T23:30:06.227Z]    Response: 
+[2026-04-08T23:30:10.063Z] ❌ API HTTP 405 (566ms)
+[2026-04-08T23:30:10.064Z]    Response: 
+[2026-04-08T23:30:12.118Z] ❌ API HTTP 405 (520ms)
+[2026-04-08T23:30:12.119Z]    Response: 
+[2026-04-08T23:30:14.267Z] ❌ API HTTP 405 (612ms)
+[2026-04-08T23:30:14.269Z]    Response: 
+[2026-04-09T16:07:13.287Z] ❌ API returned status 405 Method Not Allowed
+[2026-04-09T16:07:13.287Z]    Response: 
+[2026-04-09T16:07:13.287Z]    ⚠️ This usually means:
+[2026-04-09T16:07:13.287Z]       1. Your Next.js app is not running
+[2026-04-09T16:07:13.287Z]       2. The API route does not exist at this URL
+[2026-04-09T16:07:13.287Z]       3. CORS or other middleware is blocking the request
+[2026-04-09T16:07:13.288Z] 
+⚠️ API endpoint is not reachable, will use direct IndexNow submission only
+[2026-04-09T16:07:13.288Z]    This is okay - we can submit directly to IndexNow
+[2026-04-09T16:07:16.366Z] ❌ API HTTP 405 (621ms)
+[2026-04-09T16:07:16.366Z]    Response: 
+[2026-04-09T16:07:18.787Z] ❌ API HTTP 405 (321ms)
+[2026-04-09T16:07:18.788Z]    Response: 
+[2026-04-09T16:07:20.243Z] ❌ API HTTP 405 (278ms)
+[2026-04-09T16:07:20.244Z]    Response: 
+[2026-04-09T16:07:21.847Z] ❌ API HTTP 405 (301ms)
+[2026-04-09T16:07:21.847Z]    Response: 
+[2026-04-09T16:07:23.432Z] ❌ API HTTP 405 (284ms)
+[2026-04-09T16:07:23.433Z]    Response: 
+[2026-04-09T16:07:25.054Z] ❌ API HTTP 405 (274ms)
+[2026-04-09T16:07:25.055Z]    Response: 
+[2026-04-09T16:07:26.543Z] ❌ API HTTP 405 (320ms)
+[2026-04-09T16:07:26.544Z]    Response: 
+[2026-04-09T16:07:28.161Z] ❌ API HTTP 405 (299ms)
+[2026-04-09T16:07:28.162Z]    Response: 
+[2026-04-09T16:07:29.748Z] ❌ API HTTP 405 (286ms)
+[2026-04-09T16:07:29.749Z]    Response: 
+[2026-04-09T16:07:31.169Z] ❌ API HTTP 405 (279ms)
+[2026-04-09T16:07:31.170Z]    Response: 
+[2026-04-09T16:07:32.624Z] ❌ API HTTP 405 (309ms)
+[2026-04-09T16:07:32.626Z]    Response: 
+[2026-04-09T16:07:34.268Z] ❌ API HTTP 405 (321ms)
+[2026-04-09T16:07:34.269Z]    Response: 
+[2026-04-09T16:07:35.972Z] ❌ API HTTP 405 (376ms)
+[2026-04-09T16:07:35.972Z]    Response: 
+[2026-04-09T16:07:37.392Z] ❌ API HTTP 405 (277ms)
+[2026-04-09T16:07:37.393Z]    Response: 
+[2026-04-09T16:07:38.839Z] ❌ API HTTP 405 (293ms)
+[2026-04-09T16:07:38.840Z]    Response: 

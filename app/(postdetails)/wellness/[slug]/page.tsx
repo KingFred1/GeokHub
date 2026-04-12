@@ -277,13 +277,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not a wellness post, redirect to the correct URL
     if (!isWellnessPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/wellness/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/wellness/${decodedSlug}`;

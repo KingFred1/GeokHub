@@ -254,13 +254,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not a mental health post, redirect to the correct URL
     if (!isMentalHealthPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/mentalhealth/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/mentalhealth/${decodedSlug}`;

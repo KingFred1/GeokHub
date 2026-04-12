@@ -151,13 +151,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not a business news post, redirect to the correct URL
     if (!isBusinessPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/news/business/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/news/business/${decodedSlug}`;

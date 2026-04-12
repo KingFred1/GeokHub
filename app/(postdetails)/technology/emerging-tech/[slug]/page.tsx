@@ -364,13 +364,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not an emerging tech post, redirect to the correct URL
     if (!isEmergingTechPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/technology/emerging-tech/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/technology/emerging-tech/${decodedSlug}`;

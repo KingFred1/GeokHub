@@ -143,13 +143,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not a world news post, redirect to the correct URL
     if (!isWorldPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/news/world/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/news/world/${decodedSlug}`;

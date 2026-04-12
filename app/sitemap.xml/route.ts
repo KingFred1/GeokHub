@@ -29,14 +29,9 @@ interface SanityPost {
 async function generateSitemapUrls() {
   const baseUrl = 'https://www.geokhub.com';
 
-  // Fetch only AI and Cybersecurity published posts for better performance
+  // Fetch all published posts
   const posts = await client.fetch<SanityPost[]>(`
-    *[_type == "post" && defined(slug.current) && publishedAt <= now() && (
-      count((categories[]->slug.current)[@ in ["ai", "artificial-intelligence", "cybersecurity", "security"]]) > 0 ||
-      count((categories[]->parent->slug.current)[@ in ["ai", "artificial-intelligence", "cybersecurity", "security"]]) > 0 ||
-      count((lower(categories[]->title))[@ in ["ai", "artificial intelligence", "cybersecurity", "security"]]) > 0 ||
-      count((lower(categories[]->parent->title))[@ in ["ai", "artificial intelligence", "cybersecurity", "security"]]) > 0
-    )] | order(publishedAt desc) {
+    *[_type == "post" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
       "slug": slug.current,
       _updatedAt,
       publishedAt,
@@ -59,10 +54,17 @@ async function generateSitemapUrls() {
     { url: `${baseUrl}/disclaimer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
   ];
 
-  // Active category pages - only AI and Cybersecurity
+  // Active category pages
   const categoryRoutes = [
     { url: `${baseUrl}/technology/ai`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/technology/cybersecurity`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/technology/programming`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/technology/gadgets`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/technology/emerging-tech`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/technology/cloud-devops`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/technology/tech-news`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${baseUrl}/news`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/news/world`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
   ];
 
   // Post routes

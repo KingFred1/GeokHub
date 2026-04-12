@@ -295,13 +295,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not a weight loss post, redirect to the correct URL
     if (!isWeightLossPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/weightloss/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/weightloss/${decodedSlug}`;

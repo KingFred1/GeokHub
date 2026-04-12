@@ -209,13 +209,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not a gadgets post, redirect to the correct URL
     if (!isGadgetsPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/technology/gadgets/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/technology/gadgets/${decodedSlug}`;

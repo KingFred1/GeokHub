@@ -188,13 +188,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not an AI post, redirect to the correct URL
     if (!isAIPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/technology/ai/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/technology/ai/${decodedSlug}`;

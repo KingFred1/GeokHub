@@ -213,13 +213,12 @@ export async function generateMetadata({
       );
     });
 
+    // If not a cybersecurity post, redirect to the correct URL
     if (!isCybersecurityPost) {
-      return {
-        robots: {
-          index: false,
-          follow: false,
-        },
-      };
+      const correctUrl = getPostUrlPath(post, decodedSlug);
+      if (correctUrl !== `/technology/cybersecurity/${decodedSlug}`) {
+        redirect(correctUrl);
+      }
     }
 
     const canonicalUrl = `https://www.geokhub.com/technology/cybersecurity/${decodedSlug}`;
