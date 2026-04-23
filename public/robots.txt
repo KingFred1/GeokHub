@@ -4,6 +4,6 @@ Allow: /
 Disallow: /studio/
 Disallow: /api/
 Disallow: /admin/
+Disallow: /dashboard/
 
-
-Sitemap: https://www.geokhub.com/sitemap.xml
+Sitemap: https://www.geokhub.com/sitemap-new.xml
