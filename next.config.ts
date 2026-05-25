@@ -37,43 +37,15 @@ const nextConfig: NextConfig = {
   },
 
   // Permanent 301 redirects for URL structure changes
-  // async redirects() {
-  //   return [
-  //     {
-  //       source: '/technology',
-  //       destination: '/technology/tech-news',
-  //       permanent: true,
-  //     },
-  //     // Only redirect specific category slugs, not all slugs
-  //     {
-  //       source: '/lifestyle/mentalhealth',
-  //       destination: '/lifestyle/category/mentalhealth',
-  //       permanent: true,
-  //     },
-  //     {
-  //       source: '/lifestyle/wellness',
-  //       destination: '/lifestyle/category/wellness',
-  //       permanent: true,
-  //     },
-  //     {
-  //       source: '/lifestyle/weightloss',
-  //       destination: '/lifestyle/category/weightloss',
-  //       permanent: true,
-  //     },
-  //     // Redirect the main lifestyle page
-  //     {
-  //       source: '/lifestyle',
-  //       destination: '/lifestyle/category/lifestyle',
-  //       permanent: true,
-  //     },
-  //     // Remove the catch-all redirect that's causing issues
-  //     // {
-  //     //   source: '/lifestyle/:slug',
-  //     //   destination: '/lifestyle/post/:slug',
-  //     //   permanent: true,
-  //     // },
-  //   ];
-  // },
+  async redirects() {
+    return [
+      {
+        source: '/sitemap-new.xml',
+        destination: '/sitemap-index.xml',
+        permanent: true,
+      },
+    ];
+  },
 
   async headers() {
     return [

@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // 1 hour
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.geokhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://geokhub.com';
   const currentDate = new Date().toISOString();
 
   return new Response(

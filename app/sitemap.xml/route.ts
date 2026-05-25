@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { client } from '@/sanity/lib/client';
-import { getCanonicalPath, getSlugString } from '@/lib/seo';
+import { getCanonicalPath } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate every hour for faster updates
@@ -27,7 +27,7 @@ interface SanityPost {
 }
 
 async function generateSitemapUrls() {
-  const baseUrl = 'https://www.geokhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://geokhub.com';
 
   // Fetch all published posts
   const posts = await client.fetch<SanityPost[]>(`
@@ -72,7 +72,6 @@ async function generateSitemapUrls() {
 
   for (const post of (posts || [])) {
     const canonicalPath = getCanonicalPath(post);
-    const slugValue = getSlugString(post.slug);
 
     if (canonicalPath.startsWith("/blogs/")) continue;
 

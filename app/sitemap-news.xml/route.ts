@@ -91,7 +91,7 @@ async function fetchRecentNewsPosts(): Promise<SanityPost[]> {
 export async function GET() {
   noStore(); // Critical: Prevent caching
   
-  const baseUrl = 'https://www.geokhub.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://geokhub.com';
 
   try {
     const posts = await fetchRecentNewsPosts();
